@@ -1,0 +1,106 @@
+div.mega {
+	background-color: #ffffff;
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 48px;
+	font-weight: bold;
+}
+
+div.header {
+	background-color: #ffffff;
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 36px;
+	font-weight: bold;
+	page-break-before: always;
+}
+
+div.subheader {
+	background-color: #ffffff;
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+div.subsubheader {
+	background-color: #ffffff;
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+div.subsubsubheader {
+	background-color: #ffffff;
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+div.minor {
+	background-color: #ffffff;
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	font-style: italic;
+}
+
+div.main {
+	background-color: #ffffff;
+	width: 80%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+}
+
+div.warn {
+	background-color: #ffffff;
+	color: #ff0000;
+	width: 80%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+div.license {
+	margin: 10px;
+	padding: 10px;
+	background-color: #dddddd;
+
+	font-family: monospace;
+	font-size: 12px;
+}
+
+b {
+	font-weight: bold;
+}
+
+a {
+	color: #0000ff;
+	text-decoration: none;
+}
+
+a:hover {
+	background-color: #0000ff;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+
+table, th, td {
+   border: 1px solid black;
+}
+
+td {
+    padding: 4px;
+}
+
+th {
+	font-weight: bold;
+}

@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HoustonTracker 2 Manual</title>
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js">
+  </script><![endif]-->
+  <link rel="icon" href="data/favicon.ico" type="image/ico">
+  <link rel="stylesheet" href="data/main.css">
+  <script type="text/javascript" src="data/iedummy.js"></script>
+</head>
+<body>
+  <div class="mega">
+  HoustonTracker 2 Manual<br><br>
+  </div>
+  <div class="main">
+    The latest version of this document can be found online at <a href="http://irrlichtproject.de/houston/manual.html" target="_blank">
+    http://irrlichtproject.de/houston/manual.html</a><br><br><br>
+  </div>
+  <a name="content"></a>
+  <div class="header">
+  Contents<br><br>
+  </div>
+  <div class="main">
+    <a href="#about"><b>1. About</b></a><br>
+    &nbsp;&nbsp; <a href="#about">1.1. What is HoustonTracker 2?</a><br>
+    &nbsp;&nbsp; <a href="#features">1.2. Features</a><br>
+    &nbsp;&nbsp; <a href="#supported">1.3. Supported Calculators</a><br>
+    &nbsp;&nbsp; <a href="#license">1.4. License</a><br><br>
+    <a href="#definitions"><b>2. Conventions, Terms, and Definitions</b></a><br><br>
+    <a href="#setup"><b>3. Setup</b></a><br>
+    &nbsp;&nbsp; <a href="#requirements">3.1. Requirements</a><br>
+    &nbsp;&nbsp; <a href="#install">3.2. Installation</a><br>
+    &nbsp;&nbsp; <a href="#running">3.3. Running HT2</a><br><br>
+    <a href="#usage"><b>4. Using HT2</b></a><br>
+    &nbsp;&nbsp; <a href="#quickstart">4.1. Quickstart Tutorial</a><br>
+    &nbsp;&nbsp; <a href="#keys">4.2. Keys</a><br>
+    &nbsp;&nbsp; <a href="#compose">4.3. Composing Music</a><br>  
+    &nbsp;&nbsp;&nbsp;&nbsp; <a href="#songsettings">4.3.1. Modes, Indicators, and Global Variables</a><br>
+    &nbsp;&nbsp;&nbsp;&nbsp; <a href="#songseq">4.3.2. Editing the Song Sequence</a><br>
+    &nbsp;&nbsp;&nbsp;&nbsp; <a href="#notepat">4.3.3. Editing Note Patterns</a><br>
+    &nbsp;&nbsp;&nbsp;&nbsp; <a href="#fxpat">4.3.4. Editing Drum/Effects Patterns</a><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#drums">4.3.4.1. Drums</a><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#fxreference">4.3.4.2. Effects Reference</a><br>
+    &nbsp;&nbsp; <a href="#ldsav">4.4. Loading, Saving, and Backing Up</a><br>
+    &nbsp;&nbsp; <a href="#error">4.5. Error Codes</a><br><br>
+    <a href="#thanks"><b>5. Thanks, Credits, and Greetings</b></a><br><br>
+    <a href="#source"><b>Appendix A: Building from Source</b></a><br>
+    <a href="#dataformat"><b>Appendix B: Data Format Specification</b></a><br>
+    <a href="#technotes"><b>Appendix C: Synthesis Techniques</b></a><br><br><br><br><br>
+  </div>
+  
+  <a name="about"></a>
+  <div class="header">
+    1. About<br>
+  </div>
+  <div class="subheader">
+    <br>1.1. What is HoustonTracker 2?<br><br>
+  </div>
+  <div class="main">
+    HoustonTracker 2 is a software sequencer that enables you to create music on Texas Instruments graphing calculators. It uses the machines' communication 
+    port to
+    output multi-channel 1-bit music. Its interface is inspired by popular trackers such as LSDJ, Famitracker, and Milkytracker.<br><br>
+    HT2 supports several models of the Z80-based line of TI calculators. It is mainly targetted at older, obsolete models like the TI-82, but also works on newer
+    machines up to and including the TI-84 Plus SE. For a complete list of supported models, see section <a href="#supported">1.3. Supported Calculators</a>.<br>
+    <br><br>
+  </div>
+  <a name="features"></a>
+  <div class="subheader">
+    1.2. Features<br><br>
+  </div>
+  <div class="main">
+    &bull; 3 tone channels<br>
+    &bull; 1 non-interrupting drum channel<br>
+    &bull; up to 128 note patterns<br>
+    &bull; up to 64 drum/fx patterns<br>
+    &bull; sequence length up to 255 pattern rows<br>
+    &bull; 16-bit frequency precision<br>
+    &bull; 8-bit speed precision, can be configured per step<br>
+    &bull; various effects, including:<br>
+    &nbsp;&nbsp;- L/C/R stereo hard-panning for tone and drum channels<br>
+    &nbsp;&nbsp;- 8bit duty cycle control<br>
+    &nbsp;&nbsp;- duty cycle sweep<br>
+    &bull; 2 user definable samples<br>
+    &bull; up to 8 savestates<br>
+    &bull; edit during playback<br>
+    <br><br>
+  </div>
+  <a name="supported"></a>
+  <div class="subheader">
+    1.3. Supported Calculators<br><br>
+  </div>
+  <div class="main">
+    The following table gives an overview over which TI calculator models are supported by HoustonTracker 2. If your calculator isn't listed in the table,
+    chances are HT2 doesn't support it.<br><br>
+    <table class="main">
+     <tr>
+      <th>model</th>
+      <th>ROM versions</th>
+      <th>shell</th>
+      <th>HT2 build</th>
+      <th>status</th>
+     </tr>
+     <tr>
+      <td>TI-73, 73 Explorer</td>
+      <td>all</td>
+      <td>mallard</td>
+      <td>-</td>
+      <td style="color: #444444;">planned</td>
+     </tr>
+     <tr>
+      <td>TI-76.fr</td>
+      <td>all</td>
+      <td>Ion</td>
+      <td>ht2.83p</td>
+      <td style="color: #444444;">untested</td>
+     </tr>
+     <tr>
+      <td>TI-81</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td style="color: #ff0000;">not supported</td>
+     </tr>
+     <tr>
+      <td>TI-82</td>
+      <td>&lt; 16.0</td>
+      <td>-</td>
+      <td>-</td>
+      <td style="color: #444444;">planned</td>
+     </tr>
+     <tr>
+      <td>TI-82</td>
+      <td>16.0-19.0</td>
+      <td>CrASH</td>
+      <td>ht2.82p</td>
+      <td style="color: #00a000;">supported</td>
+     </tr>
+     <tr>
+      <td>TI-82 Parcus</td>
+      <td>19.006</td>
+      <td>CrASH196</td>
+      <td>ht2p.82p</td>
+      <td style="color: #444444;">broken</td>
+     </tr>
+     <tr>
+      <td>TI-82 Advanced</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td style="color: #ff0000;">not supported</td>
+     </tr>
+     <tr>
+      <td>TI-82 Stats, Stats.fr</td>
+      <td>all</td>
+      <td>Ion</td>
+      <td>ht2.83p</td>
+      <td style="color: #00a000;">supported</td>
+     </tr>
+     <tr>
+      <td>TI-82 Plus</td>
+      <td>all</td>
+      <td>DoorsCS</td>
+      <td>ht2.8xp</td>
+      <td style="color: #00a000;">supported</td>
+     </tr>
+     <tr>
+      <td>TI-83 (all versions)</td>
+      <td>all</td>
+      <td>Ion</td>
+      <td>ht2.83p</td>
+      <td style="color: #00a000;">supported</td>
+     </tr>
+     <tr>
+      <td>TI-83 Plus (all versions)</td>
+      <td>all</td>
+      <td>DoorsCS</td>
+      <td>ht2.8xp</td>
+      <td style="color: #00a000;">supported</td>
+     </tr>
+     <tr>
+      <td>TI-84 Plus/Plus SE</td>
+      <td>all</td>
+      <td>DoorsCS</td>
+      <td>ht2.8xp</td>
+      <td style="color: #00a000;">supported</td>
+     </tr>
+     <tr>
+      <td>TI-84 Plus CSE/CE</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td style="color: #ff0000;">not supported</td>
+     </tr>
+     <tr>
+      <td>TI-85, 86</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td style="color: #ff0000;">not supported</td>
+     </tr>
+     <tr>
+      <td>TI-89, 92, 92+, V200</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td style="color: #ff0000;">not supported</td>
+     </tr>
+    </table><br>
+    Models marked as "not supported" have differences in architecture that would require a major rewrite of HT2. There are no plans to support these models
+    in the near future, especially not the 84+ Color models.<br>
+    <br><br>
+  </div>
+  <a name="license"></a>
+  <div class="subheader">
+    1.4. License<br><br>
+  </div>
+  <div class="main">
+    HoustonTracker 2 is free, open source software. It is released under a "revised" BSD-License. This means you're basically free to use, modify, and 
+    redistribute this software both in binary
+    as well as source form, as long as you don't pretend that I endorse what you're doing, or try to hold me responsible for any damage done.<br><br>
+    The full license terms are as follows:<br><br>
+
+    <div class="license">
+    Copyright (c) 2015, utz^irrlicht project<br>
+    All rights reserved.<br><br>
+
+    Redistribution and use in source and binary forms, with or without<br>
+    modification, are permitted provided that the following conditions are met:<br>
+    &nbsp;&nbsp; * Redistributions of source code must retain the above copyright<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;   notice, this list of conditions and the following disclaimer.<br>
+    &nbsp;&nbsp; * Redistributions in binary form must reproduce the above copyright<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;   notice, this list of conditions and the following disclaimer in the<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;   documentation and/or other materials provided with the distribution.<br>
+    &nbsp;&nbsp; * Neither the name of IRRLICHT PROJECT nor the<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;   names of its contributors may be used to endorse or promote products<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;   derived from this software without specific prior written permission.<br><br>
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND<br>
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED<br>
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE<br>
+    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY<br>
+    DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES<br>
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;<br>
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND<br>
+    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT<br>
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS<br>
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    </div>
+    <br><br><br><br><br><br>
+  </div>
+
+
+  <a name="definitions"></a>
+  <div class="header">
+    2. Conventions, Terms, and Definitions<br><br>
+  </div>
+  <div class="main">
+    The following section outlines some basic terms and conventions used in HoustonTracker 2, and in this documentation.<br><br><br>
+    <div class="minor">
+      Keypress conventions<br><br>
+    </div>
+    <div class="main">
+      In this document, keypresses are denoted in bold font, surrounded by square brackets. All keypresses in HT2 are sequential, meaning you
+      never need to press more than one key at the same time.<br>
+      For example, <b>[ALPHA]</b>, <b>[GRAPH]</b>, <b>[ENTER]</b> means you should first press the ALPHA key, then the GRAPH key, and finally the ENTER key.
+      <br><br><br>
+    </div>
+    <div class="minor">
+      Hexadecimal notation<br><br>
+    </div>
+    <div class="main">
+      Hexadecimal numbers in this document are prefixed with 0x. So 0x20 = $20 = 20h = 32 decimal.<br>
+      All numbers in the HoustonTracker 2 user interface itself are hexadecimal, therefore no prefix is used there.<br><br><br>
+    </div>
+    <div class="minor">
+      Terminology<br><br>
+    </div>
+    <div class="main">
+      <table>
+        <tr><th>bit</th><td>This humble binary digit is at the core of HT2's inner workings. It can take a value of 0 (off) or 1 (on).</td></tr>
+	<tr><th>byte</th><td>Not related to chewing by any means, the byte is an 8-bit number. It can take any value from 0x00 (decimal 0) to 0xFF (255).</td></tr>
+	<tr><th>duty cycle</th><td>The relative amount of time each of the two half-periods of a square wave will consume.</td></tr>
+        <tr><th>hi-byte</th><td>The left two hexadecimal digits, aka most significant byte of a word.</td></tr>
+	<tr><th>lo-byte</th><td>The right two hexadecimal digits, aka least significant byte of a word.</td></tr>
+	<tr><th>nibble</th><td>A single hexadecimal digit. It consists of 4 bits, and can therefore take a value from 0x0 to 0xF (15).</td></tr>
+        <tr><th>pattern</th><td>A list of events that makes up a part of a tune. These can be notes, drum triggers, or effect commands. All patterns in HT2 are 
+	16 steps long.</td></tr>
+	<tr><th>pitch</th><td>The (perceived) frequency of a note.</td></tr>
+	<tr><th>shell</th><td>A program that facilitates the execution of machine language programs on your TI calculator, among other things. 
+	  You'll need to install one in order to run HT2.</td></tr>
+	<tr><th>song sequence</th><td>A matrix containing the order of patterns. Think of it as a storyboard, or the song's masterplan.</td></tr>
+	<tr><th>word</th><td>A 16-bit value. Equivalent to two bytes, or four hexadecimal digits.</td></tr>
+      </table>
+      <br><br><br><br><br><br>
+    </div>
+  </div>
+
+  
+  <a name="setup"></a>
+  <div class="header">
+    3. Setup<br>
+  </div>
+  <a name="requirements"></a>
+  <div class="subheader">
+    <br>3.1. Requirements<br><br>
+  </div>
+  <div class="minor">
+  Hardware<br><br>
+  </div>
+  <div class="main">
+  - a TI graphing calculator (see <a href="#supported">1.3. Supported Calculators</a>)<br>
+  - a suitable PC<->Calc link cable, e.g. 
+  <a href="https://education.ti.com/en/us/products/computer_software/connectivity-software/silver-usb-cable-for-windows-mac/features/features-summary" 
+  target="_blank">
+    TI SilverLink</a> (recommended), 
+    <a href="http://guide.alibaba.com/shop/texas-instruments-instruments-ti-graphlink-serial-cable-for-windows_10284857.html" target="_blank">TI GraphLink</a>,
+     homemade <a href="http://www.ticalc.org/hardware/cables/parallel.html" target="_blank">parallel</a> 
+     or <a href="http://www.ticalc.org/hardware/cables/serial.html" target="_blank">serial</a> cable<br>
+  - a 2.5mm (micro-)jack adapter/cable<br><br>
+  <table><tr>
+    <td><img src="data/idea.jpg"></td><td>You can use a cheap calc-to-calc link cable to make your own 2.5mm adapter.</td>
+  </tr></table><br>
+  <table><tr>
+    <td><img src="data/warn.jpg"></td><td>The plastic base of many adapters is too thick to fit into
+    TI's extra narrow socket. If that's the case, you need to carefully scrape off some plastic from the base of the jack until it fits.</td>
+  </tr></table><br><br>
+  <div class="minor">
+  Software<br><br>
+  </div>
+  In addition to the HT2 executable, you will also need to obtain:<br><br>
+  - TI linking software for exchanging data between your PC and your calc (recommended: <a href="http://lpg.ticalc.org/prj_tilp/" target="blank">TiLP</a>)<br>
+  - a so-called "shell" for your calculator. The following table lists the recommended shells for each model. Other shells may work, but haven't been tested.
+  <br><br>
+  <table>
+  <tr>
+    <th>
+      model
+    </th>
+    <th>
+      shell
+    </th>
+   </tr>
+   <tr>
+    <td>
+      TI-82
+    </td>
+    <td>
+      <a href="http://www.ticalc.org/pub/82/asm/shells/crashsdk.zip">CrASH 1.6</a>
+    </td>
+   </tr>
+   <tr>
+    <td>
+      TI-83, TI-82Stats
+    </td>
+    <td>
+      <a href="http://www.ticalc.org/pub/83/asm/shells/ion16u.zip">Ion 1.6U</a>
+    </td>
+   </tr>
+   <tr>
+    <td>
+      TI-83 Plus, TI-84 Plus
+    </td>
+    <td>
+      <a href="http://dcs.cemetech.net" target="_blank">Doors CS 7</a>
+    </td>
+   </tr>
+  </table>
+  <br>
+  <table><tr>
+    <td><img src="data/warn.jpg"></td><td>HT2 is not compatible with MirageOS.</td>
+  </tr></table><br><br><br>
+  </div>
+  <a name="install"></a>
+  <div class="subheader">
+    3.2. Installation<br><br>
+  </div>
+  <div class="warn">
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>After installing HoustonTracker 2, your calculator will not be able to perform most of its regular tasks until HT2 is 
+    removed. 
+    Do not install HT2 if you need to use your calculator for regular work, such as in school or university.</td>
+    </tr></table><br><br>
+  </div>
+  <div class="main">
+    The following instructions assume that you have TiLP installed on your computer. If you are using another linking program, then you probably 
+    know what to do...<br><br><br>
+  </div>
+  <div class="minor">
+    Installing on TI82<br><br>
+  </div>
+  <div class="main">
+    Step 1: Reset your calculator by pressing <b>[2nd]</b>, <b>[+]</b>, <b>[3]</b>.<br>
+    Step 2: Switch off your calculator, and connect it to your computer with a link cable.<br>
+    Step 3: Switch the calculator back on.<br>
+    Step 4: On your computer, open TiLP. Make sure your calculator and link cable settings are correct - if not, press Ctrl+D to reconfigure.<br>
+    Step 5: Put your calculator into transmission mode by pressing <b>[2nd]</b>, <b>[X,T,&#920;]</b>, <b>[&#9656;]</b>, <b>[ENTER]</b>.<br>
+    Step 6: In Tilp, go to "File"->"Restore", and select CRASH.82B from the CrASH package. Doing so will prompt for confirmation on both TiLP and your calc.<br>
+    Step 7: Assuming all went good, you can now put your calc in transmission mode again, and send ("File"->"Send Files") ht2.82p.<br><br>
+  </div>
+  <div class="warn">
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>If you intend to use a SilverLink cable in conjunction with a TI-82, do not install the official TI connectivity 
+    software on your computer. If you currently have 
+    TI Connect installed, or had it installed in the past, make sure you fully remove all of its components, especially the USB driver that came with it.</td>
+    </tr></table><br>
+  </div>
+  <div class="minor">
+    Installing on TI83/TI82Stats<br><br>
+  </div>
+  <div class="main">
+    Step 1: Reset your calculator by pressing <b>[2nd]</b>, <b>[+]</b>, <b>[5]</b>.<br>
+    Step 2: Switch off your calculator, and connect it to your computer with a link cable.<br>
+    Step 3: Switch the calculator back on.<br>
+    Step 4: On your computer, open TiLP. Make sure your calculator and link cable settings are correct - if not, press Ctrl+D to reconfigure.<br>
+    Step 5: Put your calculator into transmission mode by pressing <b>[2nd]</b>, <b>[X,T,&#920;,n]</b>, <b>[&#9656;]</b>, <b>[ENTER]</b>.<br>
+    Step 6: In Tilp, go to "File"->"Send Files", and select ION.83G from the Ion package.<br>
+    Step 7: After Ion has been received by the calculator, quit the link menu with [2nd], [MODE]. Now press [PRGM], select "ION", and press [ENTER].<br>
+    Step 8: Press <b>[2nd]</b>, <b>[+]</b>, <b>[2]</b>, <b>[7]</b>. Select ION and press <b>[ENTER]</b> to delete it. Likewise, delete IONZ.<br>
+    Step 9: Assuming all went good, you can now put your calc in transmission mode again, and send ("File"->"Send Files") ht2.83p.<br><br><br>
+  </div>
+  <div class="minor">
+    Installing on TI83 Plus/TI84 Plus<br><br>
+  </div>
+  <div class="main">
+    Step 1: Reset your calculator by pressing <b>[2nd]</b>, <b>[+]</b>, <b>[7]</b>, <b>[&#9656;]</b>, <b>[&#9656;]</b>, <b>[ENTER]</b>.<br>
+    Step 2: Switch off your calculator, and connect it to your computer with a link cable. This will switch your calc back on.<br>
+    Step 3: On your computer, open TiLP. Make sure your calculator and link cable settings are correct - if not, press Ctrl+D to reconfigure.<br>
+    Step 4: In Tilp, go to "File"->"Send Files", and select DoorsCS7.8xk from the DoorsCS package.<br>
+    Step 5: Assuming all went good, you can now send ("File"->"Send Files") ht2.8xp.<br><br><br>
+  </div>
+  <div class="main">
+    <table><tr>
+    <td><img src="data/idea.jpg"></td>
+    <td>
+    For faster access, you can use TiLP in GUI-less mode. To do so, open a command prompt (cmd.exe on Win or any shell on *nix),
+      and enter the following command:<br>
+      <div class="license">
+        tilp [calc-model] [cable-model] [filename]
+      </div>
+      So, to send HT2 to your TI83 Plus via a SilverLink cable, you would type
+      <div class="license">
+        tilp ti83+ SilverLink ht2.8xp
+      </div>
+    </td>
+    </tr></table><br><br><br>
+  </div>
+  <a name="running"></a>
+  <div class="subheader">
+    3.3. Running HT2<br><br>
+  </div>
+  <div class="main">
+    Once you've successfully installed HT2, running it is very simple.<br><br>
+    Step 1: Press <b>[PRGM]</b> (TI82/83), resp. <b>[APPS]</b> (TI83 Plus/84 Plus).<br>
+    Step 2: Select "CRASH" (TI82), "A" (TI83), resp. "DoorsCS" (Plus models), and press <b>[ENTER]</b>.<br>
+    Step 3: Make sure HoustonTracker 2 is highlighted, and press <b>[ENTER]</b> again. Unless an error occured, HT2 is now running.<br>
+    Step 4: Now plug in your audio cable or headphones.<br><br>
+    
+    After exiting HT2 with keys <b>[ALPHA],[ON]</b>, you will be returned to the Shell. Press <b>[MODE]</b> (CrASH, Ion) resp. <b>[CLEAR]</b> (DoorsCS) to exit 
+    it.<br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>On TI83/8x Plus, booting and shutting down HT2 will take up to 10 seconds.</td>
+    </tr></table><br><br><br><br><br>
+  </div>
+
+
+  <a name="usage"></a>
+  <div class="header">
+    4. Using HT2<br><br>
+  </div>
+  <a name="quickstart"></a>
+  <div class="subheader">
+    4.1. Quickstart Tutorial<br><br>
+  </div>
+  <div class="main">
+    The following section will explain how to get started with HoustonTracker 2 in 10 easy steps. 
+    If you can't be bothered to read the whole manual, and want to get started with HT2 in 5 minutes, then this section is for you.<br><br><br>
+    <b>Step 1:</b> Start Houston Tracker, and plug in your audio/headphone cable. Check the <a href="#running">previous sections</a> if you can't figure out 
+    how to do that.<br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>Always plug in headphones <b>after</b> you've started HT2.</td>
+    </tr></table><br><br>
+    <b>Step 2:</b> Enter some patterns into the song sequence. To do so, press the following keys: <b>[0],[0],[0],[1],[0],[2],[0],[0]</b>. 
+    Your main screen should now look like this:<br><br><img src="data/tut1.png"><br><br><br>
+    <b>Step 3:</b> Move the cursor up to the first position in the sequence again. Now press <b>[2nd]</b>. This will bring up the pattern screen.<br><br>
+    <img src="data/tut2.png"><br><br><br>
+    <b>Step 4:</b> Let's activate RowPlay mode, so we can hear what we're doing. Press <b>[ALPHA],[MODE],[ALPHA].</b><br><br><br>
+    <b>Step 5:</b> Ok, let's put some notes into this pattern thing. Press <b>[PRGM],[PRGM]</b>.<br><br><br>
+    <b>Step 6:</b> Wow, that's a pretty low note. Let's change the octave by pressing <b>[GRAPH],[2]</b>. Now we can enter some more notes, for example
+    by pressing <b>[PRGM],[PRMG],[SIN],[SIN],[TAN],[TAN]</b>.<br><br><img src="data/tut3.png"><br><br><br>
+    <b>Step 7:</b> Press <b>[ENTER]</b> to hear what we've got so far.<br><br><br>
+    <b>Step 8:</b> Hmmm, sounds pretty boring, right? So let's spice things up with some drums. Press <b>[2nd]</b> to go back to the main screen.
+    Now move the cursor all the way to the right, and press <b>[2nd]</b> again. This will bring up the FX pattern screen.<br><br><img src="data/tut4.png">
+    <br><br><br>
+    <b>Step 9:</b> Press <b>[1],[&#9662;],[2],[2],[1],[&#9662;],[2],[2],[1],[&#9662;],[2],[2],[&#9662;],[2],[&#9662;],[2]</b>.<br><br>
+    <img src="data/tut5.png"><br><br><br>
+    <b>Step 10:</b> Congratulations, you've just composed your first "song" in HoustonTracker 2!<br><br><br><br>
+  </div>
+  <a name="keys"></a>
+  <div class="subheader">
+    <br>4.2. Keys<br><br>
+  </div>
+  <div class="main">
+    <img src="data/keymap.png" alt="Houstontracker Keymap"><br><br>
+    <table>
+     <tr>
+      <th>key</th>
+      <th>standard function</th>
+      <th>ALPHA mode function</th>
+      <th>Description</th>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[ON]</b></td>
+      <td>-</td>
+      <td>QUIT</td>
+      <td>Exit HT2. The current tune will be preserved in memory. You can only exit when music isn't playing. On TI83/8x Plus, this will take a few moments.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[Y=]</b></td>
+      <td>LOAD</td>
+      <td>SAVE</td>
+      <td>Load a song. Will prompt for a save slot number (0..7). Needs to be CONFirmed.<br>
+        In ALPHA mode, save the current song. Will prompt for a save slot number (0..7). Needs to be CONFirmed.</td>
+     </tr>
+     <tr>
+      <td><b>[WINDOW]</b></td>
+      <td>ZAP SONG</td>
+      <td>DEL SLOT</td>
+      <td>Clears the current tune. Needs to be CONFirmed.<br>
+        In ALPHA mode, prompt for a save slot number (0..7) and deletes it. Needs to be CONFirmed.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[.]</b></td>
+      <td>CONFIRM</td>
+      <td>-</td>
+      <td>Confirm action. (Cancel action with key <b>[0]</b>.)</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[2nd]</b></td>
+      <td>TOGGLE SEQ/PTN</td>
+      <td>-</td>
+      <td>Toggle between sequence and pattern view. When used on sequence view, it will display the pattern selected by the cursor.</td>
+     </tr>
+     <tr>
+      <td><b>[ALPHA]</b></td>
+      <td>ALPHA MODE ON</td>
+      <td>ALPHA MODE OFF</td>
+      <td>Toggle ALPHA mode on and off.<br>TIP: When music is playing, you can hold down this key to pause the playback.</td>
+     </tr>
+     <tr>
+      <td><b>[MODE]</b></td>
+      <td>TOGGLE AUTOINC</td>
+      <td>TOGGLE ROWPLAY</td>
+      <td>Toggle automatic cursor increment on/off (on by default).<br>
+          In ALPHA mode, toggle playing notes while editing (off by default). Beware that RowPlay may ignore effect settings under certain circumstances.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[&#9652;]</b></td>
+      <td>MOVE UP</td>
+      <td>JUMP TO START</td>
+      <td>Move cursor up. In ALPHA mode, jump to row 00 of the sequence.</td>
+     </tr>
+     <tr>
+      <td><b>[&#9662;]</b></td>
+      <td>MOVE DOWN</td>
+      <td>JUMP TO END</td>
+      <td>Move cursor down. In ALPHA mode, jump to the last rows in the sequence.</td>
+     </tr>
+     <tr>
+      <td><b>[&#9666;]</b></td>
+      <td>MOVE LEFT</td>
+      <td>PGUP/PREV PTN</td>
+      <td>Move cursor left. In ALPHA mode, move one page (10 lines) up in sequence.<br>
+          On pattern screens, cycle through patterns in ALPHA mode.</td>
+     </tr>
+     <tr>
+      <td><b>[&#9656;]</b></td>
+      <td>MOVE RIGHT</td>
+      <td>PGDOWN/NEXT PTN</td>
+      <td>Move cursor right. In ALPHA mode, move one page (10 lines) down in sequence.<br>
+          On pattern screens, cycle through patterns in ALPHA mode.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[ENTER]</b></td>
+      <td>PLAY/STOP</td>
+      <td>-</td>
+      <td>Start playing from row 00, or stop playback if player is running.</td>
+     </tr>
+     <tr>
+      <td><b>[(-)]</b></td>
+      <td>PLAY CURR/ PAUSE</td>
+      <td>-</td>
+      <td>Start playing from the current position in sequence, or hold down to pause playback while player is running.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[0]</b></td>
+      <td>0/DEL NOTE/CANCEL</td>
+      <td>REMOVE PTN</td>
+      <td>Depending on context, either input 0 at cursor, delete a note, or cancel action.<br>
+          On the Sequence screen and with ALPHA mode active, remove the currently selected pattern from the sequence.</td>
+     </tr>
+     <tr>
+      <td><b>[1]..[9]</b></td>
+      <td>1..9</td>
+      <td>-</td>
+      <td>Input 1..9 at cursor.</td>
+     </tr>
+     <tr>
+      <td><b>[MATH]</b></td>
+      <td>A</td>
+      <td>A#</td>
+      <td>Input hex digit A or note A at cursor, depending on the context. While setting notes and being in ALPHA mode, input an A#.</td>
+     </tr>
+     <tr>
+      <td><b>[MATRIX]/[APPS]</b></td>
+      <td>B</td>
+      <td>-</td>
+      <td>Input hex digit B or note B at cursor, depending on the context.</td>
+     </tr>
+     <tr>
+      <td><b>[PRGM]</b></td>
+      <td>C</td>
+      <td>C#</td>
+      <td>Input hex digit C or note C at cursor, depending on the context. While setting notes and being in ALPHA mode, input a C#.</td>
+     </tr>
+     <tr>
+      <td><b>[x&#8315;&sup1;]</b></td>
+      <td>D</td>
+      <td>D#</td>
+      <td>Input hex digit D or note D at cursor, depending on the context. While setting notes and being in ALPHA mode, input a D#.</td>
+     </tr>
+     <tr>
+      <td><b>[SIN]</b></td>
+      <td>E</td>
+      <td>-</td>
+      <td>Input hex digit E or note E at cursor, depending on the context.</td>
+     </tr>
+     <tr>
+      <td><b>[COS]</b></td>
+      <td>F</td>
+      <td>F#</td>
+      <td>Input hex digit F or note F at cursor, depending on the context. While setting notes and being in ALPHA mode, input an F#.</td>
+     </tr>
+     <tr>
+      <td><b>[TAN]</b></td>
+      <td>G</td>
+      <td>G#</td>
+      <td>Input note G at cursor. While setting notes and being in ALPHA mode, input a G#.<br>This key does nothing in sequence/fx ptn view.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[,]</b></td>
+      <td>MUTE CH1</td>
+      <td>UNMUTE ALL</td>
+      <td>Mute/unmute channel 1. In ALPHA mode, unmute all channels.</td>
+     </tr>
+     <tr>
+      <td><b>[(]</b></td>
+      <td>MUTE CH2</td>
+      <td>MUTE DRUMS</td>
+      <td>Mute/unmute channel 2. In ALPHA mode, mute/unmute drum channel.</td>
+     </tr>
+     <tr>
+      <td><b>[)]</b></td>
+      <td>MUTE CH3</td>
+      <td>MUTE ALL</td>
+      <td>Mute/unmute channel 3. In ALPHA mode, mute all channels.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[TRACE]</b></td>
+      <td>SET SPEED</td>
+      <td>SET USR DRUM</td>
+      <td>Set the global song speed.<br>  In ALPHA mode, set the user drum pointer. Any value between 0x0000 and 0xFFFF is permitted. However,
+          it is recommended to stick with values in the range of 0x0000 - 0x7FFF, as higher values may produce unpredictable results.</td>
+     </tr>
+     <tr>
+      <td><b>[GRAPH]</b></td>
+      <td>SET OCTAVE</td>
+      <td>-</td>
+      <td>Set the current octave. Only works on note pattern screens. Valid values are 0..6.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[X,T,&#920;]</b></td>
+      <td>TRANSPOSE UP</td>
+      <td>TRANSPOSE DOWN</td>
+      <td>Transpose current pattern up by one half-tone. In ALPHA mode, transpose current pattern down by one half-tone.<br>
+          Out-of-range notes will be replaced with rests.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[x&sup2;]</b></td>
+      <td>QUICK SET LP</td>
+      <td>SET LP</td>
+      <td>Set the loop point to the current row in sequence. Only works on sequence screen.<br>  In ALPHA mode, enter a new LP value. Changes will not 
+      take effect until the next player restart.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[LN]</b></td>
+      <td>QUICK SET BS</td>
+      <td>SET BS</td>
+      <td>Set Block Start to the current row in sequence. Only works on sequence screen.<br> In ALPHA mode, enter a new BS value.</td>
+     </tr>
+     <tr>
+      <td><b>[STO&#9658;]</b></td>
+      <td>QUICK SET BE</td>
+      <td>SET BE</td>
+      <td>Set Block End to the current row in sequence. Only works on sequence screen.<br> In ALPHA mode, enter a new BE value.</td>
+     </tr>
+     <tr><td>&nbsp;</td><tr>
+     <tr>
+      <td><b>[&div;]</b></td>
+      <td>DEL ROW</td>
+      <td>DEL BLOCK</td>
+      <td>Delete the current row.<br>In ALPHA mode, delete the selected block.</td>
+     </tr>
+     <tr>
+      <td><b>[&times;]</b></td>
+      <td>INS BLOCK</td>
+      <td>PASTE BLOCK</td>
+      <td>Insert a copy of the selected block at the cursor.<br>In ALPHA mode, paste selected block over the current and following rows.<br>
+          The target row must be outside of the selected block.</td>
+     </tr>
+     <tr>
+      <td><b>[-]</b></td>
+      <td>COPY ROW</td>
+      <td>-</td>
+      <td>Insert a copy of the current row at the cursor.</td>
+     </tr>
+     <tr>
+      <td><b>[+]</b></td>
+      <td>PUT NEXT FREE</td>
+      <td>CLONE CURR</td>
+      <td>Put the next unused free pattern in sequence at the current position.<br> In ALPHA mode, clone the current pattern and insert the 
+      clone at the current cursor position.</td>
+     </tr>
+    </table>
+    <br><br><br><br>
+  </div>
+  <a name="compose"></a>
+  <div class="subheader">
+    4.3. Composing Music<br><br>
+  </div>
+  <a name="songsettings"></a>
+  <div class="subsubheader">
+    4.3.1. Modes, Indicators, and Global Variables<br><br>
+  </div>
+  <div class="minor">
+    &nbsp;&nbsp;<img src="data/vars.png"><br><br>
+    Modes and Indicators<br><br>
+  </div>
+  <div class="main">
+    There are a number of different indicators, which will tell you about various modes and editing settings that are currently applied.<br><br>
+    The <b style="background:#ac936b">Alpha mode indicator</b> comes in the shape of a capital letter A, which is displayed below the diagonal left edge of the 
+    HT2 logo. 
+    When the A is visible, then Alpha mode is active. The Alpha mode is HT2's version of CAPS LOCK. Many keys in HT2 have a primary and secondary function. 
+    In Alpha mode, the secondary functions will be triggered. You can toggle Alpha mode on and off by pressing - you guessed it - <b>[ALPHA]</b>.<br><br>
+    The <b style="background:#6b6bff">playback indicators</b> are located directly below the HT2 logo. The first position tells you if the music player is
+    currently stopped or running. While stopped, it will display a &#x25a0;, when running, it will display the capital letter P. Next to this position, you
+    will find four positions which normally read "123D" (for channel 1, 2, 3, and drums respectively). These positions indicate which channels are currently 
+    muted. Muted channels will display a "-" instead of their channel number/letter.<br><br>
+    The <b style="background:#f378c5">AutoInc/RowPlay</b> indicators tell you whether the auto-incrementing and RowPlay functions are currently activated. They
+    are located in the lower third of the right screen side, just below the the global variables. The <b>AutoInc indicator</b> displays "A1" when 
+    auto-incrementing is
+    active, and A0 when inactive. Auto-incrementing means that after you enter a value or note in HT2, the cursor will automatically advance to the next position.
+    You can toggle AutoInc with key <b>[MODE]</b>. The <b>RowPlay indicator</b> tells you whether RowPlay mode is currently active. If so, it will display the 
+    capital letter P. When entering a note, HT2 will
+    automatically play the current pattern position (including all channels that are not muted). You can toggle RowPlay by activating <b>[ALPHA]</b> mode, and 
+    then pressing key <b>[MODE]</b>.<br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>RowPlay mode can't reliably detect all effect settings that apply to the current position, so depending on the 
+    circumstances,
+    it may not reflect how the position will actually sound when the whole song is played back.</td>
+    </tr></table><br>
+    Below the AutoInc/RowPlay indicators, there is the general purpose <b style="background:#ffb56b">message area</b>. Here, various important messages will be
+    displayed, such as occuring errors, or requests for the user to confirm an action. Confirming is done with key <b>[.]</b>, cancelling is done with key 
+    <b>[0]</b>.
+    <br><br><br>
+  </div>
+  <div class="minor">
+    Global Variables<br><br>
+  </div>
+  <div class="main">
+    The <b style="background:#6be16b">loop point</b> defines what row in the sequence the player will loop back to after it has reached the end of the song.
+    Pressing <b>[x&sup2;]</b> will set the loop point to the row currently highlighted by the cursor. To set it to another row, first enter <b>[ALPHA]</b> mode,
+    then press <b>[x&sup2;]</b> and enter a 2-digit hex number.<br><br>
+    
+    The <b style="background:#ffff6b">global song speed</b> can be changed by pressing <b>[TRACE]</b>, followed by a 2-digit hex number. Generally, the higher 
+    the number, the lower the speed. However, 0x00 is an exception. It is the slowest possible setting, equivalent to a speed of 0x100.<br><br>
+    
+    To set the <b style="background:#c06bf2">user drum pointer</b>, go into <b>[ALPHA]</b> mode, then press <b>[TRACE]</b>, followed by a 4-digit hex number. 
+    See the section on <a href="#drums">drums</a> for
+    details about the user drum pointer.<br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>Changes to the global variables are not effective until you restart the player.</td>
+    </tr></table><br><br><br>
+  </div>
+  <a name="songseq"></a>
+  <div class="subsubheader">
+    4.3.2. Editing the Song Sequence<br><br>
+  </div>
+  <div class="main">
+    &nbsp;&nbsp;<img src="data/seq.png">
+    <br><br>
+  </div>
+  <div class="main">
+    The sequence screen is where you build the general structure of your song. It consists of four editable columns, each containing a list of patterns.
+    Each column represents a different channel. To toggle between the main (sequence) screen and the pattern screens, select a pattern in the sequence 
+    with the cursor, then press <b>[2nd]</b>.<br><br>
+    The first 3 columns represent the 3 tone channels, ie. they contain <a href="#notepat">note patterns</a>. The last channel represents the drum channel and
+    effects settings, ie. it contains <a href="#fxpat">fx patterns</a>. 
+    The tone channels differ somewhat in sound and features. <b>Channel 1</b> features the <a href="#fxreference">A0x effect</a>, which adds noise and/or glitchy
+    sounds to the regular tone. <b>Channel 2</b> is somewhat louder than the other channels. It features a variable duty cycle and the duty cycle sweep effect. 
+    <b>Channel 3</b> features hi-speed pitch slides. It also sports a variably duty cycle.<br><br>
+    <br><br>
+  </div>
+  <div class="minor">
+    Moving around on the sequence screen<br><br>
+  </div>
+  <div class="main">
+    Keys <b>[&#9652;]</b>, <b>[&#9662;]</b>, <b>[&#9666;]</b>, and <b>[&#9656;]</b> move the cursor around on the sequence screen.<br><br>
+    Pressing <b>[&#9666;]</b> resp. <b>[&#9656;]</b> in <b>[ALPHA]</b> mode will move the cursor up/down by 10 rows.<br><br>
+    Pressing <b>[&#9652;]</b> in <b>[ALPHA]</b> mode will move the cursor to the start of the sequence. Likewise, pressing <b>[&#9662;]</b> in <b>[ALPHA]</b> mode will move 
+    the cursor to the end of the sequence.<br>
+    <br><br><br>
+  </div>
+  <div class="minor">
+    Editing the sequence<br><br>
+  </div>
+  <div class="main">
+    Use keys <b>[0]</b>..<b>[9]</b> and <b>A</b>..<b>F</b> (<b>[MATH]</b>, <b>[MATRX]</b> resp. <b>[APPS]</b>, <b>[PRGM]</b>, <b>[x&#8315;&sup1;]</b>, 
+    <b>[SIN]</b>, and <b>[COS]</b>) to enter pattern numbers. You can have a maximum of 128 note patterns, and 64 fx patterns, so the 
+    highest pattern numbers are 0x7F and 0x3F respectively. Note patterns are shared across all 3 tone channels, so you can use any note pattern on any channel. 
+    If you try to enter an invalid pattern number, HT2 will automatically replace it with an arbitrary valid one.<br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>Note patterns and fx patterns use a different numbering, e.g. note pattern 01 is 
+    different from fx pattern 01.</td>
+    </tr></table><br>
+    To automatically put the first unused pattern at the current sequence position, press <b>[+]</b>. To clone the pattern at the current position (copy it's
+    contents to a new, unused pattern), press <b>[+]</b> in <b>[ALPHA]</b> mode.<br><br>
+    To delete the pattern number at the current position, press <b>[0]</b> in <b>[ALPHA]</b> mode.<br><br>
+    You can press <b>[-]</b> to copy the current row. This will insert the copy at the current position.<br><br>
+    Press <b>[&div;]</b> to delete the current row.<br><br><br><br>
+  </div>
+  <div class="minor">
+    Block Operations<br><br>
+  </div>
+  <div class="main">
+    HT2 uses two block markers, <b>block start (BS)</b> and <b>block end (BE)</b> to select a section of sequence data for copying, pasting, and cutting.
+    Block operations work only on the whole sequence, not on individual channels.<br><br>
+    To set the block start to the current row in the sequence, press <b>[LN]</b>. Likewise, to set the block end to the current row, press [STO&#9658;]. 
+    Pressing these keys in <b>[ALPHA]</b> mode will allow you to set the BS/BE positions manually.<br><br>
+    To copy the marked block and insert it at the current cursor position, press <b>[&times;]</b>. Pressing <b>[&times;]</b> in <b>[ALPHA]</b> mode will
+    paste the block over the following sequence rows. Note that you cannot insert/paste a block into itself, so the target must always be outside the selected
+    block.<br><br>
+    Press <b>[&div;]</b> in <b>[ALPHA]</b> mode to delete the selected block and move the following sequence data up.<br><br>
+    <br><br>
+  </div>
+  <a name="notepat"></a>
+  <div class="subsubheader">
+    4.3.3. Editing Note Patterns<br><br>
+  </div>
+  <div class="main">
+    &nbsp;&nbsp;<img src="data/noteptns.png">
+    <br><br>
+  </div>
+  <div class="main">
+    All note patterns have a fixed length of 16 steps, which are organized in two columns à 8 steps.<br><br>
+    Notes can be entered with keys <b>[MATH]</b> (A), <b>[MATRX]</b> resp. <b>[APPS]</b> (B), <b>[PRGM]</b> (C), <b>[x&#8315;&sup1;]</b> (D), <b>[SIN]</b> (E),
+    <b>[COS]</b> (F), and <b>[TAN]</b> (G). Sharp notes (black keys) can be reached in <b>[ALPHA]</b> mode.<br><br>
+    In order to hear notes while you're entering them, you can toggle <b>RowPlay</b> by pressing <b>[MODE]</b> in <b>[ALPHA]</b> mode. A "P" will be displayed
+    next to the AutoInc indicator to let you know that RowPlay is active. Note that RowPlay is somewhat
+    limited. Among other things, it may ignore current effect settings. Also, it will fail if the pattern you're editing is not on the current step in the song 
+    sequence.
+    <br><br>
+    To change the current octave, press <b>[GRAPH]</b>, then enter a number between 0 and 6. You can also edit octaves manually in the pattern.<br><br>
+    
+    <table><tr>
+    <td><img src="data/idea.jpg"></td><td>To cycle through note patterns, you can use keys <b>[&#9666;]</b> and <b>[&#9656;]</b> in <b>[ALPHA]</b> mode.
+    </tr></table><br>
+    <table><tr>
+    <td><img src="data/idea.jpg"></td><td>In order to use a different pattern length, you can utilize the <a href="#fxreference">B00 effect command</a>.
+    </tr></table><br><br><br>
+  </div>
+  <a name="fxpat"></a>
+  <div class="subsubheader">
+    4.3.4. Editing Drum/Effects Patterns<br><br>
+  </div>
+  <div class="main">
+    &nbsp;&nbsp;<img src="data/fxptns.png">
+    <br><br>
+  </div>
+  <div class="main">
+    Like with note patterns, fx patterns are organized in two columns à 8 steps. Each step consists of four hex digits. 
+    The <b>first digit</b> sets the drum sound to be used on that step. A value of 0 means no drum. Refer to the <a href="#drums">following section</a>
+    to learn more about drums in HT2.<br><br>
+    The <b>second digit</b> sets the effect command. A value of 0 means no effect. Finally, the <b>last two digits</b> set the effect parameters. 
+    Refer to <a href="#fxreference">section 4.3.4.2</a> to learn all about effects.
+    <br><br><br>
+  </div>
+  <a name="drums"></a>
+  <div class="subsubsubheader">
+    4.3.4.1. Drums<br><br>
+  </div>
+  <div class="main">
+    There are 15 different drums to chose from (0x1..0xF). Some of the drums use the TI-OS as sample data, so their sound may vary across
+    different calculator models.<br><br>
+    Drums can be played in different modes, which affects the way they sound. Use command Cxx to change the drum mode, with xx = 0x00..0x4f. There are 80 
+    different drum modes, though not all of them are particularly useful. <br><br>
+    Setting a non-zero value for the <b>lower nibble</b> of the parameter causes the drum data to be manipulated in various ways. Refer to <a href="#technotes">
+    Appendix C</a> for details about this functionality.<br><br>
+    The <b>upper nibble</b> of the parameter
+    defines the behaviour of the drum data pointer. The effects are as follows:<br><br>
+    <table>
+    <tr><th>mode</th><th>command</th><th>effect</th><tr>
+    <tr><td>0</td><td>C00</td><td>Increment pointer, ie. use the "standard" drum set.</td><tr>
+    <tr><td>1</td><td>C1x</td><td>Decrement pointer, ie. use the "alternative" drum set. Generally speaking, these drums are less useful than the standard set. 
+            Also, some drums will produce unpredictable results, namely drum 0, 1, C, and D.</td><tr>
+    <tr><td>2</td><td>C2x</td><td>Increment and loop pointer. Even less useful than mode 1, and suffers from the same problems. Also, this mode causes a slight 
+           global pitch shift.</td><tr>
+    <tr><td>3</td><td>C3x</td><td>Decrement and loop pointer. Like mode 2, with different sounds.</td><tr>
+    <tr><td>4</td><td>C4x</td><td>Don't move pointer. Instead of drums, in this mode triggering a drum will play a fixed, most likely out-of-tune frequency. 
+           This mode causes a slight
+	   global pitch shift.</td><tr>
+    </table><br> 
+    Drum 0xE and 0xF are special cases.<br><br>
+    0xF is the user drum pointer, which can be configured individually. To change it, go into <b>[ALPHA]</b> mode, then press <b>[TRACE]</b>.<br>The user drum 
+    pointer
+    can be set to any value between $0000 and $FFFF. However, if you want to play it safe you should keep the pointer in range 0x0000 - 0x7FFF. This is because 
+    the user drum
+    is actually a pointer to ROM/RAM. Pointing the user drum to RAM (0x8000 and up) will give unpredictable results, as the RAM contents change frequently.
+    <br><br>
+    0xE is the user defined sample. This feature is a bit quirky in use. In order to create a custom sample, go to FX pattern 0x20. Now, instead of entering
+    the usual drum triggers, fx commands, and fx parameters, you enter your sample data. You can use more than one pattern, so after you've filled up FX pattern
+    0x20, go to 0x21.<br><br>
+    The data is in 1-bit PWM format, meaning each byte denotes a phase length. 
+    Think of it as the amount of time taken until the beeper output will toggle again. The values are inverse, ie. a lower value denotes a longer phase. 
+    Yes, it's a bit confusing... As an example, this is what drum sample 1 (the kick drum) looks like:
+    <div class="license">
+    0x80, 0x80, 0x70, 0x70, 0x60, 0x60, 0x50, 0x50, 0x40, 0x40, 0x40, 0x30, 0x30, 0x30, 0x30, 0x20, 0x20, 0x20, 0x20, 0x20,
+    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x8, 0x8, 0x8, 0x8, 0x8, 0x8, 0x8, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 
+    0x0
+    </div>
+    This will give you a waveform looking like this:<br><br>
+    <img src="data/drumwave.png" alt="image of drum waveform"><br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>The last byte of the sample must be 0.
+    </tr></table><br>
+    <table><tr>
+    <td><img src="data/idea.jpg"></td><td>You can even define a second drum sample, which you can then trigger in drum mode C1x/C3x. This sample also starts at 
+    FX pattern 0x20, but needs to be written backwards,
+    so the second byte of the sample is on the last position (FX parameter of the last row) of FX pattern 0x1F, third byte is just before that (drum/FX command 
+    of the last row),
+    and so forth.
+    </tr></table><br>
+    
+    <br>
+    <br><br>
+  </div>
+  <a name="fxreference"></a>
+  <div class="subsubsubheader">
+    4.3.4.2. Effects Reference<br><br>
+  </div>
+  <div class="main">
+    <table>
+      <tr>
+        <th>command</th>
+        <th>effect</th>
+        <th>description</th>
+      </tr>
+      <tr>
+        <td>1xy</td>
+        <td>SET PAN</td>
+        <td>Set panning for all channels. To determine how the panning will be set, you need to look at the individual bits of the effect parameter, starting
+	   at the rightmost one (aka bit 0).<br><br>
+	   &nbsp;&nbsp; bit 0 set: pan channel 1 right (add 0x01 to parameter)<br>
+	   &nbsp;&nbsp; bit 1 set: pan channel 1 left (add 0x02 to parameter)<br>
+	   &nbsp;&nbsp; bit 0,1 reset: pan channel 1 center (don't add anything to parameter)<br>
+	   &nbsp;&nbsp; bit 2 set: pan channel 2 right (add 0x04 to parameter)<br>
+	   &nbsp;&nbsp; bit 3 set: pan channel 2 left (add 0x08 to parameter)<br>
+	   &nbsp;&nbsp; bit 2,3 reset: pan channel 2 center (don't add anything to parameter)<br>
+	   &nbsp;&nbsp; bit 4 set: pan channel 3 right (add 0x10 to parameter)<br>
+	   &nbsp;&nbsp; bit 5 set: pan channel 3 left (add 0x20 to parameter)<br>
+	   &nbsp;&nbsp; bit 4,5 reset: pan channel 3 center (don't add anything to parameter)<br>
+	   &nbsp;&nbsp; bit 6 set: pan drums right (add 0x40 to parameter)<br>
+	   &nbsp;&nbsp; bit 7 set: pan drums left (add 0x80 to parameter)<br>
+	   &nbsp;&nbsp; bit 6,7 reset: pan drums center (don't add anything to parameter)<br><br>
+	   Example:
+	   <table>
+	     <tr><td>command</td><td>bitmask</td><td>calculation</td><td>effect</td><tr>
+	     <tr><td>100</td><td>00000000</td><td>0x00 + 0x00 + 0x00 + 0x00 = 0x00</td><td>pan all channels to center</td><tr>
+	     <tr><td>155</td><td>01010101</td><td>0x01 + 0x04 + 0x10 + 0x40 = 0x55</td><td>pan all channels right</td><tr>
+	     <tr><td>112</td><td>00010010</td><td>0x02 + 0x00 + 0x10 + 0x00 = 0x12</td><td>pan ch1 left, ch2 center, ch3 right, drums center</td><tr>
+	   </table>
+	   </td>
+      </tr>
+      <tr>
+      <td>2xx</td>
+        <td>PITCH SLIDE UP CH3</td>
+        <td>Cause a (rather fast) upward pitch slide on channel 3. While this effect is active, rests will be ignored on channel 3.<br>
+	    xx defines the speed of the slide. It can be any value, but beware that the pitch counter will eventually wrap.<br>0x00 switches off the effect.<br>
+      </tr>
+      <tr>
+      <td>3xx</td>
+        <td>PITCH SLIDE DOWN CH3</td>
+        <td>Cause a very fast downward pitch slide on channel 3. While this effect is active, rests will be ignored on channel 3.<br>
+	    xx defines the speed. It can be any value, but beware that the pitch counter will eventually wrap, after which the pitch will start to slide upwards.
+	    <br><br>
+	    <table><tr>
+	    <td><img src="data/warn.jpg"></td><td>This effect is switched off with command <b>200</b>. 
+	    Entering 300 causes a glitchy effect instead (like 3FF, but even faster).
+            </tr></table>
+      </tr>
+      <tr>
+      <td>40x</td>
+        <td>DUTY CYCLE SWEEP CH2</td>
+        <td>Do a SID-style duty cycle sweep on channel 2. This will override any duty cycle settings on that channel.<br>
+	    401 activates the effect, 400 deactivates it and resets the duty cycle to 50:50.<br>
+      </tr>
+      <tr>
+      <td>5xx</td>
+        <td>DUTY CYCLE CH2</td>
+        <td>Set the duty cycle for channel 2.<br>
+	    xx can be any value, but 0x00 will cause glitches. A value of 0x80 produces the default 50:50 wave.<br>
+      </tr>
+      <tr>
+      <td>6xx</td>
+        <td>DUTY CYCLE CH3</td>
+        <td>Set the duty cycle for channel 3.<br>
+	    xx can be any value, but 0x00 will cause glitches. A value of 0x80 produces the default 50:50 wave.<br>
+      </tr>
+      <tr>
+        <td>A0x</td>
+        <td>ADD SFX CH1</td>
+        <td>Add a sound effect to channel 1.<br>
+	   A00 deactivates the effect.<br>
+	   A01 adds noise or glitchy sounds to channel 1. The actual outcome depends on the current pitch of ch1. To some extend, it's also influenced by the
+	   currently active drum sound.<br>
+	   A02 adds slight random inaccuracies to the pitch of channel 1. It has little effect by itself, but can be used to produce a phasing effect in 
+	   conjunction with other channels
+	   set to the same note as ch1. The effect does not work equally well on all pitches, namely it won't do anything on C notes.</td>
+      </tr>
+      <tr>
+        <td>B00</td>
+        <td>BREAK PTN</td>
+        <td>Break pattern and jump to the next one. This command doesn't take any parameters. Also, it is ignored on the first line of a pattern.</td>
+      </tr>
+      <tr>
+      <td>Cxx</td>
+        <td>DRUM MODE</td>
+        <td>Set the drum mode, where x is 0x00..0x4F. Refer to the <a href="#drums">drums section</a> for details.<br>
+      </tr>
+      <tr>
+        <td>D0x</td>
+        <td>VOLUME CH1/D</td>
+        <td>Double the volume for channel 1, at the expense of switching off the drums.<br>
+	   D01 activates the effect, D00 switches it off.</td>
+      </tr>
+      <tr>
+        <td>E0x</td>
+        <td>RESET FX</td>
+        <td>Reset previous FX commands to default settings. This effect causes a slightly longer than normal delay when triggered.<br> 
+	  E00 - reset all effects.<br>
+	  E01 - reset all effects except speed.<br>
+	  E02 - reset all effects except speed and duty cycles.<br>
+	  E03 - reset all effects except speed, duty cycles, and panning settings.<br></td>
+      </tr>
+      <tr>
+        <td>Fxy</td>
+        <td>SET SPEED</td>
+        <td>Set the current speed. xy can be any hexadecimal number between 0x01 and 0xFF. The higher the value, the slower the speed. This command 
+	overrides the global speed setting.<br>
+	  TIP: When entering this effect while the player is running, make sure to enter the parameter first, and then the F command.</td>
+      </tr>
+    </table>
+    <br><br><br>
+  </div>
+  <a name="ldsav"></a>
+  <div class="subheader">
+    4.4. Loading, Saving, and Backing Up<br><br>
+  </div>
+  <div class="minor">
+    Saving<br><br>
+  </div>
+  <div class="main">
+    To save your current work in progress, activate <b>[ALPHA]</b> mode, then press <b>[Y=]</b>. The letters "SA" will appear in the message area. 
+    Now, enter the number of the save slot you want to load (0..7), and confirm by pressing <b>[.]</b>. (If you got here by accident, press <b>[0]</b> 
+    to cancel.)<br><br>
+    If the save was successful, error code E0 will be displayed in the message area. If the save was unsuccessful due to insufficient memory, error code
+    E2 will be displayed instead. Note that you may run out of memory rather quickly. You will always be able to maintain at least two save slots, however.
+    <br><br><br>
+  </div>
+  <div class="minor">
+    Loading<br><br>
+  </div>
+  <div class="main">
+    To load a previously saved tune, simply press <b>[Y=]</b>. The letters "LD" will appear in the message area.<br>
+    Now, enter the number of the save slot you want to load (0..7), and confirm by pressing <b>[.]</b>. (If you got here by accident, press <b>[0]</b> 
+    to cancel.)<br>
+    The tune in question will be loaded, or error code E5 will be printed if the selected save slot was empty.
+    <br><br><br>
+  </div>
+  <div class="minor">
+    Deleting a save slot<br><br>
+  </div>
+  <div class="main">
+    In case you run out of memory, or want to get rid of one of your save slots for other reasons, you can specify a save slot to be deleted.<br>
+    In order to do so, activate <b>[ALPHA]</b> mode, then press <b>[WINDOW]</b>. The letters "DS" will appear in the message area.<br> Now, enter the number
+    of the save slot you want to delete (0..7), and confirm by pressing <b>[.]</b>. (If you got here by accident, press <b>[0]</b> to cancel.)<br>
+    And that's all you need to know about deleting save slots!
+    <br><br><br>
+  </div>
+  <div class="minor">
+    Backups<br><br>
+  </div>
+  <div class="main">
+    Creating a backup of your HT2 songs is trivial: Simply send the HT2 PRGM file to your computer or another calc of the same model.
+    The program file contains all the save slots as well as the currently loaded song. <br><br>
+    <img src="data/underconstr.jpg">&nbsp;In the future, there will be a PC utility for manipuling backup files.
+    <br><br><br><br>
+  </div>
+  <a name="error"></a>
+  <div class="subheader">
+    4.5. Error Codes<br><br>
+  </div>
+  <div class="main">
+    If a major error happens, HT2 will attempt to detect it, and print an error code in the message area. An special error message will also be displayed if 
+    saving a backup of the current song was successful.<br><br>
+    The following table lists all possible error codes:<br><br>
+    <table>
+     <tr style="font-weight: bold;">
+      <th>code</th>
+      <th>name</th>
+      <th>description</th>
+     </tr>
+     <tr>
+      <td>E0</td>
+      <td>SAVE OK</td>
+      <td>Saving backup was successful, no error occured.</td>
+     </tr>
+     <tr>
+      <td>E1</td>
+      <td>INVALID BLOCK</td>
+      <td>Block End is set before Block Start, or the row where the block should be inserted/pasted to is within the selected block.</td>
+     </tr>
+     <tr>
+      <td>E2</td>
+      <td>INSUFFICIENT MEMORY</td>
+      <td>There is not enough RAM to perform the desired action (usually saving).</td>
+     </tr>
+     <tr>
+      <td>E3</td>
+      <td>INVALID PTN</td>
+      <td>An invalid pattern number was set in the song sequence.</td>
+     </tr>
+     <tr>
+      <td>E4</td>
+      <td>LP INVALID</td>
+      <td>Invalid loop point. Row to loop to is empty.</td>
+     </tr>
+     <tr>
+      <td>E5</td>
+      <td>FILE I/O ERR</td>
+      <td>Loading song failed. Save slot is empty or corrupt.</td>
+     </tr>
+     <tr>
+      <td>E6</td>
+      <td>SAVESTATE ERR</td>
+      <td>Wrong savestate version, or savestate corrupt.</td>
+     </tr>
+     <tr>
+      <td>E7</td>
+      <td>NO FREE PTN</td>
+      <td>Could not find a free pattern.</td>
+     </tr>
+     <tr>
+      <td>E8</td>
+      <td>BLOCK TOO LARGE</td>
+      <td>The selected block is too large to be inserted.</td>
+     </tr>
+    </table>
+    <br>
+    Small errors (like trying to set an inexistent note or an invalid pattern number) will be simply ignored by HT2.<br>
+    <br><br><br><br><br>
+  </div> 
+  
+  <a name="thanks"></a>
+  <div class="header">
+    5. Thanks, Credits, and Greetings<br><br>
+  </div>
+  <div class="main">
+    Thanks to...<br><br>
+    ... TylerBarnes, Tronimal, garvalf, and Flashbob for beta testing<br>
+    ... extra thanks to garvalf for preparing the HT2 cheatsheet<br>
+    ... Shiru, introspec, and Alone Coder for their expertise and advice<br>
+    ... Brandon Wilson, Lionel Debroux, and everybody who has been hacking/documenting TI calcs<br><br>
+    The TI-82 image that was used as the basis of the <a href="#keys">keymap</a> was authored by Martin Olsson, and is released under 
+    a <a href="https://gnu.org/licenses/fdl.html">GDFL</a>/<a href="https://creativecommons.org/licenses/by-sa/3.0/">Creative Commons BY-SA</a> license.
+    <br><br><br><br><br>
+  </div> 
+
+  <a name="source"></a>
+  <div class="header">
+    Appendix A: Building from Source<br><br>
+  </div>
+  <div class="main">
+  The latest version of the HT2 source code can always be found at <a href="https://github.com/utz82/HoustonTracker2" target="_blank">
+  github.com/utz82/HoustonTracker2</a><br><br>
+  HoustonTracker 2 is developed under Linux. If you're running Linux or another *nix derivate, building HT2 is a matter of simply running the build script,
+  provided you have a few basic tools installed. If you're developing on Windows or another non-Posix compliant system, you'll need to provide your own build
+  script or build from hand.<br><br>
+  <div class="minor">
+      Building Requirements<br><br>
+  </div>
+  &bull; The <a href="http://pasmo.speccy.org" target="_blank">Pasmo</a> assembler must be installed and present in your search path (unless you want to adapt the 
+  sources for another assembler).<br>
+  &bull; When targetting the TI-82, you will also need <a href="https://www.perl.org/get.html" target="_blank">Perl</a> installed on your system. 
+  If on *nix, you most likely have it already installed.<br>
+  &bull; Optionally, you may want to install an TI calculator emulator. For *nix systems, using the development version of
+  <a href="http://lpg.ticalc.org/prj_tilem/develop.html" target="_blank">tilem2</a> is recommended.<br>
+  <br>
+  <div class="minor">
+      Building with the Build Script (*nix only)<br><br>
+  </div>
+  It's as simple as opening a terminal, navigating to the folder containing HT2, and typing<br>
+  <div class="license">
+    ./compile.sh -[model]
+  </div>
+  where [model] is one of<br><br>
+  <table>
+   <tr><td>82</td><td>build for TI-82</td></tr>
+   <tr><td>8p</td><td>build for TI-82 Parcus</td></tr>
+   <tr><td>83</td><td>build for TI-83, TI-82 Stats</td></tr>
+   <tr><td>8x</td><td>build for TI-83 Plus, TI-84 Plus etc.</td></tr>
+  </table>
+  <br>
+  Optionally, you can rebuild the note table <i>before</i> running the build script. In order to do so, run the tablegen.sh 
+  shell script. This will allow you to change HT2's base tuning.
+  <br><br>
+  In order to have the build script automatically run your builds in tilem2, uncomment the lines in compile.sh that look like this:
+  <div class="license">
+    tilem2 -a -r "/path/to/your/romfiles/xyz.rom" -m [model] [buildfile]
+  </div>
+  <br><br>
+  <div class="minor">
+      Building by Hand<br><br>
+  </div>
+  The following steps are required to build HT2 by hand: <br><br>
+  1. Assemble the sources with the following command:
+  <div class="license">
+     pasmo --equ MODEL=[model] --alocal main.asm main.bin
+  </div>
+  
+  where [model] can be either 1 (TI-82 build), 2 (TI-83 build), 3 (Plus models build), or 4 (TI-82 Parcus build).
+  <br><br>
+  2. Pack the resulting main.bin into a TI executable (82p, 83p, 8xp) using a packer of your choice (bin8x, oysterpac.pl, etc...).<br>
+  <br><br><br><br><br>
+  </div>
+  
+  <a name="dataformat"></a>
+  <div class="header">
+    Appendix B: Data Format Specification<br><br>
+  </div>
+  <div class="minor">
+      Work Area Data Format<br><br>
+  </div>
+  <div class="main">
+    The work area is where HT2 stores the currently loaded song. It begins at label "musicData", and is 5125 bytes in size. The actual address in memory 
+    depends on the version of HT2.<br><br>
+    <table>
+      <tr><th>offset</th><th>length</th><th>description</th></tr>
+      <tr><td>+0</td><td>byte</td><td>global speed</td></tr>
+      <tr><td>+1</td><td>word</td><td>user drum pointer</td></tr>
+      <tr><td>+3</td><td>byte</td><td>loop point</td></tr>
+      <tr><td>+4</td><td>1 KB</td><td>pattern sequence list. 1 byte per pattern. Order is ch1, ch2, ch3, fx. Empty positions contain 0xff.</td></tr>
+      <tr><td>+1028</td><td>byte</td><td>one 0xFF byte to mark the end of the sequence list.</td></tr>
+      <tr><td>+1029</td><td>2 KB</td><td>note patterns. Each note pattern has an uncompressed length of 16 bytes. Empty positions contain 0x00.</td></tr>
+      <tr><td>+3077</td><td>2 KB</td><td>FX patterns. Each fx pattern has an uncompressed length of 32 bytes. Empty positions contain 0x00.</td></tr>
+    </table>
+    <br><br>
+  </div>
+  <div class="minor">
+      Compressed Savestate Format<br><br>
+  </div>
+  <div class="main">
+    HT2 uses a very simple compression scheme to store song data backups. They are set up as follows:<br><br>
+    <table>
+      <tr><th>offset</th><th>length</th><th>description</th></tr>
+      <tr><td>+0</td><td>byte</td><td>global speed</td></tr>
+      <tr><td>+1</td><td>word</td><td>user drum pointer</td></tr>
+      <tr><td>+3</td><td>byte</td><td>loop point</td></tr>
+      <tr><td>+4</td><td>?</td><td>pattern sequence list. 1 byte per pattern. Order is ch1, ch2, ch3, fx.</td></tr>
+      <tr><td>?</td><td>byte</td><td>one 0xFF byte to mark the end of the sequence list.</td></tr>
+      <tr><td>?</td><td>?</td><td>note patterns.<br>
+        if byte at offset &gt;= 0xE0, then the following [byte - 0xDF] patterns are empty.<br>
+	else, if byte at offset &gt;= 0xD0, then the following [byte - 0xCF] rows are empty.<br>
+	else, if byte at offset &lt; 0xD0, it's a regular note value.     
+      </td></tr>
+      <tr><td>?</td><td>byte</td><td>one 0xFF byte to mark the end of the note pattern area.</td></tr>
+      <tr><td>?</td><td>?</td><td>FX patterns.<br>
+        FX patterns are preceded by their pattern number. A pattern number of 0xFF signals that the savestate contains no FX patterns.<br>
+	If bit 7 of the pattern number is set, it's the last pattern to be loaded. Setting bit 7 is optional if the last saved FX pattern is 0x3F.<br>
+      </td></tr>
+    </table><br><br>
+    Start and end addresses of backup savestates are stored in the savestate lookup table.
+    <br><br><br><br><br>
+  </div>
+  
+  <a name="technotes"></a>
+  <div class="header">
+    Appendix C: Synthesis Techniques<br><br>
+  </div>
+  <div class="main">
+    The following section describes how the multi-channel synthesis is achieved in HT2, and how the effects are produced.<br><br><br>
+  </div>
+  <div class="minor">
+    General Notes<br><br>
+  </div>
+  <div class="main">
+    Sound mixing in HT2 is achieved through a 1-bit synthesis technique called Pulse Interleaving. <br><br>
+    Typically, a 1-bit DAC can only output one single square wave frequency. What Pulse Interleaving does is interlace the multiple software channels
+    at a rapid rate. Due to their own hardware latency, common output devices such as speakers or headphones cannot fully adjust their speaker cones at this rate.
+    Therefore the cones will be left in a floating state between full extension and full contraction. This is how the
+    different volume levels needed to mix HT2's four software channels are achieved. <br><br>
+    The average time taken to interlace one sample of all 4 channels is (1/16300)s, meaning channel states are swapped
+    at a rate of about 65200 Hz. The exact timings depend on various factors such as actual tone frequencies, effect and drum settings, hardware model,
+    and battery state.<br><br>
+    Internally, three different methods are applied to generate the software channel outputs. Tone channel 2 and 3 share the same method, while channel 1 and
+    the drum channel use their own respective techniques.<br><br><br>
+  </div>
+  <div class="minor">
+    Tone Channel 1<br><br>
+  </div>
+  <div class="main">
+    Once per interlacing cylce, a 16-bit constant (the "frequency base value") is added to a 16-bit counter. When the addition produces an overflow 
+    (carry, result >0xFFFF), the channels' output stated will be toggled. This means of course that channel 1 has to keep a record of its own output state.
+    <br><br>
+    The A01 effect (noise/glitch) is achieved by constantly rotating the hi-byte of the add counter. This may or may not generate enough pseudo-randomness to
+    produce a noise-like effect, depending on the frequency base value. Likewise, the A02 effect will rotate the lo-byte of the add counter.<br><br><br>   
+  </div>
+  <div class="minor">
+    Channels 2 and 3<br><br>
+  </div> 
+  <div class="main">
+    Tone channels 2 and 3 do not keep a record of their own output state. Instead, they recalculate the output state on every interlacing cycle. In order to
+    do this, the hi-byte of the add counter is compared against a threshold value. If the threshold constant is greater than the hi-byte of the add counter,
+    the output state will be high (1), otherwise it will be low (0).<br><br>
+    The threshold value determines the duty cycle ratio. When the threshold is 0x80, the output state will be high 50% of the time, and low for the 
+    other 50%. When the threshold is, say, 0x40, the ratio will be 25%:75%.<br><br>
+    The D01 effect (duty cycle sweep) is achieved by incrementing the threshold value once every interlacing cycle. As it is an 8-bit value, it will wrap to
+    0 once it reaches 0xFF.<br><br>
+    The pitch slides are achieved by adding a constant to the frequency base value once per interlacing cycle.<br><br><br>
+  </div> 
+  <div class="minor">
+    Drum Channel<br><br>
+  </div>
+  <div class="main">
+    Drums are generated from values in either ROM or RAM. The values read will be interpreted as 8-bit counters, which are decremented once per interlacing cycle.
+    When the counter reaches 0, the output state of the drum channel is toggled, and the next value is read from ROM/RAM. When a 0-byte is read, 
+    the output stops.<br><br>
+    Drums 0x1, 0xC, and 0xD are hard-coded in RAM. The "user drum sample" (drum 0xE) is effectively a pointer to FX pattern 0x20. The "user drum pointer" 
+    (drum 0xF) is a simple user-definable pointer which can point to either RAM or ROM. All other drums point to ROM, which explains why they sound different
+    depending on what calculator model is used.<br><br>
+    The "drum mode" effect (Cxx) will do two things. The upper nibble of the effect parameter determines the direction of the ROM/RAM pointer used to retrieve the
+    counter values. If the upper nibble is 0, the pointer will move forward. If 1, it will move backward. If 2 or 3, only the lo-byte of the pointer will be
+    in/decremented, which means the pointer stays on the same 256-byte memory page. If 4, the pointer will not be moved at all.<br><br>
+    The lower nibble of the effect parameter will determine how the values are modified after they are read from memory. The manipulations are as follows:<br><br>
+    <table>
+      <tr><th>&nbsp;value&nbsp;</th><th>effect</th></tr>
+      <tr><td>0x0</td><td>no manipulation</td></tr>
+      <tr><td>0x1</td><td>transform into binary coded decimal</td></tr>
+      <tr><td>0x2</td><td>multiply by 2</td></tr>
+      <tr><td>0x3</td><td>divide by 2</td></tr>
+      <tr><td>0x4</td><td>1's complement</td></tr>
+      <tr><td>0x5</td><td>use lo-byte of pointer as value</td></tr>
+      <tr><td>0x6</td><td>add lo-byte of pointer</td></tr>
+      <tr><td>0x7</td><td>add hi-byte of pointer</td></tr>
+      <tr><td>0x8</td><td>subtract hi-byte of pointer</td></tr>
+      <tr><td>0x9</td><td>subtract lo-byte of pointer</td></tr>
+      <tr><td>0xA</td><td>logical AND with hi-byte of pointer</td></tr>
+      <tr><td>0xB</td><td>logical AND with lo-byte of pointer</td></tr>
+      <tr><td>0xC</td><td>logical OR with hi-byte of pointer</td></tr>
+      <tr><td>0xD</td><td>logical OR with lo-byte of pointer</td></tr>
+      <tr><td>0xE</td><td>exclusive OR with hi-byte of pointer</td></tr>
+      <tr><td>0xF</td><td>exclusive OR with lo-byte of pointer</td></tr>
+    </table>
+    <br><br>
+    In some drum modes, the drum channel will always produce sound, even when no drum is triggered. This is due to the fact that the modifications 
+    are applied before checking if the value read from memory is 0.<br><br><br>
+  </div>
+  <div class="header">
+    eof.
+  </div>
+</body>
+</html>
