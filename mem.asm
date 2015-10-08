@@ -460,13 +460,27 @@ chkMemEnd				;check if end of usr memory reached
 					;IN: nothing | OUT: jumps to errorHand if mem_end reached
 	or a				;clear carry
 	push hl
-	ld hl,mem_end-4
+	;ld hl,mem_end-4
+	ld hl,savestates+2		;DEBUG
 	sbc hl,de			;subtract current mempos from mem_end-3
 	pop hl
 	ret nc
 
 saveError				;handling out of memory errors
 	pop hl				;pop useless return address
+	
+	ld hl,savestateLUT		;delete savestateLUT entry
+	ld a,(StateSelect)
+	add a,a
+	add a,a
+	ld e,a
+	ld d,0
+	add hl,de
+	xor a
+	ld (hl),a
+	inc hl
+	ld (hl),a
+	
 	ld a,2				;set error code
 	jp errorHand
 
