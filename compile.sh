@@ -44,6 +44,21 @@
 			tilem2 -a -r "/path/to/your/rom/romfile.bin" -m ti83p ht2.8xp
 		fi
 	fi
+	if [ "$1" = "-8xs" ]
+	then
+		pasmo -d --equ MODEL=5 --alocal main.asm main.bin main.sym
+		if [ "$?" = "0" ]
+		then
+			cp _bin/bin8x bin8x
+			./bin8x -i main.bin -o ht2s.8xp -nHT2 -4 -v
+			rm main.bin
+			rm bin8x
+			#./binpac8x.py -O "HT2 0.1" main.bin
+			#mv main.8xp ht2.8xp
+			#rm main.8xp
+			tilem2 -a -r "/path/to/your/rom/romfile.bin" -m ti83p ht2s.8xp
+		fi
+	fi
 # 	if [ "$1" = "-73" ]
 # 	then
 # 		cp _bin/as73.bat as73.bat

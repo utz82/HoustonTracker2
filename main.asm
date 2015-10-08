@@ -1,5 +1,5 @@
 ;************************************************************************************
-;HOUSTONTRACKER 2.00
+;HOUSTONTRACKER 2.00.01
 ;by utz * irrlichtproject.de/houston
 ;************************************************************************************
 
@@ -11,6 +11,7 @@ TI82 EQU 1
 TI83 EQU 2
 TI8X EQU 3
 TI8P EQU 4
+TI8XS EQU 5
 
 IF MODEL = TI82		
 include "_include/ti82.inc"
@@ -26,6 +27,10 @@ ENDIF
 
 IF MODEL = TI8X
 include "_include/ti8xp.inc"
+ENDIF
+
+IF MODEL = TI8XS
+include "_include/ti8xs.inc"
 ENDIF
 
 	db "HT 2.00", 0
@@ -86,7 +91,7 @@ ENDIF
 IF MODEL = TI82	|| MODEL = TI8P			;generated on the lowest page of apd_buf on TI82
 CsrTab2		equ #80+(256*(HIGH(apd_buf)))
 ENDIF
-IF MODEL = TI8X
+IF MODEL = TI8X || MODEL = TI8XS
 CsrTab2		equ 256*((HIGH(text_mem2))+1)	;generated on the second page of statram on TI83P
 ENDIF
 

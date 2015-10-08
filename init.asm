@@ -25,7 +25,7 @@ IF MODEL = TI82
 	out (rom),a
 ENDIF
 
-IF MODEL = TI8X
+IF MODEL = TI8X || MODEL = TI8XS
 	in a,(2)				;detect hardware
 	ld b,a
 	and #80					;if bit 7 is set, we have TI83+ BASIC
