@@ -1245,7 +1245,8 @@ kcomma						;mute ch1
 	xor 1
 	ld (MuteState),a
 	ld a,(mute1)				;toggle mute switch
-	xor #28
+	;xor #28
+	xor #8
 	ld (mute1),a
 	call printMute12
 	jp waitForKeyRelease
@@ -1254,10 +1255,11 @@ _unmuteAll
 	xor a
 	ld (MuteState),a
 	ld a,#9f
+	ld (mute1),a
 	ld (mute2),a
 	ld (mute3),a
 	ld a,#30				;#30 jr nc / #18 jr
-	ld (mute1),a
+	;ld (mute1),a
 	ld (muteD),a
 	call printMute12
 	call printMute3D
@@ -1423,10 +1425,11 @@ _muteAll
 	ld a,%11000011
 	ld (MuteState),a
 	ld a,#97
+	ld (mute1),a
 	ld (mute2),a
 	ld (mute3),a
 	ld a,#18				;#30 jr nc / #18 jr
-	ld (mute1),a
+	;ld (mute1),a
 	ld (muteD),a
 	call printMute12
 	call printMute3D

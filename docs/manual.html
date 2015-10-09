@@ -832,8 +832,8 @@
     The first 3 columns represent the 3 tone channels, ie. they contain <a href="#notepat">note patterns</a>. The last channel represents the drum channel and
     effects settings, ie. it contains <a href="#fxpat">fx patterns</a>. 
     The tone channels differ somewhat in sound and features. <b>Channel 1</b> features the <a href="#fxreference">A0x effect</a>, which adds noise and/or glitchy
-    sounds to the regular tone. <b>Channel 2</b> is somewhat louder than the other channels. It features a variable duty cycle and the duty cycle sweep effect. 
-    <b>Channel 3</b> features hi-speed pitch slides. It also sports a variably duty cycle.<br><br>
+    sounds to the regular tone. <b>Channel 2</b> is somewhat louder than the other channels, and features a SID-style duty cycle sweep effect. 
+    <b>Channel 3</b> features hi-speed pitch slides. All channels support a variable duty cycle.<br><br>
     <br><br>
   </div>
   <div class="minor">
@@ -1035,15 +1035,18 @@
       </tr>
       <tr>
       <td>4xx</td>
-        <td>RESERVED</td>
-        <td></td>
+        <td>DUTY CYCLE/ NOISE CH1</td>
+        <td>Set the duty cycle for channel 2, and toggle noise mode.<br>
+	   xx <= 0x80 - set duty cycle and disable noise mode (equivalent to setting A00 command)<br>
+	   xx > 0x80 - set duty cycle and enable noise mode (equivalent to setting A01 command).<br>
+	</td>
       </tr>
       <tr>
       <td>5xx</td>
         <td>DUTY CYCLE/ SWEEP CH2</td>
-        <td>Set the duty cycle for channel 2, or activate duty cycle sweep.<br>
-	    xx <= 0x80 - set duty cycle and deactivate duty cycle sweep. A value of 0x80 produces the default 50:50 wave. Very low/high values will cause glitches.<br>
-	    xx > 0x80 - activate SID-style duty cycle sweep.<br>
+        <td>Set the duty cycle for channel 2, or enable duty cycle sweep.<br>
+	    xx <= 0x80 - set duty cycle and disable duty cycle sweep. A value of 0x80 produces the default 50:50 wave. Very low/high values will cause glitches.<br>
+	    xx > 0x80 - enable SID-style duty cycle sweep.<br>
       </tr>
       <tr>
       <td>6xx</td>
@@ -1057,7 +1060,7 @@
         <td>Add a sound effect to channel 1.<br>
 	   A00 deactivates the effect.<br>
 	   A01 adds noise or glitchy sounds to channel 1. The actual outcome depends on the current pitch of ch1. To some extend, it's also influenced by the
-	   currently active drum sound.<br>
+	   currently active drum sound. It works best with high notes, especially A-5 and A-6.<br>
 	   A02 adds slight random inaccuracies to the pitch of channel 1. It has little effect by itself, but can be used to produce a phasing effect in 
 	   conjunction with other channels
 	   set to the same note as ch1. The effect does not work equally well on all pitches, namely it won't do anything on C notes.</td>
@@ -1069,14 +1072,13 @@
       </tr>
       <tr>
       <td>Cxx</td>
-        <td>DRUM MODE</td>
-        <td>Set the drum mode, where x is 0x00..0x4F. Refer to the <a href="#drums">drums section</a> for details.<br>
+        <td>RESERVED</td>
+        <td></td>
       </tr>
       <tr>
-        <td>D0x</td>
-        <td>VOLUME CH1/D</td>
-        <td>Double the volume for channel 1, at the expense of switching off the drums.<br>
-	   D01 activates the effect, D00 switches it off.</td>
+        <td>Dxx</td>
+        <td>DRUM MODE</td>
+        <td>Set the drum mode, where x is 0x00..0x4F. Refer to the <a href="#drums">drums section</a> for details.<br></td>
       </tr>
       <tr>
         <td>E0x</td>

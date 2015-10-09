@@ -118,9 +118,10 @@ mainlp						;the main loop. yes, it's very simple ;)
 ;************************************************************************************
 exit						;exit HT2
 	ld a,#30				;reset mute switches (#30 = jr nc,..)
-	ld (mute1),a
+	;ld (mute1),a
 	ld (muteD),a
 	ld a,#9f				;#9f = sbc a,a
+	ld (mute1),a
 	ld (mute2),a
 	ld (mute3),a
 	

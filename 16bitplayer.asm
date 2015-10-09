@@ -172,20 +172,17 @@ rdnotesRP				;entry point for RowPlay
 	ld l,a			;4
 	
 	ld a,(hl)		;7	;lookup lo byte of frequency value
-	add a,a			;4	;for channel 1, values are multiplied by 2
 	ld (ch1),a		;13	;and store it to base counter
 	inc l			;4
-	;ld a,0			;7	;preserve carry
-	ld a,(hl)
-	adc a,(hl)		;7	;lookup and double add hi byte of frequency vaule
-	;add a,(hl)		;7	;done: how about ld a,(hl), adc a,(hl)?
+	ld a,(hl)		;7
 	ld (ch1+1),a		;13	;and store it to base counter
 	
 	ld l,0			;7	;reset freq.LUT pointer
 	pop de			;10	;ch3 ptn pointer to de
 	ld a,(de)		;7
 	inc de			;6	;increment ptn pos pointer
-	rla			;4	;can use rla here since carry is reset from previous add a,l op
+	;rla			;4	;can use rla here since carry is reset from previous add a,l op
+	add a,a
 	add a,l			;4
 	ld l,a			;4
 	
@@ -258,9 +255,12 @@ drumres equ $+1
 	ld hl,0			;10	;HL holds "add" value for ch1, zero it; the 0-word also acts as stop byte for the drums
 					;TODO: seems messy (see above)
 
-mask1 equ $+2				;panning switches for drum and ch1
-maskD equ $+3	
-	ld ix,lp_msk		;14	;initialize output masks for those channels that use it (set to all channels off)
+;mask1 equ $+2				;panning switches for drum and ch1
+;maskD equ $+3	
+;	ld ix,lp_msk		;14	;initialize output masks for those channels that use it (set to all channels off)
+
+maskD equ $+1				;panning switch for drum ch
+	ld ixh,lp_off		;11	;initialize output mask for drum channel
 
 ;*************************************************************************************
 playnote				;synthesize and output current step
@@ -287,14 +287,26 @@ panD equ $+1
 					;28t
 outdr
 ;volswap2 equ $+1
-	ld a,ixl		;8	;load output mask ch1 - ld a,ixl = dd 7d, ld a,ixh = dd 7c, or ixl = dd b5, and ixl = dd a5
+; 	ld a,ixl		;8	;load output mask ch1 - ld a,ixl = dd 7d, ld a,ixh = dd 7c, or ixl = dd b5, and ixl = dd a5
+; 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
+; mute1					;mute switch for ch1
+; 	jr nc,out1		;12/7	;skip the following if result was <=#ffff
+; 					;else						
+; pan1 equ $+1
+; 	xor lp_sw		;7	;toggle output mask ch1
+; 	ld ixl,a		;8 -41	;and update it
+	
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
+phaseshift1 equ $+1
+	ld a,#80		;7	;set duty
+	cp h			;4
 mute1					;mute switch for ch1
-	jr nc,out1		;12/7	;skip the following if result was <=#ffff
-					;else						
+	sbc a,a			;4
+	or lp_off		;7
 pan1 equ $+1
-	xor lp_sw		;7	;toggle output mask ch1
-	ld ixl,a		;8	;and update it
+	and lp_on		;7 -40
+	
+
 out1
 	out (link),a		;11	;output state ch1
 					;----- DRUMS: 77/78/87/88t (old 85/95t) (old 105/115t)
@@ -425,8 +437,7 @@ fxJumpTab
 	nop
 	jp fx3
 	nop
-	;jp fx4
-	jp fxcont
+	jp fx4
 	nop
 	jp fx5
 	nop
@@ -442,7 +453,7 @@ fxJumpTab
 	nop
 	jp fxB
 	nop
-	jp fxC
+	jp fxcont
 	nop
 	jp fxD
 	nop
@@ -469,10 +480,12 @@ pch1
 	rrca
 	jp c,setleft1
 	ex af,af'
-	ld a,lp_sw
+	;ld a,lp_sw
+	;ld (pan1),a
+	;ld a,lp_off
+	;ld (mask1),a
+	ld a,lp_on
 	ld (pan1),a
-	ld a,lp_off
-	ld (mask1),a
 	ex af,af'
 	
 pch2
@@ -523,19 +536,13 @@ fx3					;pitch slide up
 	ld (pitchslide+1),a
 	jp fxcont	
 
-; fx4					;ch2 pwm mode
-; 	ld a,(de)
-; 	or a
-; 	jr z,_resetpwm
-; 	ld a,#ce
-; 	ld (pwmswitch),a
-; 	jp fxcont
-; _resetpwm
-; 	ld a,#c6
-; 	ld (pwmswitch),a
-; 	ld a,#80
-; 	ld (phaseshift2),a
-; 	jp fxcont
+fx4					;duty cycle ch1
+	ld a,(de)
+	ld (phaseshift1),a
+	cp #81				;if duty < #80, deactivate Axx
+	jr c,Askip
+	ld a,4				;else, activate noise mode (A01)
+	jr Afast
 
 fx5					;duty cycle ch2
 	ld a,(de)
@@ -560,24 +567,24 @@ fx6					;duty cycle ch3
 fxA					;ch1 "glitch" effect
 	ld a,(de)
 	or a
-	jr z,_Askip
+	jr z,Askip
 	dec a
 	ld a,5
-	jr nz,_Afast
+	jr nz,Afast
 
 	dec a
-_Afast
+Afast
 	ld (fxswap2),a
 	ld a,#cb
 	ld (fxswap1),a
 	jp fxcont
-_Askip
+Askip
 	ld a,#c6
 	ld (fxswap1),a
 	jp fxcont
 	
 	
-fxC					;set drum mode.
+fxD					;set drum mode.
 	ld a,(de)
 	and #0f				;calculate jump
 	add a,a
@@ -586,55 +593,55 @@ fxC					;set drum mode.
 _jumpx equ $+1
 	jr $
 
-_fxCx0
+_fxDx0
 	ld a,0				;nop (default)
-	jr _fxCxx
-_fxCx1
+	jr _fxDxx
+_fxDx1
 	ld a,#27			;daa
-	jr _fxCxx
-_fxCx2
+	jr _fxDxx
+_fxDx2
 	ld a,#8f			;add a,a
-	jr _fxCxx
-_fxCx3
+	jr _fxDxx
+_fxDx3
 	ld a,#1f			;rra
-	jr _fxCxx
-_fxCx4
+	jr _fxDxx
+_fxDx4
 	ld a,#2f			;cpl
-	jr _fxCxx
-_fxCx5
+	jr _fxDxx
+_fxDx5
 	ld a,#79			;ld a,c
-	jr _fxCxx
-_fxCx6
+	jr _fxDxx
+_fxDx6
 	ld a,#89			;add a,c
-	jr _fxCxx
-_fxCx7
+	jr _fxDxx
+_fxDx7
 	ld a,#88			;add a,b
-	jr _fxCxx
-_fxCx8
+	jr _fxDxx
+_fxDx8
 	ld a,#90			;sub b
-	jr _fxCxx
-_fxCx9
+	jr _fxDxx
+_fxDx9
 	ld a,#91			;sub c
-	jr _fxCxx
-_fxCxa
+	jr _fxDxx
+_fxDxa
 	ld a,#a0			;and b
-	jr _fxCxx
-_fxCxb
+	jr _fxDxx
+_fxDxb
 	ld a,#a1			;and c
-	jr _fxCxx
-_fxCxc
+	jr _fxDxx
+_fxDxc
 	ld a,#b0			;or b
-	jr _fxCxx
-_fxCxd
+	jr _fxDxx
+_fxDxd
 	ld a,#b1			;or c
-	jr _fxCxx
-_fxCxe
+	jr _fxDxx
+_fxDxe
 	ld a,#a8			;xor b
-	jr _fxCxx
-_fxCxf
+	jr _fxDxx
+_fxDxf
 	ld a,#a9			;xor c
 
-_fxCxx
+_fxDxx
 	ld (drumswap2),a
 	ld a,(de)
 	and #70
@@ -649,72 +656,26 @@ _fxCxx
 _jump equ $+1
 	jr $
 
-_fxC0x
+_fxD0x
 	ld a,#03			;inc bc
-	jr _fxCyy	
-_fxC1x
+	jr _fxDyy	
+_fxD1x
 	ld a,#0b			;dec bc
-	jr _fxCyy	
-_fxC2x
+	jr _fxDyy	
+_fxD2x
 	ld a,#0c			;inc c
-	jr _fxCyy	
-_fxC3x
+	jr _fxDyy	
+_fxD3x
 	ld a,#0d			;dec c
-	jr _fxCyy
-_fxC4x
+	jr _fxDyy
+_fxD4x
 	xor a				;nop
 
-_fxCyy
+_fxDyy
 	ld (drumswap),a					
 	jp fxcont
 
-fxD					;ch1/d volume shift
-; 	ld a,(de)
-; 	or a
-; 	jr z,_Vreset
-;
-; 	dec a				;D01 = double vol ch1
-; 	jr nz,_fxD2
-; 	ld a,#7d
-; _fxDxx
-; 	ld (volswap2),a
-; 	ld (volswap1),a
-; 	jp fxcont
-;
-; _fxD2					;D02 = double vol drums
-; 	dec a
-; 	jr nz,_fxD3
-; 	ld a,#7c
-; 	jr _fxDxx
-; 	
-; _fxD3					;D03 = drums OR ch1
-; 	dec a
-; 	ld a,#7c
-; 	ld (volswap1),a
-; 	jr nz,_fxD4	
-; 	ld a,#b5
-; 	db #c2				;jp nz,...
-; 	
-;
-; _fxD4					;D04 = drums AND ch1
-; 	ld a,#a5
-; 	ld (volswap2),a
-; 	jp fxcont	
-; 	
-; _Vreset
-; 	ld a,#7c
-; 	ld (volswap1),a
-; 	inc a
-; 	ld (volswap2),a
-; 	jp fxcont
-	
-	jr nz,_Vskip
-	ld a,#7c
-	db #c2
-_Vskip
-	ld a,#7d
-	ld (volswap1),a
-	jp fxcont
+
 
 fxE					;reset all fx
 	ld a,(de)
@@ -729,20 +690,24 @@ fxE					;reset all fx
 		
 setright1
 	ex af,af'
-	ld a,lp_swr
-	ld (pan1),a
+	;ld a,lp_swr
+	;ld (pan1),a
+	;ld a,lp_r
+	;ld (mask1),a
 	ld a,lp_r
-	ld (mask1),a
+	ld (pan1),a
 	ex af,af'
 	rrca
 	jp pch2
 
 setleft1
 	ex af,af'
-	ld a,lp_swl
+	;ld a,lp_swl
+	;ld (pan1),a
+	;ld a,lp_l
+	;ld (mask1),a
+	ld a,lp_r
 	ld (pan1),a
-	ld a,lp_l
-	ld (mask1),a
 	ex af,af'
 	jp pch2
 	
@@ -808,15 +773,16 @@ resetFX1
 	
 resetFX2	
 	ld a,lp_sw			;reset panning switches
-	ld (pan1),a
+	;ld (pan1),a
 	ld (panD),a
 	
 	ld a,lp_on
+	ld (pan1),a
 	ld (pan2),a
 	ld (pan3),a
 	
 	ld a,lp_off			;TEST
-	ld (mask1),a
+	;ld (mask1),a
 	ld (maskD),a
 
 resetFX3	
