@@ -162,7 +162,7 @@
       <td>TI-82 Plus</td>
       <td>all</td>
       <td>DoorsCS</td>
-      <td>ht2.8xp</td>
+      <td>ht2.8xp/ht2s.8xp</td>
       <td style="color: #00a000;">supported</td>
      </tr>
      <tr>
@@ -176,14 +176,14 @@
       <td>TI-83 Plus (all versions)</td>
       <td>all</td>
       <td>DoorsCS</td>
-      <td>ht2.8xp</td>
+      <td>ht2.8xp/ht2s.8xp</td>
       <td style="color: #00a000;">supported</td>
      </tr>
      <tr>
       <td>TI-84 Plus/Plus SE</td>
       <td>all</td>
       <td>DoorsCS</td>
-      <td>ht2.8xp</td>
+      <td>ht2.8xp/ht2s.8xp</td>
       <td style="color: #00a000;">supported</td>
      </tr>
      <tr>
@@ -434,7 +434,13 @@
     Step 2: Switch off your calculator, and connect it to your computer with a link cable. This will switch your calc back on.<br>
     Step 3: On your computer, open TiLP. Make sure your calculator and link cable settings are correct - if not, press Ctrl+D to reconfigure.<br>
     Step 4: In Tilp, go to "File"->"Send Files", and select DoorsCS7.8xk from the DoorsCS package.<br>
-    Step 5: Assuming all went good, you can now send ("File"->"Send Files") ht2.8xp.<br><br><br>
+    Step 5: Assuming all went good, you can now send ("File"->"Send Files") ht2.8xp.<br><br>
+    <table><tr>
+    <td><img src="data/idea.jpg"></td><td>If you don't have enough free memory because you have a large number of archived apps, you can install
+       ht2s.8xp instead.</td>
+    </tr></table><br>
+    <br>
+    
   </div>
   <div class="main">
     <table><tr>
@@ -1028,22 +1034,22 @@
             </tr></table>
       </tr>
       <tr>
-      <td>40x</td>
-        <td>DUTY CYCLE SWEEP CH2</td>
-        <td>Do a SID-style duty cycle sweep on channel 2. This will override any duty cycle settings on that channel.<br>
-	    401 activates the effect, 400 deactivates it and resets the duty cycle to 50:50.<br>
+      <td>4xx</td>
+        <td>RESERVED</td>
+        <td></td>
       </tr>
       <tr>
       <td>5xx</td>
-        <td>DUTY CYCLE CH2</td>
-        <td>Set the duty cycle for channel 2.<br>
-	    xx can be any value, but 0x00 will cause glitches. A value of 0x80 produces the default 50:50 wave.<br>
+        <td>DUTY CYCLE/ SWEEP CH2</td>
+        <td>Set the duty cycle for channel 2, or activate duty cycle sweep.<br>
+	    xx <= 0x80 - set duty cycle and deactivate duty cycle sweep. A value of 0x80 produces the default 50:50 wave. Very low/high values will cause glitches.<br>
+	    xx > 0x80 - activate SID-style duty cycle sweep.<br>
       </tr>
       <tr>
       <td>6xx</td>
         <td>DUTY CYCLE CH3</td>
         <td>Set the duty cycle for channel 3.<br>
-	    xx can be any value, but 0x00 will cause glitches. A value of 0x80 produces the default 50:50 wave.<br>
+	    xx can be any value, but very low/high values will cause glitches. A value of 0x80 produces the default 50:50 wave.<br>
       </tr>
       <tr>
         <td>A0x</td>

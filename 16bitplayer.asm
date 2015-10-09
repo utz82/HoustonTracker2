@@ -425,7 +425,8 @@ fxJumpTab
 	nop
 	jp fx3
 	nop
-	jp fx4
+	;jp fx4
+	jp fxcont
 	nop
 	jp fx5
 	nop
@@ -522,23 +523,33 @@ fx3					;pitch slide up
 	ld (pitchslide+1),a
 	jp fxcont	
 
-fx4					;ch2 pwm mode
-	ld a,(de)
-	or a
-	jr z,_resetpwm
-	ld a,#ce
-	ld (pwmswitch),a
-	jp fxcont
-_resetpwm
-	ld a,#c6
-	ld (pwmswitch),a
-	ld a,#80
-	ld (phaseshift2),a
-	jp fxcont
+; fx4					;ch2 pwm mode
+; 	ld a,(de)
+; 	or a
+; 	jr z,_resetpwm
+; 	ld a,#ce
+; 	ld (pwmswitch),a
+; 	jp fxcont
+; _resetpwm
+; 	ld a,#c6
+; 	ld (pwmswitch),a
+; 	ld a,#80
+; 	ld (phaseshift2),a
+; 	jp fxcont
 
 fx5					;duty cycle ch2
 	ld a,(de)
-	ld (phaseshift2),a	
+	cp #81				;if fx param > #80, switch to pwm sweep mode
+	jr nc,_activatePWM
+	
+	ld (phaseshift2),a		;set duty
+	ld a,#c6			;deactivate pwm sweep
+	ld (pwmswitch),a	
+	jp fxcont
+	
+_activatePWM
+	ld a,#ce
+	ld (pwmswitch),a
 	jp fxcont
 	
 fx6					;duty cycle ch3
