@@ -259,8 +259,11 @@ drumres equ $+1
 ;maskD equ $+3	
 ;	ld ix,lp_msk		;14	;initialize output masks for those channels that use it (set to all channels off)
 
-maskD equ $+2				;panning switch for drum ch
-	ld ixh,lp_off		;11	;initialize output mask for drum channel
+;maskD equ $+2				;panning switch for drum ch
+;	ld ixh,lp_off		;11	;initialize output mask for drum channel
+maskD equ $+1
+	ld a,lp_off
+	ex af,af'
 
 ;*************************************************************************************
 playnote				;synthesize and output current step
@@ -272,18 +275,22 @@ dru equ $+1
 	add a,0			;7	;add current drum pitch counter
 	ld (dru),a		;13	;and save it as current pitch counter
 	
-volswap1 equ $+1	
-	ld a,ixh		;8	;output mask for drum channel - ld a,ixh = dd 7c, ld a,ixl = dd 7d
+;volswap1 equ $+1	
+	;ld a,ixh		;8	;output mask for drum channel - ld a,ixh = dd 7c, ld a,ixl = dd 7d
+	ex af,af'
 	out (link),a		;11	;output drum channel state
+	ex af,af'
 					;---- CH2: 104t	
 muteD					;mute switch for drums
 	jr nc,waitD		;12/7	;skip the following if result was <=#ff
 
 drumswap				;switch for drum mode. inc bc = #03, dec bc = #0b, inc c = #0c, dec c = #0d, nop	
 	inc bc			;6	;increment sample data pointer
+	ex af,af'
 panD equ $+1
 	xor lp_sw		;7	;toggle output mask
-	ld ixh,a		;8	;and update it
+	;ld ixh,a		;8	;and update it
+	ex af,af'
 					;28t
 outdr	
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
@@ -370,8 +377,13 @@ rowplaySwap equ $+1			;switch for jumping to exitRowplay instead, jp z = #ca, re
 	push de
 	push hl
 	push bc
+	ex af,af'
+	push af
 
 	call keyhand
+	
+	pop af
+	ex af,af'
 	
 	pop bc				;retrieve all counters
 	pop hl
@@ -782,8 +794,8 @@ resetFX3
 	
 	ld (pwmswitch),a		;reset pwm sweep
 	
-	ld a,#7c			;reset volume shift drums/ch1
-	ld (volswap1),a
+	;ld a,#7c			;reset volume shift drums/ch1
+	;ld (volswap1),a
 	;inc a
 	;ld (volswap2),a
 	
