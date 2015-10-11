@@ -1,0 +1,14 @@
+
+version 2.01
+
+NEW/CHANGES
+
+- channel 1 now has variable duty cycle, too
+- new effect: 4xx - set duty/noise mode ch1
+- old 4xx (toggle duty cycle sweep) has been merged in to 5xx (set duty ch2)
+- Cxx (set drum mode) is now Dxx
+- old Dxx (set vol ch1/drums) has been removed (no longer possible for technical reasons)
+
+BUGFIXES
+
+- fixed recovery from failed save attempt

@@ -259,7 +259,7 @@ drumres equ $+1
 ;maskD equ $+3	
 ;	ld ix,lp_msk		;14	;initialize output masks for those channels that use it (set to all channels off)
 
-maskD equ $+1				;panning switch for drum ch
+maskD equ $+2				;panning switch for drum ch
 	ld ixh,lp_off		;11	;initialize output mask for drum channel
 
 ;*************************************************************************************
@@ -285,17 +285,7 @@ panD equ $+1
 	xor lp_sw		;7	;toggle output mask
 	ld ixh,a		;8	;and update it
 					;28t
-outdr
-;volswap2 equ $+1
-; 	ld a,ixl		;8	;load output mask ch1 - ld a,ixl = dd 7d, ld a,ixh = dd 7c, or ixl = dd b5, and ixl = dd a5
-; 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
-; mute1					;mute switch for ch1
-; 	jr nc,out1		;12/7	;skip the following if result was <=#ffff
-; 					;else						
-; pan1 equ $+1
-; 	xor lp_sw		;7	;toggle output mask ch1
-; 	ld ixl,a		;8 -41	;and update it
-	
+outdr	
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
 phaseshift1 equ $+1
 	ld a,#80		;7	;set duty
