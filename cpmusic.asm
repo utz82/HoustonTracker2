@@ -3,7 +3,7 @@
 	db #10			;speed
 	;dw #5fcd		;usr drum
 
-IF MODEL = TI82
+IF MODEL = TI82 || TI8P
 	dw #5e31
 ENDIF
 
@@ -11,7 +11,7 @@ IF MODEL = TI83
 	dw #2bae
 ENDIF
 
-IF MODEL = TI8X
+IF MODEL = TI8X || TI8XS
 	dw #1f73
 ENDIF
 	db #01			;loop point
