@@ -77,6 +77,8 @@ AutoInc		equ apd_buf+#16		;1	auto inc mode (1 = off, 0 = on)
 
 RowPlay		equ apd_buf+#17		;1	RowPlay mode (0 = off, #ff = on)
 
+LastKey		equ apd_buf+#18		;1	#a0 if last key set ALPHA mode on, else 0
+
 PrintBuf	equ ops			;6	print bitmap buffer
 
 ;FontLUT	equ 256*((HIGH(apd_buf))+1)	;font LUT
@@ -1217,6 +1219,24 @@ _rdkeys
 	
 _wait
 	ld b,a
+	
+	ld a,(LastKey)			;reset ALPHA mode if last key pressed was not ALPHA
+	or a
+	jr nz,_resetLK
+	
+	xor a
+	ld (AlphaFlag),a
+	
+	ld de,#2888
+	call setXY
+	call clearPrintBuf			;clear print buffer
+	jp printBuf				;remove Alpha mode marker from screen
+	;ret
+	
+_resetLK
+	xor a
+	ld (LastKey),a	
+	
 _waitlp
 	ex (sp),hl
 	ex (sp),hl

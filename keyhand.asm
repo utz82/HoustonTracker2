@@ -997,6 +997,7 @@ kalpha
 	ld a,(AlphaFlag)	
 	xor #a0
 	ld (AlphaFlag),a			;set AlphaFlag
+	ld (LastKey),a				;set LastKey
 
 	or a
 	jr z,_skip
