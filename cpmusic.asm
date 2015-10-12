@@ -1,9 +1,9 @@
-;collapsed savestate
+;collapsed savestate - test song
 
 	db #10			;speed
 	;dw #5fcd		;usr drum
 
-IF MODEL = TI82 || TI8P
+IF MODEL = TI82 || MODEL = TI8P
 	dw #5e31
 ENDIF
 
@@ -11,7 +11,7 @@ IF MODEL = TI83
 	dw #2bae
 ENDIF
 
-IF MODEL = TI8X || TI8XS
+IF MODEL = TI8X || MODEL = TI8XS
 	dw #1f73
 ENDIF
 	db #01			;loop point
