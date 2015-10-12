@@ -39,12 +39,20 @@ text_mem	equ	#808f		;128 bytes
 text_mem2	equ	#8bdf		;128 bytes
 ops		equ	#8028		;66 bytes
 
+mem_end		equ	#fcb3		;user memory end (excl. safety margin)
+
 ;**********************************************************************************
 ;rom_call macro
 
 macro rom_call,addr
-		call #8d74
-		dw addr
+		;call #8d74
+		;dw addr
+		call addr
+endm
+
+macro key_delay
+		nop
+		nop
 endm
 
 ;**********************************************************************************
