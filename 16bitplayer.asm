@@ -255,14 +255,8 @@ drumres equ $+1
 	ld hl,0			;10	;HL holds "add" value for ch1, zero it; the 0-word also acts as stop byte for the drums
 					;TODO: seems messy (see above)
 
-;mask1 equ $+2				;panning switches for drum and ch1
-;maskD equ $+3	
-;	ld ix,lp_msk		;14	;initialize output masks for those channels that use it (set to all channels off)
-
-;maskD equ $+2				;panning switch for drum ch
-;	ld ixh,lp_off		;11	;initialize output mask for drum channel
-maskD equ $+1
-	ld a,lp_off
+maskD equ $+1				;panning switch for drum ch
+	ld a,lp_off			;initialize output mask for drum channel
 	ex af,af'
 
 ;*************************************************************************************
@@ -274,25 +268,26 @@ drumswap2
 dru equ $+1
 	add a,0			;7	;add current drum pitch counter
 	ld (dru),a		;13	;and save it as current pitch counter
-	
-;volswap1 equ $+1	
-	;ld a,ixh		;8	;output mask for drum channel - ld a,ixh = dd 7c, ld a,ixl = dd 7d
-	ex af,af'
-	out (link),a		;11	;output drum channel state
-	ex af,af'
-					;---- CH2: 104t	
+
 muteD					;mute switch for drums
 	jr nc,waitD		;12/7	;skip the following if result was <=#ff
+	
+	ex af,af'		;4	;load output mask for drum channel
+	out (link),a		;11	;output drum channel state
+					;---- CH2: 104t	
+	;ex af,af'		;4
+					
+;muteD					;mute switch for drums
+;	jr nc,waitD		;12/7	;skip the following if result was <=#ff
 
 drumswap				;switch for drum mode. inc bc = #03, dec bc = #0b, inc c = #0c, dec c = #0d, nop	
 	inc bc			;6	;increment sample data pointer
-	ex af,af'
+	;ex af,af'		;4
 panD equ $+1
-	xor lp_sw		;7	;toggle output mask
-	;ld ixh,a		;8	;and update it
-	ex af,af'
-					;28t
+	xor lp_sw		;7	;toggle output mask	
+	nop				;28t
 outdr	
+	ex af,af'		;4
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
 phaseshift1 equ $+1
 	ld a,#80		;7	;set duty
@@ -301,8 +296,7 @@ mute1					;mute switch for ch1
 	sbc a,a			;4
 	or lp_off		;7
 pan1 equ $+1
-	and lp_on		;7 -40
-	
+	and lp_on		;7
 
 out1
 	out (link),a		;11	;output state ch1
@@ -354,12 +348,8 @@ readkeys				;check if a key has been pressed
 reentry	
 	exx			;4
 
-; 	dec de
-; 	ld a,d
-; 	or e
-; 	jp nz,playnote
 	dec e			;4	;update speed counter - slightly inefficient, but faster on average than dec de\ld a,d\or e, and gives better sound
-	jr nz,playnote		;12/7   ;TODO: worth using jp??? worth retracting to dec de..? (+8t)?
+	jp nz,playnote		;10
 				;
 	dec d			;4
 	jp nz,playnote		;10
@@ -402,9 +392,15 @@ counterSP equ $+1
 
 ;*************************************************************************************
 waitD
+ 	ex af,af'		;4	;load output mask for drum channel
+ 	out (link),a		;11	;output drum channel state
+; 					;---- CH2: 104t	
+; 	ex af,af'		;4
+
 fxswap1
 fxswap2 equ $+1
-	ld a,4			;7	;swap with rlc h (cb 04) for noise/glitch effect, with rlc l (cb 05) for phase effect - ld a,n = c6
+	dw 0
+	;ld a,4			;7	;swap with rlc h (cb 04) for noise/glitch effect, with rlc l (cb 05) for phase effect - ld a,n = c6
 	jp outdr		;10
 				;17+12=29
 
@@ -482,10 +478,6 @@ pch1
 	rrca
 	jp c,setleft1
 	ex af,af'
-	;ld a,lp_sw
-	;ld (pan1),a
-	;ld a,lp_off
-	;ld (mask1),a
 	ld a,lp_on
 	ld (pan1),a
 	ex af,af'
@@ -581,8 +573,10 @@ Afast
 	ld (fxswap1),a
 	jp fxcont
 Askip
-	ld a,#c6
+	;ld a,#c6
+	xor a
 	ld (fxswap1),a
+	ld (fxswap2),a
 	jp fxcont
 	
 	
@@ -692,10 +686,6 @@ fxE					;reset all fx
 		
 setright1
 	ex af,af'
-	;ld a,lp_swr
-	;ld (pan1),a
-	;ld a,lp_r
-	;ld (mask1),a
 	ld a,lp_r
 	ld (pan1),a
 	ex af,af'
@@ -704,10 +694,6 @@ setright1
 
 setleft1
 	ex af,af'
-	;ld a,lp_swl
-	;ld (pan1),a
-	;ld a,lp_l
-	;ld (mask1),a
 	ld a,lp_r
 	ld (pan1),a
 	ex af,af'
@@ -775,7 +761,6 @@ resetFX1
 	
 resetFX2	
 	ld a,lp_sw			;reset panning switches
-	;ld (pan1),a
 	ld (panD),a
 	
 	ld a,lp_on
@@ -783,26 +768,19 @@ resetFX2
 	ld (pan2),a
 	ld (pan3),a
 	
-	ld a,lp_off			;TEST
-	;ld (mask1),a
+	ld a,lp_off
 	ld (maskD),a
 
 resetFX3	
-	ld a,#c6			;reset ch1 fx
-	ld (fxswap1),a
-	;ld (fxswap2),a
-	
-	ld (pwmswitch),a		;reset pwm sweep
-	
-	;ld a,#7c			;reset volume shift drums/ch1
-	;ld (volswap1),a
-	;inc a
-	;ld (volswap2),a
+	ld a,#c6			;reset pwm sweep	
+	ld (pwmswitch),a		
 	
 	ld a,#03			;reset drum counter mode
 	ld (drumswap),a
 	
 	xor a
+	ld (fxswap1),a			;reset A0x fx
+	ld (fxswap2),a
 	ld (pitchslide),a
 	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
