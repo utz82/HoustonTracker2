@@ -775,8 +775,10 @@
     There are a number of different indicators, which will tell you about various modes and editing settings that are currently applied.<br><br>
     The <b style="background:#ac936b">Alpha mode indicator</b> comes in the shape of a capital letter A, which is displayed below the diagonal left edge of the 
     HT2 logo. 
-    When the A is visible, then Alpha mode is active. The Alpha mode is HT2's version of CAPS LOCK. Many keys in HT2 have a primary and secondary function. 
-    In Alpha mode, the secondary functions will be triggered. You can toggle Alpha mode on and off by pressing - you guessed it - <b>[ALPHA]</b>.<br><br>
+    When the A is visible, then Alpha mode is active. The Alpha mode is HT2's version of the SHIFT key on a PC - except that you press it <b>before</b> pressing
+    another key, not together with the second key.<br>Many keys in HT2 have a primary and secondary function. 
+    In Alpha mode, the secondary functions will be triggered. You can toggle Alpha mode on and off by pressing - you guessed it - <b>[ALPHA]</b>. Alpha mode
+    will be turned off automatically once an Alpha mode action has been performed.<br><br>
     The <b style="background:#6b6bff">playback indicators</b> are located directly below the HT2 logo. The first position tells you if the music player is
     currently stopped or running. While stopped, it will display a &#x25a0;, when running, it will display the capital letter P. Next to this position, you
     will find four positions which normally read "123D" (for channel 1, 2, 3, and drums respectively). These positions indicate which channels are currently 
@@ -787,8 +789,7 @@
     active, and A0 when inactive. Auto-incrementing means that after you enter a value or note in HT2, the cursor will automatically advance to the next position.
     You can toggle AutoInc with key <b>[MODE]</b>. The <b>RowPlay indicator</b> tells you whether RowPlay mode is currently active. If so, it will display the 
     capital letter P. When entering a note, HT2 will
-    automatically play the current pattern position (including all channels that are not muted). You can toggle RowPlay by activating <b>[ALPHA]</b> mode, and 
-    then pressing key <b>[MODE]</b>.<br><br>
+    automatically play the current pattern position (including all channels that are not muted). You can toggle RowPlay by pressing <b>[ALPHA], [MODE]</b>.<br><br>
     <table><tr>
     <td><img src="data/warn.jpg"></td><td>RowPlay mode can't reliably detect all effect settings that apply to the current position, so depending on the 
     circumstances,
@@ -804,13 +805,13 @@
   </div>
   <div class="main">
     The <b style="background:#6be16b">loop point</b> defines what row in the sequence the player will loop back to after it has reached the end of the song.
-    Pressing <b>[x&sup2;]</b> will set the loop point to the row currently highlighted by the cursor. To set it to another row, first enter <b>[ALPHA]</b> mode,
-    then press <b>[x&sup2;]</b> and enter a 2-digit hex number.<br><br>
+    Pressing <b>[x&sup2;]</b> will set the loop point to the row currently highlighted by the cursor. To set it to another row, press <b>[ALPHA], [x&sup2;]</b>,
+    then enter a 2-digit hex number.<br><br>
     
     The <b style="background:#ffff6b">global song speed</b> can be changed by pressing <b>[TRACE]</b>, followed by a 2-digit hex number. Generally, the higher 
     the number, the lower the speed. However, 0x00 is an exception. It is the slowest possible setting, equivalent to a speed of 0x100.<br><br>
     
-    To set the <b style="background:#c06bf2">user drum pointer</b>, go into <b>[ALPHA]</b> mode, then press <b>[TRACE]</b>, followed by a 4-digit hex number. 
+    To set the <b style="background:#c06bf2">user drum pointer</b>, press <b>[ALPHA], [TRACE]</b>, followed by a 4-digit hex number. 
     See the section on <a href="#drums">drums</a> for
     details about the user drum pointer.<br><br>
     <table><tr>
@@ -841,8 +842,8 @@
   </div>
   <div class="main">
     Keys <b>[&#9652;]</b>, <b>[&#9662;]</b>, <b>[&#9666;]</b>, and <b>[&#9656;]</b> move the cursor around on the sequence screen.<br><br>
-    Pressing <b>[&#9666;]</b> resp. <b>[&#9656;]</b> in <b>[ALPHA]</b> mode will move the cursor up/down by 10 rows.<br><br>
-    Pressing <b>[&#9652;]</b> in <b>[ALPHA]</b> mode will move the cursor to the start of the sequence. Likewise, pressing <b>[&#9662;]</b> in <b>[ALPHA]</b> mode will move 
+    Pressing <b>[ALPHA], [&#9666;]</b> resp. <b>[ALPHA], [&#9656;]</b> will move the cursor up/down by 10 rows.<br><br>
+    Pressing <b>[ALPHA], [&#9652;]</b> will move the cursor to the start of the sequence. Likewise, pressing <b>[ALPHA], [&#9662;]</b> mode will move 
     the cursor to the end of the sequence.<br>
     <br><br><br>
   </div>
@@ -859,8 +860,8 @@
     different from fx pattern 01.</td>
     </tr></table><br>
     To automatically put the first unused pattern at the current sequence position, press <b>[+]</b>. To clone the pattern at the current position (copy it's
-    contents to a new, unused pattern), press <b>[+]</b> in <b>[ALPHA]</b> mode.<br><br>
-    To delete the pattern number at the current position, press <b>[0]</b> in <b>[ALPHA]</b> mode.<br><br>
+    contents to a new, unused pattern), press <b>[ALPHA], [+]</b>.<br><br>
+    To delete the pattern number at the current position, press <b>[ALPHA], [0]</b>.<br><br>
     You can press <b>[-]</b> to copy the current row. This will insert the copy at the current position.<br><br>
     Press <b>[&div;]</b> to delete the current row.<br><br><br><br>
   </div>
@@ -872,10 +873,10 @@
     Block operations work only on the whole sequence, not on individual channels.<br><br>
     To set the block start to the current row in the sequence, press <b>[LN]</b>. Likewise, to set the block end to the current row, press [STO&#9658;]. 
     Pressing these keys in <b>[ALPHA]</b> mode will allow you to set the BS/BE positions manually.<br><br>
-    To copy the marked block and insert it at the current cursor position, press <b>[&times;]</b>. Pressing <b>[&times;]</b> in <b>[ALPHA]</b> mode will
+    To copy the marked block and insert it at the current cursor position, press <b>[&times;]</b>. Pressing <b>[ALPHA], [&times;]</b> will
     paste the block over the following sequence rows. Note that you cannot insert/paste a block into itself, so the target must always be outside the selected
     block.<br><br>
-    Press <b>[&div;]</b> in <b>[ALPHA]</b> mode to delete the selected block and move the following sequence data up.<br><br>
+    Press <b>[ALPHA], [&div;]</b> to delete the selected block and move the following sequence data up.<br><br>
     <br><br>
   </div>
   <a name="notepat"></a>
@@ -889,8 +890,8 @@
   <div class="main">
     All note patterns have a fixed length of 16 steps, which are organized in two columns à 8 steps.<br><br>
     Notes can be entered with keys <b>[MATH]</b> (A), <b>[MATRX]</b> resp. <b>[APPS]</b> (B), <b>[PRGM]</b> (C), <b>[x&#8315;&sup1;]</b> (D), <b>[SIN]</b> (E),
-    <b>[COS]</b> (F), and <b>[TAN]</b> (G). Sharp notes (black keys) can be reached in <b>[ALPHA]</b> mode.<br><br>
-    In order to hear notes while you're entering them, you can toggle <b>RowPlay</b> by pressing <b>[MODE]</b> in <b>[ALPHA]</b> mode. A "P" will be displayed
+    <b>[COS]</b> (F), and <b>[TAN]</b> (G). Sharp notes (black keys) can be reached with <b>[ALPHA]</b> + note key.<br><br>
+    In order to hear notes while you're entering them, you can toggle <b>RowPlay</b> by pressing <b>[ALPHA], [MODE]</b>. A "P" will be displayed
     next to the AutoInc indicator to let you know that RowPlay is active. Note that RowPlay is somewhat
     limited. Among other things, it may ignore current effect settings. Also, it will fail if the pattern you're editing is not on the current step in the song 
     sequence.
@@ -898,7 +899,7 @@
     To change the current octave, press <b>[GRAPH]</b>, then enter a number between 0 and 6. You can also edit octaves manually in the pattern.<br><br>
     
     <table><tr>
-    <td><img src="data/idea.jpg"></td><td>To cycle through note patterns, you can use keys <b>[&#9666;]</b> and <b>[&#9656;]</b> in <b>[ALPHA]</b> mode.
+    <td><img src="data/idea.jpg"></td><td>You can cycle through note patterns with <b>[ALPHA], [&#9666;]</b> and <b>[ALPHA], [&#9656;]</b>.
     </tr></table><br>
     <table><tr>
     <td><img src="data/idea.jpg"></td><td>In order to use a different pattern length, you can utilize the <a href="#fxreference">B00 effect command</a>.
@@ -946,7 +947,7 @@
 	   global pitch shift.</td><tr>
     </table><br> 
     Drum 0xE and 0xF are special cases.<br><br>
-    0xF is the user drum pointer, which can be configured individually. To change it, go into <b>[ALPHA]</b> mode, then press <b>[TRACE]</b>.<br>The user drum 
+    0xF is the user drum pointer, which can be configured individually. To change it, press <b>[ALPHA], [TRACE]</b>.<br>The user drum 
     pointer
     can be set to any value between $0000 and $FFFF. However, if you want to play it safe you should keep the pointer in range 0x0000 - 0x7FFF. This is because 
     the user drum
@@ -1107,7 +1108,7 @@
     Saving<br><br>
   </div>
   <div class="main">
-    To save your current work in progress, activate <b>[ALPHA]</b> mode, then press <b>[Y=]</b>. The letters "SA" will appear in the message area. 
+    To save your current work in progress, press <b>[ALPHA], [Y=]</b>. The letters "SA" will appear in the message area. 
     Now, enter the number of the save slot you want to load (0..7), and confirm by pressing <b>[.]</b>. (If you got here by accident, press <b>[0]</b> 
     to cancel.)<br><br>
     If the save was successful, error code E0 will be displayed in the message area. If the save was unsuccessful due to insufficient memory, error code
@@ -1129,7 +1130,7 @@
   </div>
   <div class="main">
     In case you run out of memory, or want to get rid of one of your save slots for other reasons, you can specify a save slot to be deleted.<br>
-    In order to do so, activate <b>[ALPHA]</b> mode, then press <b>[WINDOW]</b>. The letters "DS" will appear in the message area.<br> Now, enter the number
+    In order to do so, press <b>[ALPHA], [WINDOW]</b>. The letters "DS" will appear in the message area.<br> Now, enter the number
     of the save slot you want to delete (0..7), and confirm by pressing <b>[.]</b>. (If you got here by accident, press <b>[0]</b> to cancel.)<br>
     And that's all you need to know about deleting save slots!
     <br><br><br>
@@ -1256,6 +1257,7 @@
    <tr><td>8p</td><td>build for TI-82 Parcus</td></tr>
    <tr><td>83</td><td>build for TI-83, TI-82 Stats</td></tr>
    <tr><td>8x</td><td>build for TI-83 Plus, TI-84 Plus etc.</td></tr>
+   <tr><td>8xs</td><td>build "small" version for TI-83 Plus, TI-84 Plus etc.</td></tr>
   </table>
   <br>
   Optionally, you can rebuild the note table <i>before</i> running the build script. In order to do so, run the tablegen.sh 
