@@ -1229,12 +1229,11 @@ _wait
 	
 	ld de,#2888
 	call setXY
-	call clearPrintBuf			;clear print buffer
-	jp printBuf				;remove Alpha mode marker from screen
-	;ret
+	call clearPrintBuf		;clear print buffer
+	jp printBuf			;remove Alpha mode marker from screen
 	
 _resetLK
-	xor a
+	xor a				;clear LastKey flag
 	ld (LastKey),a	
 	
 _waitlp

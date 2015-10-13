@@ -1149,6 +1149,7 @@ kyeq						;load
 	ret nz					;if it is, ignore command
 	ld de,#100d				;LD message
 	ld a,(AlphaFlag)
+	ld iyh,a
 	or a
 	jr z,_skip
 	ld de,#130a				;SA message
@@ -1158,7 +1159,8 @@ _skip
 	call confirmAction
 	jp c,exitthis
 	
-	ld a,(AlphaFlag)
+	;ld a,(AlphaFlag)
+	ld a,iyh
 	or a
 	jp nz,save
 	

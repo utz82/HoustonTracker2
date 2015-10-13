@@ -460,8 +460,8 @@ chkMemEnd				;check if end of usr memory reached
 					;IN: nothing | OUT: jumps to errorHand if mem_end reached
 	or a				;clear carry
 	push hl
-	;ld hl,mem_end-4
-	ld hl,savestates+2		;DEBUG
+	ld hl,mem_end-4
+	;ld hl,savestates+2		;DEBUG
 	sbc hl,de			;subtract current mempos from mem_end-3
 	pop hl
 	ret nc
