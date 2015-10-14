@@ -275,13 +275,13 @@ muteD					;mute switch for drums
 	
 	ex af,af'		;4	;load output mask for drum channel
 	out (link),a		;11	;output drum channel state
-					;---- CH2: 104t	
+					;---- CH2: 100t	
 
 drumswap				;switch for drum mode. inc bc = #03, dec bc = #0b, inc c = #0c, dec c = #0d, nop	
 	inc bc			;6	;increment sample data pointer
 panD equ $+1
 	xor lp_sw		;7	;toggle output mask	
-	nop			;4	;42t
+	ret c			;5	;43t, ret never taken
 outdr	
 	ex af,af'		;4
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
@@ -296,9 +296,9 @@ pan1 equ $+1
 
 out1
 	out (link),a		;11	;output state ch1
-					;----- DRUMS: 77/78/87/88t (old 85/95t) (old 105/115t)
+					;----- DRUMS: 71/71t
+					
 	exx			;4	;back to the normal register set
-	
 	add iy,de		;15	;this is actually ch3
 phaseshift3 equ $+1			;switch for phase shift/set duty cycle
 	ld a,#80		;7	
@@ -346,7 +346,10 @@ reentry
 
 	dec e			;4	;update speed counter - slightly inefficient, but faster on average than dec de\ld a,d\or e, and gives better sound
 	jp nz,playnote		;10
-				;
+
+xFX equ $+1	
+	jp noXFX		;
+noXFX
 	dec d			;4
 	jp nz,playnote		;10
 				;
@@ -398,6 +401,22 @@ fxswap2 equ $+1
 				;15+18+10=43
 
 ;*************************************************************************************
+noteCut
+nLength equ $+1
+	ld a,0
+	dec a
+	ld (nLength),a
+	jr nz,noXFX
+	ld hl,0
+	ld sp,hl
+nLengthBackup equ $+1
+	ld a,0
+	ld (nLength),a
+	dec d
+	jp nz,playnote
+	jr keyPressed
+;*************************************************************************************
+
 drums					;select drum
 	ld hl,samples-2			;point to beginning of sample pointer table - 2 (because minimum offset will be +2)
 	rra				;divide drum # by 8 to get offset in table (carry is cleared before calling drum select)
@@ -444,7 +463,7 @@ fxJumpTab
 	nop
 	jp fxB
 	nop
-	jp fxcont
+	jp fxC
 	nop
 	jp fxD
 	nop
@@ -571,7 +590,25 @@ Askip
 	ld (fxswap1),a
 	ld (fxswap2),a
 	jp fxcont
+
+fxC
+	ld a,(de)
+	or a
+	jr z,resetfxC
+	ld (nLength),a
+	ld (nLengthBackup),a
+	ld a,LOW(noteCut)
+	ld (xFX),a
+	ld a,HIGH(noteCut)
+	ld (xFX+1),a
+	jp fxcont
 	
+resetfxC
+	ld a,LOW(noXFX)
+	ld (xFX),a
+	ld a,HIGH(noXFX)
+	ld (xFX+1),a
+	jp fxcont	
 	
 fxD					;set drum mode.
 	ld a,(de)
@@ -777,6 +814,11 @@ resetFX3
 	ld (pitchslide),a
 	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
+	
+	ld a,LOW(noXFX)			;reset extended FX
+	ld (xFX),a
+	ld a,HIGH(noXFX)
+	ld (xFX+1),a
 
 	ret				;must return with Z-flag set
 ;*************************************************************************************
