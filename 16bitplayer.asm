@@ -724,7 +724,7 @@ setright1
 
 setleft1
 	ex af,af'
-	ld a,lp_r
+	ld a,lp_l
 	ld (pan1),a
 	ex af,af'
 	jp pch2
