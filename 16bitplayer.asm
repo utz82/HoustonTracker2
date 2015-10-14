@@ -270,22 +270,18 @@ dru equ $+1
 	ld (dru),a		;13	;and save it as current pitch counter
 
 muteD					;mute switch for drums
-	jr nc,waitD		;12/7	;skip the following if result was <=#ff
+					;jr nc,waitD		;12/7	;skip the following if result was <=#ff
+	jp nc,waitD		;10
 	
 	ex af,af'		;4	;load output mask for drum channel
 	out (link),a		;11	;output drum channel state
 					;---- CH2: 104t	
-	;ex af,af'		;4
-					
-;muteD					;mute switch for drums
-;	jr nc,waitD		;12/7	;skip the following if result was <=#ff
 
 drumswap				;switch for drum mode. inc bc = #03, dec bc = #0b, inc c = #0c, dec c = #0d, nop	
 	inc bc			;6	;increment sample data pointer
-	;ex af,af'		;4
 panD equ $+1
 	xor lp_sw		;7	;toggle output mask	
-	nop				;28t
+	nop			;4	;42t
 outdr	
 	ex af,af'		;4
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
@@ -394,15 +390,12 @@ counterSP equ $+1
 waitD
  	ex af,af'		;4	;load output mask for drum channel
  	out (link),a		;11	;output drum channel state
-; 					;---- CH2: 104t	
-; 	ex af,af'		;4
-
+ 					;---- CH2: 104t	
 fxswap1
 fxswap2 equ $+1
-	dw 0
-	;ld a,4			;7	;swap with rlc h (cb 04) for noise/glitch effect, with rlc l (cb 05) for phase effect - ld a,n = c6
+	dw 0			;8	;swap with rlc h (cb 04) for noise/glitch effect, with rlc l (cb 05) for phase effect
 	jp outdr		;10
-				;17+12=29
+				;15+18+10=43
 
 ;*************************************************************************************
 drums					;select drum
