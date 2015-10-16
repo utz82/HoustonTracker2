@@ -763,7 +763,7 @@ _header					;printing ptn#/curr. octave info
 	call getSeqOffset
 	
 	ld a,(CPtn)			;current ptn#
-	cp #7f				;if pattern# > #7f
+	cp #80				;if pattern# > #7f
 	jp nc,printSeqScr		;default to sequence screen
 	
 printPtnScrNoInit			;init point when cycling through patterns
@@ -1209,7 +1209,7 @@ setXYmod equ $+1
 
 
 ;************************************************************************************	
-waitForKeyRelease			;wait for key release function. TODO: how about skip the out command? It should not be necessary...
+waitForKeyRelease			;wait for key release function.
 
 _rdkeys
  	in a,(kbd)
