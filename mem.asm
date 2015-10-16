@@ -368,7 +368,7 @@ _cont
 _sfxlp
 	ex af,af'
 	inc a				;inc pattern counter
-	cp #3f				;SHOULD BE cp #40? if it's #40 or bit 7 is set, we're done saving
+	cp #40				;SHOULD BE cp #40? if it's #40 or bit 7 is set, we're done saving
 	;ret nc
 	jp nc,_success
 	ex af,af'
