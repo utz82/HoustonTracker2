@@ -1355,7 +1355,7 @@ kMuteD
 	xor #80
 	ld (MuteState),a
 	ld a,(muteD)
-	xor #28
+	xor #11
 	ld (muteD),a
 	call printMute3D
 	jp waitForKeyRelease	

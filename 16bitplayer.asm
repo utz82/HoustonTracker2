@@ -270,8 +270,7 @@ dru equ $+1
 	ld (dru),a		;13	;and save it as current pitch counter
 
 muteD					;mute switch for drums
-					;jr nc,waitD		;12/7	;skip the following if result was <=#ff
-	jp nc,waitD		;10
+	jp nc,waitD		;10	;jp nc = #d2, jp = #c3
 	
 	ex af,af'		;4	;load output mask for drum channel
 	out (link),a		;11	;output drum channel state
@@ -282,6 +281,7 @@ drumswap				;switch for drum mode. inc bc = #03, dec bc = #0b, inc c = #0c, dec 
 panD equ $+1
 	xor lp_sw		;7	;toggle output mask	
 	ret c			;5	;43t, ret never taken
+
 outdr	
 	ex af,af'		;4
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
@@ -393,7 +393,7 @@ counterSP equ $+1
 waitD
  	ex af,af'		;4	;load output mask for drum channel
  	out (link),a		;11	;output drum channel state
- 					;---- CH2: 104t	
+ 					;---- CH2: 100t	
 fxswap1
 fxswap2 equ $+1
 	dw 0			;8	;swap with rlc h (cb 04) for noise/glitch effect, with rlc l (cb 05) for phase effect
@@ -457,7 +457,7 @@ fxJumpTab
 	nop
 	jp fxcont			;fx8
 	nop
-	jp fxcont			;fx9
+	jp fx9			;fx9
 	nop
 	jp fxA
 	nop
@@ -568,6 +568,11 @@ _activatePWM
 fx6					;duty cycle ch3
 	ld a,(de)
 	ld (phaseshift3),a
+	jp fxcont
+	
+fx9
+	ld a,(de)
+	ld (pitchslide+1),a
 	jp fxcont
 
 fxA					;ch1 "glitch" effect
