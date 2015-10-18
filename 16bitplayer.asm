@@ -530,15 +530,18 @@ pchD
 fx2					;pitch slide up
 	ld a,(de)
 	ld (pitchslide),a
-	xor a
-	ld (pitchslide+1),a
+	;xor a
+	;ld (pitchslide+1),a
 	jp fxcont
 	
-fx3					;pitch slide up
+fx3					;pitch slide down
 	ld a,(de)
-	neg
+	;neg
 	ld (pitchslide),a
+	or a
+	jr z,_skip
 	ld a,#ff
+_skip
 	ld (pitchslide+1),a
 	jp fxcont	
 

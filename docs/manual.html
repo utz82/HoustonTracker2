@@ -376,7 +376,12 @@
   <br>
   <table><tr>
     <td><img src="data/warn.jpg"></td><td>HT2 is not compatible with MirageOS.</td>
-  </tr></table><br><br><br>
+  </tr></table><br>
+  <table><tr>
+    <td><img src="data/idea.jpg"></td><td>If you don't own a TI calc, you can run HT2 on an emulator. The beta version of tilem2 is recommended.
+    A Win32 installer can be found <a href="http://tilem.sourceforge.net/beta/tilem-2.1-beta-20130325.exe">here</a>, *nix users can obtain the 
+    development version via <i>svn checkout https://tilem.svn.sourceforge.net/svnroot/tilem/trunk tilem</i>. You need to have TiLP installed in any case.</td>
+  </tr></table><br><br><br><br>
   </div>
   <a name="install"></a>
   <div class="subheader">
@@ -863,7 +868,11 @@
     contents to a new, unused pattern), press <b>[ALPHA], [+]</b>.<br><br>
     To delete the pattern number at the current position, press <b>[ALPHA], [0]</b>.<br><br>
     You can press <b>[-]</b> to copy the current row. This will insert the copy at the current position.<br><br>
-    Press <b>[&div;]</b> to delete the current row.<br><br><br><br>
+    Press <b>[&div;]</b> to delete the current row.<br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>Pressing play on a sequence row that has empty positions will have undesired side effects.</td>
+    </tr></table><br>
+    <br><br>
   </div>
   <div class="minor">
     Block Operations<br><br>
@@ -1021,18 +1030,14 @@
       <td>2xx</td>
         <td>PITCH SLIDE UP CH3</td>
         <td>Cause a (rather fast) upward pitch slide on channel 3. While this effect is active, rests will be ignored on channel 3.<br>
-	    xx defines the speed of the slide. It can be any value, but beware that the pitch counter will eventually wrap.<br>0x00 switches off the effect.<br>
+	    xx defines the speed of the slide, lower values mean slower slides. xx can be any value, but beware that the pitch counter will eventually wrap.<br>200 switches off the effect.<br>
       </tr>
       <tr>
       <td>3xx</td>
         <td>PITCH SLIDE DOWN CH3</td>
         <td>Cause a very fast downward pitch slide on channel 3. While this effect is active, rests will be ignored on channel 3.<br>
-	    xx defines the speed. It can be any value, but beware that the pitch counter will eventually wrap, after which the pitch will start to slide upwards.
-	    <br><br>
-	    <table><tr>
-	    <td><img src="data/warn.jpg"></td><td>This effect is switched off with command <b>200</b>. 
-	    Entering 300 causes a glitchy effect instead (like 3FF, but even faster).
-            </tr></table>
+	    xx defines the speed of the slide, higher values mean slower slides. xx can be any value, but beware that the pitch counter will eventually wrap, after which the pitch will start to slide upwards.
+	    <br>300 switches off the effect.<br>
       </tr>
       <tr>
       <td>4xx</td>
