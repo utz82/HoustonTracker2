@@ -233,6 +233,13 @@ fxcont
 
 ch2 equ $+1
 	ld de,0			;10	;DE' holds the base counter for ch3
+
+	ld a,d				;deactivate pitch slide on rest notes, else activate
+	or e
+	jr z,_skip
+	ld a,#eb
+_skip
+	ld (slideswitch),a
 	
 	ld iy,0			;14	;IY is the add value for ch3, zero it
 	
@@ -311,7 +318,8 @@ pan3 equ $+1
 pitchslide equ $+1
 	ld hl,0			;10	;switch for pitch slide
 	add hl,de		;11
-	ex de,hl		;4
+slideswitch
+	ex de,hl		;4	;#eb = ex de,hl || nop (when initial DE = 0)
 out3
 	out (link),a		;11
 					;---- CH1: 88t
