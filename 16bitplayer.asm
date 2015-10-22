@@ -12,22 +12,22 @@ initrp					;init point for row play
 	ld (usrdrum),hl			;save it to drum table           / and if song is already in mem, it is then also already loaded
 
 	ld a,(looprow)			;set loop point
-	add a,a				;A*4
-	add a,a
+	;add a,a				;A*4
+	;add a,a
 	ld l,a
 	ld h,0
+	add hl,hl			;loop point x4 because each seqrow is 4 bytes
+	add hl,hl
 	ld de,ptns
 	
 	ld a,(de)			;while we're at it, check if player is set to start from an empty row (first pattern # = #ff)
-	;inc a
-	;ret z				;and exit if so
 	
-	add hl,de			;else, continue calculating loop point
+	add hl,de			;and calculate loop point
 	ld (looppoint),hl
 	pop de
 	
 	inc a				;continue "empty row" check
-	ret z
+	ret z				;and exit if an "empty" row is found
 
 	call rdnotes1
 
@@ -71,53 +71,32 @@ ptnselect				;FIRST, set up ptn sequence pointers and push them (preserve song s
 	cp #ff			;7	;check for end marker
 	ret z			;11/5	;exit if found
 
-	
-	;ld hl,ptntab		;10	;point to pattern position LUT
-	ld h,HIGH(ptntab)
-	add a,a			;4	;A=A*2
-	;add a,l			;4
-	ld l,a			;4
-	;jr nc,psskip1		;12/7
-	;inc h			;4
 
-psskip1
+	ld h,HIGH(ptntab)		;point to pattern position LUT
+	add a,a			;4	;A=A*2
+	ld l,a			;4
 	ld c,(hl)		;7	;seq pointer ch1 to bc
 	inc hl			;6
 	ld b,(hl)		;7
 	push bc			;11
 
-	
 	inc de			;6	;point to ch3
 	ld a,(de)		;7	;load ptn# ch3
-	;ld hl,ptntab		;10
 	add a,a			;4
-	;add a,l			;4
 	ld l,a			;4
-	;jr nc,psskip2		;12/7
-	;inc h			;4
-	
-psskip2
 	ld c,(hl)		;7	;seq pointer ch3 to bc
 	inc hl			;6
 	ld b,(hl)		;7
 	push bc			;11
-	
-	
+		
 	inc de			;6	;point to ch2
 	ld a,(de)		;7	;load ptn# ch2
-	;ld hl,ptntab		;10
 	add a,a			;4
-	;add a,l			;4
 	ld l,a			;4
-	;jr nc,psskip3		;12/7
-	;inc h			;4
-
-psskip3
 	ld c,(hl)		;7	;seq pointer ch2 to bc
 	inc hl			;6
 	ld b,(hl)		;7
 	push bc			;6
-
 	
 	inc de			;6	;point to fx
 	ld a,(de)		;7	;load ptn# fx
@@ -212,7 +191,7 @@ rdnotesRP				;entry point for RowPlay
 	ld a,(de)		;7	;read fx#
 	
 	and %11110000		;7	;check for drum trigger (lower nibble)
- 	jp nz,drums		;17/10
+ 	jp nz,drums		;10
 	
 	ld hl,drumres		;10	;reset drum by setting pointer to a 0 val TODO: seems messy, optimize
 	ld (drumtrig),hl	;16	;	                                  TODO: ^^ 
@@ -234,12 +213,12 @@ fxcont
 ch2 equ $+1
 	ld de,0			;10	;DE' holds the base counter for ch3
 
-	ld a,d				;deactivate pitch slide on rest notes, else activate
-	or e
-	jr z,_skip
-	ld a,#eb
+	ld a,d			;4	;deactivate pitch slide on rest notes, else activate
+	or e			;4
+	jr z,_skip		;12/7
+	ld a,#eb		;7
 _skip
-	ld (slideswitch),a
+	ld (slideswitch),a	;13
 	
 	ld iy,0			;14	;IY is the add value for ch3, zero it
 	
@@ -256,11 +235,10 @@ cspeed equ $+2
 	ld (oldSP),sp		;20	;preserve SP  --> TODO: calculate this on entering player
 ch1 equ $+1
 	ld sp,#0000		;10	;load base frequency counter val
-	ld (counterSP),sp	;20	;TODO: maybe remove, it's not that important...
+	ld (counterSP),sp	;20	;save reload value (to be used after keyhandling)
 
 drumres equ $+1	
 	ld hl,0			;10	;HL holds "add" value for ch1, zero it; the 0-word also acts as stop byte for the drums
-					;TODO: seems messy (see above)
 
 maskD equ $+1				;panning switch for drum ch
 	ld a,lp_off			;initialize output mask for drum channel
@@ -312,7 +290,7 @@ phaseshift3 equ $+1			;switch for phase shift/set duty cycle
 	cp iyh			;8
 mute3
 	sbc a,a			;4	;result of this will be either #00 or #ff. for mute, swap #9f (sbc a,a) with #97 (sub a,a)
-	or lp_off		;7	;TODO: useless on 8x, maybe can be eliminated on other models, too?
+	or lp_off		;7
 pan3 equ $+1
 	and lp_on		;7	;and thus we derive the output state
 pitchslide equ $+1
@@ -337,7 +315,7 @@ pwmswitch				;ch2 PWM effect switch
 	cp b			;4
 mute2
 	sbc a,a			;4
-	or lp_off		;7	;TODO: useless on 8x, maybe can be eliminated on other models, too?
+	or lp_off		;7
 pan2 equ $+1
 	and lp_on		;7
 out2
