@@ -250,19 +250,23 @@ confirmAction					;wait for confirmation/abortion of user action
 	ld de,#110f
 	call printDE
 
+	;call waitForKeyRelease			;DEBUG new against bank 0 clearout
+	
 _rdkeys
 	ld a,#ef				;read key 0
 	out (kbd),a
-	nop
-	nop
+	;nop
+	;nop
+	key_delay
 	in a,(kbd)
 	rra
 	jp nc,_cancel				;if pressed, cancel user action
 
 	ld a,#f7				;read key .
 	out (kbd),a
-	nop
-	nop
+	;nop
+	;nop
+	key_delay
 	in a,(kbd)
 	rra
 	jp nc,_confirm				;if pressed, confirm user action
@@ -1230,15 +1234,21 @@ _wait
 	ld de,#2888
 	call setXY
 	call clearPrintBuf		;clear print buffer
-	jp printBuf			;remove Alpha mode marker from screen
+	call printBuf			;remove Alpha mode marker from screen
+	ld b,0
+	jr _waitlp
 	
 _resetLK
 	xor a				;clear LastKey flag
 	ld (LastKey),a	
 	
-_waitlp
+_waitlp					;waiting for keypad bounce
 	ex (sp),hl
 	ex (sp),hl
+IF MODEL = TI8X || MODEL = TI8XS
+	nop
+	nop
+ENDIF
 	djnz _waitlp
 	
  	ret			;5
