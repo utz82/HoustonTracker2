@@ -119,7 +119,7 @@ mainlp						;the main loop. yes, it's very simple ;)
 	
 ;************************************************************************************
 exit						;exit HT2
-	ld a,#30				;reset mute switches (#30 = jr nc,..)
+	ld a,#d2				;reset mute switches (#30 = jr nc,..)
 	;ld (mute1),a
 	ld (muteD),a
 	ld a,#9f				;#9f = sbc a,a
@@ -135,9 +135,10 @@ exitSP equ $+1					;reset stack
 	ld sp,0
 	pop ix					;restore index registers
 	pop iy
-	ei					;done automatically by CrASH
 
+	ei					;done automatically by CrASH
 	ret					;and byebye
+
 
 ;************************************************************************************
 ;SUBROUTINES
