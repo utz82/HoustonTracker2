@@ -1261,7 +1261,7 @@ _unmuteAll
 	ld (mute1),a
 	ld (mute2),a
 	ld (mute3),a
-	ld a,#30				;#30 jr nc / #18 jr
+	ld a,#d2				;#30 jr nc / #18 jr
 	;ld (mute1),a
 	ld (muteD),a
 	call printMute12
