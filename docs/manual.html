@@ -1024,6 +1024,8 @@
 	     <tr><td>155</td><td>01010101</td><td>0x01 + 0x04 + 0x10 + 0x40 = 0x55</td><td>pan all channels right</td><tr>
 	     <tr><td>112</td><td>00010010</td><td>0x02 + 0x00 + 0x10 + 0x00 = 0x12</td><td>pan ch1 left, ch2 center, ch3 right, drums center</td><tr>
 	   </table>
+	   <br>
+	   If you're having trouble figuring out the right values, you can use this <a href="http://garvalf.online.fr/temp/ht2_panning.html" target="_blank">online tool by garvalf</a> to calculate the parameters.
 	   </td>
       </tr>
       <tr>
@@ -1074,7 +1076,7 @@
       <tr>
         <td>B00</td>
         <td>BREAK PTN</td>
-        <td>Break pattern and jump to the next one. This command doesn't take any parameters. Also, it is ignored on the first line of a pattern.</td>
+        <td>Break pattern and jump to the next position in the sequence. This command doesn't take any parameters. Also, it is ignored on the first line of a pattern.</td>
       </tr>
       <tr>
       <td>Cxx</td>
@@ -1244,8 +1246,6 @@
   </div>
   &bull; The <a href="http://pasmo.speccy.org" target="_blank">Pasmo</a> assembler must be installed and present in your search path (unless you want to adapt the 
   sources for another assembler).<br>
-  &bull; When targetting the TI-82, you will also need <a href="https://www.perl.org/get.html" target="_blank">Perl</a> installed on your system. 
-  If on *nix, you most likely have it already installed.<br>
   &bull; Optionally, you may want to install an TI calculator emulator. For *nix systems, using the development version of
   <a href="http://lpg.ticalc.org/prj_tilem/develop.html" target="_blank">tilem2</a> is recommended.<br>
   <br>
@@ -1263,6 +1263,7 @@
    <tr><td>83</td><td>build for TI-83, TI-82 Stats</td></tr>
    <tr><td>8x</td><td>build for TI-83 Plus, TI-84 Plus etc.</td></tr>
    <tr><td>8xs</td><td>build "small" version for TI-83 Plus, TI-84 Plus etc.</td></tr>
+   <tr><td>all</td><td>build all targets.</td></tr>
   </table>
   <br>
   Optionally, you can rebuild the note table <i>before</i> running the build script. In order to do so, run the tablegen.sh 
