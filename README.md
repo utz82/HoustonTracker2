@@ -12,6 +12,8 @@ TI-83Plus/SE, and TI-84Plus/SE.
 More information and online documentation can be found at
 http://irrlichtproject.de/houston
 
+Note that the online documentation applies to the stable version of HT2, for the beta version refer to the manual in the /docs folder in source.
+
 
 ###Features
 
