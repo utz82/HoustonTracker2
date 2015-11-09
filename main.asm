@@ -1248,9 +1248,9 @@ _resetLK
 _waitlp					;waiting for keypad bounce
 	ex (sp),hl
 	ex (sp),hl
+	ld a,(hl)
 IF MODEL = TI83 || MODEL = TI8X || MODEL = TI8XS
-	nop
-	nop
+	ld a,(hl)
 ENDIF
 	djnz _waitlp
 	
