@@ -517,7 +517,8 @@ _set
 
 ignoreKeypress
 	pop hl				;clear stack
-	ret				;and back to where we came from
+	;ret				;and back to where we came from
+	jp waitForKeyRelease
 
 ;************************************************************************************
 setPrintPos				;set print position based on current cursor pos
@@ -1059,8 +1060,6 @@ kSetBlock
 	
 	call printChars
 exitthis
-	;call waitForKeyRelease
-	;ret
 	jp waitForKeyRelease
 	
 kSetBFull
@@ -1092,7 +1091,8 @@ kgraph						;set current Octave
 	call clearPrintBuf
 	call printBuf
 	
-	jp delCsr				;temporarily disable cursor
+	call delCsr				;temporarily disable cursor
+	jp waitForKeyRelease
 	
 ktrace
 	ld a,(AlphaFlag)

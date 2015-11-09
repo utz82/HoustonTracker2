@@ -144,6 +144,8 @@ exitSP equ $+1					;reset stack
 ;SUBROUTINES
 ;************************************************************************************
 rowPlay						;rowPlay subroutine
+	call waitForKeyRelease
+
 	ld a,(PlayerFlag)			;check if player is running
 	or a	
 	jp nz,_ignore				;and ignore rowPlay if that's the case	
@@ -151,7 +153,7 @@ rowPlay						;rowPlay subroutine
 	cpl					
 	ld (PlayerFlag),a			;set PlayerFlag to prevent double call
 	
-	call waitForKeyRelease
+	;call waitForKeyRelease
 	
 	xor a
 	ld h,a
@@ -604,8 +606,6 @@ printFxScr				;print an FX pattern screen
 
 	call clrMsgArea			;clear message area
 	
-	call delCsr
-
 	ld a,LOW(kjumptab)+16		;set dirkey jump table pointer offset
 	ld (kdirswitch),a
 	
@@ -1152,10 +1152,10 @@ clrS					;clear main screen area
 _clrlp
 	inc d
 	ld e,#82
-	call setXY			;TODO: does not work with setXY2
+	call setXY
 
 	xor a
-	ld b,#3b			;clearing #3b rows
+	ld b,#3c			;clearing #3b rows
 	call drawLoop
 
 	dec c
@@ -1238,7 +1238,7 @@ _wait
 	call setXY
 	call clearPrintBuf		;clear print buffer
 	call printBuf			;remove Alpha mode marker from screen
-	ld b,0
+	;ld b,0				;unnecessary, printBuf returns with b=0 anyway
 	jr _waitlp
 	
 _resetLK
@@ -1248,7 +1248,7 @@ _resetLK
 _waitlp					;waiting for keypad bounce
 	ex (sp),hl
 	ex (sp),hl
-IF MODEL = TI8X || MODEL = TI8XS
+IF MODEL = TI83 || MODEL = TI8X || MODEL = TI8XS
 	nop
 	nop
 ENDIF
@@ -1414,6 +1414,6 @@ version
 	db 0,1				;savestate format version
 
 
-IF ((MODEL != TI82))			; && (MODEL != TI8P))
-		dw #0000
-ENDIF
+; IF ((MODEL != TI82))			; && (MODEL != TI8P))
+; 		dw #0000
+; ENDIF
