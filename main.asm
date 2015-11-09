@@ -603,6 +603,8 @@ _divlp					;effectively dividing A by 12
 printFxScr				;print an FX pattern screen
 
 	call clrMsgArea			;clear message area
+	
+	call delCsr
 
 	ld a,LOW(kjumptab)+16		;set dirkey jump table pointer offset
 	ld (kdirswitch),a
