@@ -134,11 +134,10 @@ psskip4
 ;*************************************************************************************		
 rdnotes				;read in next step from song data
 					;ch1 - sp, ch2 - de, ch3 - bc, speed - de'
-reptpos equ $+1	
-	ld a,0			;7	;decrement pattern row counter
-	dec a			;4
-	jr z,ptnselect0		;12/7	;if it has reached 0, move on to the next pattern -> NEED TO CORRECT STACK BEFORE JUMP!!!
-	ld (reptpos),a		;13	;TODO: using DEC (HL) will be faster
+	
+	ld hl,reptpos		;10	;update pattern row counter
+	dec (hl)		;11
+	jr z,ptnselect0		;12/7
 
 rdnotesRP				;entry point for RowPlay	
 	ld h,HIGH(NoteTab)	;7	;point to frequency LUT	

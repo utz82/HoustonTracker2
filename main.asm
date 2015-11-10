@@ -79,6 +79,8 @@ RowPlay		equ apd_buf+#17		;1	RowPlay mode (0 = off, #ff = on)
 
 LastKey		equ apd_buf+#18		;1	#a0 if last key set ALPHA mode on, else 0
 
+reptpos		equ apd_buf+#20		;1	number of remaining rows in pattern during playback 
+
 PrintBuf	equ ops			;6	print bitmap buffer
 
 ;FontLUT	equ 256*((HIGH(apd_buf))+1)	;font LUT
