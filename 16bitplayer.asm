@@ -140,29 +140,24 @@ reptpos equ $+1
 	jr z,ptnselect0		;12/7	;if it has reached 0, move on to the next pattern -> NEED TO CORRECT STACK BEFORE JUMP!!!
 	ld (reptpos),a		;13	;TODO: using DEC (HL) will be faster
 
-rdnotesRP				;entry point for RowPlay
-	ld hl,NoteTab		;10	;point to frequency LUT
-	
+rdnotesRP				;entry point for RowPlay	
+	ld h,HIGH(NoteTab)	;7	;point to frequency LUT	
 	pop bc			;10	;ch1 ptn pointer to bc
 	ld a,(bc)		;7
 	inc bc			;6	;increment ptn pos pointer
 	add a,a			;4
-	add a,l			;4	;get offset in frequency LUT
-	ld l,a			;4
+	ld l,a			;4	;set offset in freq.LUT
 	
 	ld a,(hl)		;7	;lookup lo byte of frequency value
 	ld (ch1),a		;13	;and store it to base counter
 	inc l			;4
 	ld a,(hl)		;7
 	ld (ch1+1),a		;13	;and store it to base counter
-	
-	ld l,0			;7	;reset freq.LUT pointer
+
 	pop de			;10	;ch3 ptn pointer to de
 	ld a,(de)		;7
 	inc de			;6	;increment ptn pos pointer
-	;rla			;4	;can use rla here since carry is reset from previous add a,l op
-	add a,a
-	add a,l			;4
+	add a,a			;4
 	ld l,a			;4
 	
 	ld a,(hl)		;7
@@ -173,12 +168,11 @@ rdnotesRP				;entry point for RowPlay
 	
 	exx			;4
 	
-	ld hl,NoteTab		;10	;reset freq.LUT pointer
+	ld h,HIGH(NoteTab)	;7	;reset freq.LUT pointer
 	pop bc			;10	;ch2 ptn pointer to bc'
 	ld a,(bc)		;7
 	inc bc			;6
 	rla			;4
-	add a,l			;4
 	ld l,a			;4
 	
 	ld a,(hl)		;7
@@ -537,13 +531,10 @@ pchD
 fx2					;pitch slide up
 	ld a,(de)
 	ld (pitchslide),a
-	;xor a
-	;ld (pitchslide+1),a
 	jp fxcont
 	
 fx3					;pitch slide down
 	ld a,(de)
-	;neg
 	ld (pitchslide),a
 	or a
 	jr z,_skip
@@ -586,10 +577,7 @@ fx8					;execute note table ch2
 	ld h,HIGH(ptntab)		;point to pattern position LUT
 	add a,a				;A=A*2
 	jr c,disableExt+1
-	;jr nc,_enable
-	;ld hl,noXFX			;disable effect if given argument > #7f
-	;jr _disable
-;_enable
+
 	ld l,a			
 	ld a,(hl)			;lo-byte pattern pointer
 	inc hl			
@@ -597,7 +585,6 @@ fx8					;execute note table ch2
 	ld l,a
 	ld (xtab),hl
 	ld hl,execTable
-;_disable
 	ld (xFX),hl
 	exx
 	jp fxcont
@@ -622,7 +609,6 @@ Afast
 	ld (fxswap1),a
 	jp fxcont
 Askip
-	;ld a,#c6
 	xor a
 	ld (fxswap1),a
 	ld (fxswap2),a
@@ -631,24 +617,15 @@ Askip
 fxC					;note cut ch1
 	ld a,(de)
 	or a
-	jr z,resetfxC
+	jr z,disableExt
 	ld (nLength),a
 	ld (nLengthBackup),a
-	;ld a,LOW(noteCut)
-	;ld (xFX),a
-	;ld a,HIGH(noteCut)
-	;ld (xFX+1),a
 	exx
 	ld hl,noteCut
 	ld (xFX),hl
 	exx
 	jp fxcont
-	
-resetfxC
-	;ld a,LOW(noXFX)
-	;ld (xFX),a
-	;ld a,HIGH(noXFX)
-	;ld (xFX+1),a
+
 disableExt				;disable extended effects (8xx, Cxx)
 	exx
 	ld hl,noXFX
@@ -862,10 +839,6 @@ resetFX3
 	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
 	
-	;ld a,LOW(noXFX)			
-	;ld (xFX),a
-	;ld a,HIGH(noXFX)
-	;ld (xFX+1),a
 	exx				;reset extended FX
 	ld hl,noXFX
 	ld (xFX),hl
@@ -883,7 +856,6 @@ IF ((HIGH($))<(HIGH($+32)))
 	org 256*(1+(HIGH($)))		;align to next page if necessary
 .WARNING sample table crosses page boundary
 ENDIF
-	;ds #20
 
 	ds 2				;needed for sample LUT offset calculation
 	
