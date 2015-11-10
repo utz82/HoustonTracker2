@@ -159,11 +159,17 @@ rdnotesRP				;entry point for RowPlay
 	add a,a			;4
 	ld l,a			;4
 	
+	;ld a,(hl)		;7
+	;ld (ch3),a		;13
+	;inc l			;4
+	;ld a,(hl)		;7
+	;ld (ch3+1),a		;13
+	
 	ld a,(hl)		;7
-	ld (ch3),a		;13
 	inc l			;4
-	ld a,(hl)		;7
-	ld (ch3+1),a		;13
+	ld h,(hl)		;7
+	ld l,a			;4
+	ld (ch3),hl		;16
 	
 	exx			;4
 	
@@ -174,11 +180,17 @@ rdnotesRP				;entry point for RowPlay
 	rla			;4
 	ld l,a			;4
 	
+	;ld a,(hl)		;7
+	;ld (ch2),a		;13
+	;inc l			;4
+	;ld a,(hl)		;7
+	;ld (ch2+1),a		;13
+	
 	ld a,(hl)		;7
-	ld (ch2),a		;13
 	inc l			;4
-	ld a,(hl)		;7
-	ld (ch2+1),a		;13
+	ld h,(hl)		;7
+	ld l,a			;4
+	ld (ch2),hl		;16
 	
 	pop de			;10	;fx ptn pointer to de
 	ld a,(de)		;7	;read fx#
