@@ -1033,20 +1033,22 @@
         <td>PITCH SLIDE UP CH3</td>
         <td>Cause a (rather fast) upward pitch slide on channel 3.<br>
 	    xx defines the speed of the slide, lower values mean slower slides. xx can be any value, but beware that the pitch counter will eventually wrap.<br>200 switches off the effect.<br>
+	</td>
       </tr>
       <tr>
       <td>3xx</td>
         <td>PITCH SLIDE DOWN CH3</td>
-        <td>Cause a very fast downward pitch slide on channel 3.<br>
+        <td>Cause a very fast downward pitch slide on channel 3. Using this will disable effect 9xx.<br>
 	    xx defines the speed of the slide, higher values mean slower slides. xx can be any value, but beware that the pitch counter will eventually wrap, after which the pitch will start to slide upwards.
 	    <br>300 switches off the effect.<br>
+	</td>
       </tr>
       <tr>
       <td>4xx</td>
         <td>DUTY CYCLE/ NOISE CH1</td>
         <td>Set the duty cycle for channel 2, and toggle noise mode.<br>
-	   xx <= 0x80 - set duty cycle and disable noise mode (equivalent to setting A00 command)<br>
-	   xx > 0x80 - set duty cycle and enable noise mode (equivalent to setting A01 command).<br>
+	   xx <= 0x80 - set duty cycle and disable noise mode (equivalent to additionally setting A00 command)<br>
+	   xx > 0x80 - set duty cycle and enable noise mode (equivalent to additionally setting A01 command).<br>
 	</td>
       </tr>
       <tr>
@@ -1055,12 +1057,31 @@
         <td>Set the duty cycle for channel 2, or enable duty cycle sweep.<br>
 	    xx <= 0x80 - set duty cycle and disable duty cycle sweep. A value of 0x80 produces the default 50:50 wave. Very low/high values will cause glitches.<br>
 	    xx > 0x80 - enable SID-style duty cycle sweep.<br>
+	</td>
       </tr>
       <tr>
       <td>6xx</td>
         <td>DUTY CYCLE CH3</td>
         <td>Set the duty cycle for channel 3.<br>
 	    xx can be any value, but very low/high values will cause glitches. A value of 0x80 produces the default 50:50 wave.<br>
+	</td>
+      </tr>
+      <tr>
+      <td>8xx</td>
+        <td>EXEC NOTE TABLE CH3</td>
+        <td>Execute a given pattern as a note table for channel 3. This effect operates on a per-tick basis, and will always execute (even on rests). Execution starts after the first tick.<br>
+	    xx is the pattern to be executed as note table. If the current speed is greater than 0x10, table execution will continue at the following
+	    pattern.<br>
+	    To disable the effect, set xx to a value greater than 0x7F.<br>
+	    Using this effect will disable the Cxx (note cut ch1) effect.<br>
+	</td>
+      </tr>
+       <tr>
+      <td>9xx</td>
+        <td>GLITCH CH3</td>
+        <td>Add a nasty glitch effect to channel 3. Using this will disable effect 3xx.<br>
+	    xx can be any value, 900 turns off the effect.<br>
+	</td>
       </tr>
       <tr>
         <td>A0x</td>
@@ -1081,12 +1102,14 @@
       <tr>
       <td>Cxx</td>
         <td>NOTE CUT CH1</td>
-        <td>Cut the note on channel 1 after xx ticks. Using this effect can make the sound output slightly more noisy.</td>
+        <td>Cut the note on channel 1 after xx ticks. Using this effect can make the sound output slightly more noisy.<br>
+	    Use C00 to disable the effect.<br>
+	    Using this effect will disable the 8xx (exec note table ch3) effect.</td>
       </tr>
       <tr>
         <td>Dxx</td>
         <td>DRUM MODE</td>
-        <td>Set the drum mode, where x is 0x00..0x4F. Refer to the <a href="#drums">drums section</a> for details.<br></td>
+        <td>Set the drum mode, where xx is 0x00..0x4F. Refer to the <a href="#drums">drums section</a> for details.<br></td>
       </tr>
       <tr>
         <td>E0x</td>
@@ -1101,7 +1124,7 @@
         <td>Fxy</td>
         <td>SET SPEED</td>
         <td>Set the current speed. xy can be any hexadecimal number between 0x01 and 0xFF. The higher the value, the slower the speed. This command 
-	overrides the global speed setting.<br>
+	temporarily overrides the global speed setting, but does not permanently change it.<br>
 	  TIP: When entering this effect while the player is running, make sure to enter the parameter first, and then the F command.</td>
       </tr>
     </table>
@@ -1116,7 +1139,7 @@
   </div>
   <div class="main">
     To save your current work in progress, press <b>[ALPHA], [Y=]</b>. The letters "SA" will appear in the message area. 
-    Now, enter the number of the save slot you want to load (0..7), and confirm by pressing <b>[.]</b>. (If you got here by accident, press <b>[0]</b> 
+    Now, enter the number of the save slot you want to save (0..7), and confirm by pressing <b>[.]</b>. (If you got here by accident, press <b>[0]</b> 
     to cancel.)<br><br>
     If the save was successful, error code E0 will be displayed in the message area. If the save was unsuccessful due to insufficient memory, error code
     E2 will be displayed instead. Note that you may run out of memory rather quickly. You will always be able to maintain at least two save slots, however.

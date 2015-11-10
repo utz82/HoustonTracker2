@@ -210,6 +210,9 @@ fxcont
 
 	ld bc,0			;10	;BC' is add value for ch2, zero it
 
+xtab equ $+2
+	ld ix,ptn00		;14	;pattern pointer for "execute note table" effect
+
 ch2 equ $+1
 	ld de,0			;10	;DE' holds the base counter for ch3
 
@@ -284,7 +287,7 @@ out1
 					;----- DRUMS: 71/71t
 					
 	exx			;4	;back to the normal register set
-	add iy,de		;15	;this is actually ch3
+	add iy,de		;15	;update counter ch3
 phaseshift3 equ $+1			;switch for phase shift/set duty cycle
 	ld a,#80		;7	
 	cp iyh			;8
@@ -302,7 +305,7 @@ out3
 	out (link),a		;11
 					;---- CH1: 88t
 	
-ch3 equ $+1
+ch3 equ $+1				;misnomer, this is ch2
 	ld hl,#0000		;10	;and now, same as above but for ch2
 	add hl,bc		;11
 	ld b,h			;4
@@ -387,20 +390,38 @@ fxswap2 equ $+1
 				;15+18+10=43
 
 ;*************************************************************************************
-noteCut
+noteCut					;note cut effect for ch1
 nLength equ $+1
-	ld a,0
+	ld a,0				;update length counter
 	dec a
 	ld (nLength),a
-	jr nz,noXFX
-	ld hl,0
+	jr nz,noXFX			;resume playback if length counter != 0
+	ld hl,0				;else, zero freq. counters
 	ld sp,hl
 nLengthBackup equ $+1
-	ld a,0
+	ld a,0				;reset length counter
 	ld (nLength),a
-	dec d
-	jp nz,playnote
+	dec d				;update speed counter
+	jp nz,playnote			;and resume playback
 	jr keyPressed
+;*************************************************************************************
+execTable				;execute note table effect ch3
+	exx
+	;ld hl,NoteTab			;point to frequency table
+	ld h,HIGH(NoteTab)
+	ld a,(ix+0)			;read note byte
+	inc ix				;inc pattern pointer
+	add a,a				;fetch new freq.counter value
+	;add a,l
+	ld l,a
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	exx
+	dec d				;update speed counter
+	jp nz,playnote			;and resume playback
+	jr keyPressed
+
 ;*************************************************************************************
 
 drums					;select drum
@@ -441,7 +462,7 @@ fxJumpTab
 	nop
 	jp fxcont			;fx7
 	nop
-	jp fxcont			;fx8
+	jp fx8			;fx8
 	nop
 	jp fx9			;fx9
 	nop
@@ -559,7 +580,29 @@ fx6					;duty cycle ch3
 	ld (phaseshift3),a
 	jp fxcont
 	
-fx9
+fx8					;execute note table ch2
+	ld a,(de)
+	exx
+	ld h,HIGH(ptntab)		;point to pattern position LUT
+	add a,a				;A=A*2
+	jr c,disableExt+1
+	;jr nc,_enable
+	;ld hl,noXFX			;disable effect if given argument > #7f
+	;jr _disable
+;_enable
+	ld l,a			
+	ld a,(hl)			;lo-byte pattern pointer
+	inc hl			
+	ld h,(hl)			;hi-byte pattern pointer
+	ld l,a
+	ld (xtab),hl
+	ld hl,execTable
+;_disable
+	ld (xFX),hl
+	exx
+	jp fxcont
+	
+fx9					;ch3 "glitch" effect
 	ld a,(de)
 	ld (pitchslide+1),a
 	jp fxcont
@@ -585,23 +628,32 @@ Askip
 	ld (fxswap2),a
 	jp fxcont
 
-fxC
+fxC					;note cut ch1
 	ld a,(de)
 	or a
 	jr z,resetfxC
 	ld (nLength),a
 	ld (nLengthBackup),a
-	ld a,LOW(noteCut)
-	ld (xFX),a
-	ld a,HIGH(noteCut)
-	ld (xFX+1),a
+	;ld a,LOW(noteCut)
+	;ld (xFX),a
+	;ld a,HIGH(noteCut)
+	;ld (xFX+1),a
+	exx
+	ld hl,noteCut
+	ld (xFX),hl
+	exx
 	jp fxcont
 	
 resetfxC
-	ld a,LOW(noXFX)
-	ld (xFX),a
-	ld a,HIGH(noXFX)
-	ld (xFX+1),a
+	;ld a,LOW(noXFX)
+	;ld (xFX),a
+	;ld a,HIGH(noXFX)
+	;ld (xFX+1),a
+disableExt				;disable extended effects (8xx, Cxx)
+	exx
+	ld hl,noXFX
+	ld (xFX),hl
+	exx
 	jp fxcont	
 	
 fxD					;set drum mode.
@@ -780,6 +832,7 @@ resetFX					;reset all fx
 
 resetFX1
 	ld a,#80			;reset phase shift
+	ld (phaseshift1),a
 	ld (phaseshift2),a
 	ld (phaseshift3),a
 	
@@ -809,10 +862,14 @@ resetFX3
 	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
 	
-	ld a,LOW(noXFX)			;reset extended FX
-	ld (xFX),a
-	ld a,HIGH(noXFX)
-	ld (xFX+1),a
+	;ld a,LOW(noXFX)			
+	;ld (xFX),a
+	;ld a,HIGH(noXFX)
+	;ld (xFX+1),a
+	exx				;reset extended FX
+	ld hl,noXFX
+	ld (xFX),hl
+	exx
 
 	ret				;must return with Z-flag set
 ;*************************************************************************************

@@ -1411,7 +1411,7 @@ firstend equ $				;DEBUG
 ;memend equ $+2
 	org mem_end-2
 version
-	db 0,1				;savestate format version
+	db 0,2				;savestate format version
 
 
 ; IF ((MODEL != TI82))			; && (MODEL != TI8P))
