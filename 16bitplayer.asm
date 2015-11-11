@@ -153,19 +153,13 @@ rdnotesRP				;entry point for RowPlay
 	ld a,(hl)		;7
 	ld (ch1+1),a		;13	;and store it to base counter
 
-	pop de			;10	;ch3 ptn pointer to de
+	pop de			;10	;ch2 ptn pointer to de
 	ld a,(de)		;7
 	inc de			;6	;increment ptn pos pointer
 	add a,a			;4
 	ld l,a			;4
 	
-	;ld a,(hl)		;7
-	;ld (ch3),a		;13
-	;inc l			;4
-	;ld a,(hl)		;7
-	;ld (ch3+1),a		;13
-	
-	ld a,(hl)		;7
+	ld a,(hl)		;7	;get freq.counter for ch2(!)
 	inc l			;4
 	ld h,(hl)		;7
 	ld l,a			;4
@@ -174,35 +168,36 @@ rdnotesRP				;entry point for RowPlay
 	exx			;4
 	
 	ld h,HIGH(NoteTab)	;7	;reset freq.LUT pointer
-	pop bc			;10	;ch2 ptn pointer to bc'
+	pop bc			;10	;ch3 ptn pointer to bc'
 	ld a,(bc)		;7
 	inc bc			;6
-	rla			;4
+	add a,a			;4
 	ld l,a			;4
 	
-	;ld a,(hl)		;7
-	;ld (ch2),a		;13
-	;inc l			;4
-	;ld a,(hl)		;7
-	;ld (ch2+1),a		;13
-	
-	ld a,(hl)		;7
+	ld a,(hl)		;7	;get freq.counter for ch3(!)
 	inc l			;4
 	ld h,(hl)		;7
 	ld l,a			;4
 	ld (ch2),hl		;16
+		
+	or h			;4	;deactivate pitch slide on rest notes, else activate
+	jr z,_skip		;12/7
+	ld a,#eb		;7	;ex de,hl
+_skip
+	ld (slideswitch),a	;13
 	
 	pop de			;10	;fx ptn pointer to de
-	ld a,(de)		;7	;read fx#
+	ld a,(de)		;7	;read drum/fx cmd
 	
 	and %11110000		;7	;check for drum trigger (lower nibble)
  	jp nz,drums		;10
 	
-	ld hl,drumres		;10	;reset drum by setting pointer to a 0 val TODO: seems messy, optimize
-	ld (drumtrig),hl	;16	;	                                  TODO: ^^ 
+	ld a,#ee		;7	;deactivate drum (#ee = xor n)
 
-drx	
-	ld a,(de)		;7
+drx
+	ld (noDrum),a		;13
+	
+	ld a,(de)		;7	;read fx cmd again
 	and %00001111		;7	;
 	inc de			;6	;point to fx parameter
 	jp nz,fxselect		;10
@@ -221,13 +216,6 @@ xtab equ $+2
 ch2 equ $+1
 	ld de,0			;10	;DE' holds the base counter for ch3
 
-	ld a,d			;4	;deactivate pitch slide on rest notes, else activate
-	or e			;4
-	jr z,_skip		;12/7
-	ld a,#eb		;7
-_skip
-	ld (slideswitch),a	;13
-	
 	ld iy,0			;14	;IY is the add value for ch3, zero it
 	
 	exx			;4
@@ -246,7 +234,7 @@ ch1 equ $+1
 	ld (counterSP),sp	;20	;save reload value (to be used after keyhandling)
 
 drumres equ $+1	
-	ld hl,0			;10	;HL holds "add" value for ch1, zero it; the 0-word also acts as stop byte for the drums
+	ld hl,0			;10	;HL holds "add" value for ch1, zero it
 
 maskD equ $+1				;panning switch for drum ch
 	ld a,lp_off			;initialize output mask for drum channel
@@ -258,8 +246,9 @@ playnote				;synthesize and output current step
 	ld a,(bc)		;7	;load sample byte
 drumswap2
 	nop			;4	;daa/cpl/etc
+noDrum
 dru equ $+1
-	add a,0			;7	;add current drum pitch counter
+	add a,0			;7	;add current drum pitch counter - swapped out with xor n (#ee) to not play a drum (add a,n = #c6)
 	ld (dru),a		;13	;and save it as current pitch counter
 
 muteD					;mute switch for drums
@@ -411,16 +400,14 @@ nLengthBackup equ $+1
 	jr keyPressed
 ;*************************************************************************************
 execTable				;execute note table effect ch3
-	exx
-	;ld hl,NoteTab			;point to frequency table
-	ld h,HIGH(NoteTab)
+	exx		
+	ld h,HIGH(NoteTab)		;point to frequency table
 	ld a,(ix+0)			;read note byte
 	inc ix				;inc pattern pointer
 	add a,a				;fetch new freq.counter value
-	;add a,l
 	ld l,a
 	ld e,(hl)
-	inc hl
+	inc l
 	ld d,(hl)
 	exx
 	dec d				;update speed counter
@@ -436,11 +423,12 @@ drums					;select drum
 	rra
 	add a,l				;add offset to (h)l
 	ld l,a
-	ld a,(hl)			;load drum data pointer into bc
-	ld (drumtrig),a
+	ld a,(hl)			;fetch drum data pointer
 	inc l
-	ld a,(hl)
-	ld (drumtrig+1),a
+	ld h,(hl)
+	ld l,a
+	ld (drumtrig),hl
+	ld a,#c6			;#c6 = ld a,n
 	jp drx
 	
 ;*************************************************************************************	
