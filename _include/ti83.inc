@@ -66,4 +66,4 @@ clearlcd	equ	#4755		;aka _clrlcdf
 ;**********************************************************************************
 ;shell flags
 
-int_state	equ	drumres		;apd_buf usage flag (disabled by pointing to 0 byte)
+;int_state	equ	drumres		;apd_buf usage flag (disabled by pointing to 0 byte)
