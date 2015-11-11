@@ -331,7 +331,7 @@ reentry
 	jp nz,playnote		;10
 
 xFX equ $+1	
-	jp noXFX		;
+	jp noXFX		;	;TODO: swap out with jp nz to disable 8xx on rests, maybe?
 noXFX
 	dec d			;4
 	jp nz,playnote		;10
@@ -572,7 +572,7 @@ fx6					;duty cycle ch3
 	
 fx8					;execute note table ch2
 	ld a,(de)
-	exx
+	;exx
 	ld h,HIGH(ptntab)		;point to pattern position LUT
 	add a,a				;A=A*2
 	jr c,disableExt+1
@@ -585,7 +585,7 @@ fx8					;execute note table ch2
 	ld (xtab),hl
 	ld hl,execTable
 	ld (xFX),hl
-	exx
+	;exx
 	jp fxcont
 	
 fx9					;ch3 "glitch" effect
@@ -608,9 +608,11 @@ Afast
 	ld (fxswap1),a
 	jp fxcont
 Askip
-	xor a
-	ld (fxswap1),a
-	ld (fxswap2),a
+	;xor a
+	;ld (fxswap1),a
+	;ld (fxswap2),a
+	ld hl,0
+	ld (fxswap1),hl
 	jp fxcont
 
 fxC					;note cut ch1
@@ -619,17 +621,17 @@ fxC					;note cut ch1
 	jr z,disableExt
 	ld (nLength),a
 	ld (nLengthBackup),a
-	exx
+	;exx
 	ld hl,noteCut
 	ld (xFX),hl
-	exx
+	;exx
 	jp fxcont
 
 disableExt				;disable extended effects (8xx, Cxx)
-	exx
+	;exx
 	ld hl,noXFX
 	ld (xFX),hl
-	exx
+	;exx
 	jp fxcont	
 	
 fxD					;set drum mode.
@@ -838,10 +840,10 @@ resetFX3
 	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
 	
-	exx				;reset extended FX
+	;exx				;reset extended FX
 	ld hl,noXFX
 	ld (xFX),hl
-	exx
+	;exx
 
 	ret				;must return with Z-flag set
 ;*************************************************************************************
