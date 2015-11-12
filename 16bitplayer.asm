@@ -523,12 +523,12 @@ pchD
 	jp c,setrightD
 	rrca
 	jp c,setleftD
-	ex af,af'
+	;ex af,af'
 	ld a,lp_sw
 	ld (panD),a
 	ld a,lp_off
 	ld (maskD),a
-	ex af,af'
+	;ex af,af'
 	jp fxcont
 	
 fx2					;pitch slide up
@@ -788,22 +788,22 @@ setleft3
 	jp pchD
 	
 setrightD
-	ex af,af'
+	;ex af,af'
 	ld a,lp_swr
 	ld (panD),a
 	ld a,lp_r
 	ld (maskD),a
-	ex af,af'
-	rrca
+	;ex af,af'
+	;rrca
 	jp fxcont
 
 setleftD
-	ex af,af'
+	;ex af,af'
 	ld a,lp_swl
 	ld (panD),a
 	ld a,lp_l
 	ld (maskD),a
-	ex af,af'
+	;ex af,af'
 	jp fxcont
 
 ;*************************************************************************************	
