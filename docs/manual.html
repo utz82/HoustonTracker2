@@ -1069,8 +1069,8 @@
       <tr>
       <td>8xx</td>
         <td>EXEC NOTE TABLE CH3</td>
-        <td>Execute a given pattern as a note table for channel 3. This effect operates on a per-tick basis, and will always execute (even on rests). Execution starts after the first tick.<br>
-	    xx is the pattern to be executed as note table. If the current speed is greater than 0x10, table execution will continue at the following
+        <td>Execute a given pattern as a note table for channel 3. This effect operates on a per-tick basis. Execution starts after the first tick.<br>
+	    xx is the pattern to be executed as note table. If the current tempo is greater than 0x10, table execution will continue at the following
 	    pattern.<br>
 	    To disable the effect, set xx to a value greater than 0x7F.<br>
 	    Using this effect will disable the Cxx (note cut ch1) effect.<br>
@@ -1440,7 +1440,7 @@
       <tr><td>0xF</td><td>exclusive OR with lo-byte of pointer</td></tr>
     </table>
     <br><br>
-    In some drum modes, the drum channel will always produce sound, even when no drum is triggered. This is due to the fact that the modifications 
+    In some drum modes, the drum channel will produce sound even if a 0-byte is encountered in the data. This is due to the fact that the modifications 
     are applied before checking if the value read from memory is 0.<br><br><br>
   </div>
   <div class="header">

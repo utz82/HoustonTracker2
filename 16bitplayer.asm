@@ -180,9 +180,10 @@ rdnotesRP				;entry point for RowPlay
 	ld l,a			;4
 	ld (ch2),hl		;16
 		
-	or h			;4	;deactivate pitch slide on rest notes, else activate
+	or h			;4	;deactivate pitch slide and table execution on rest notes, else activate
+	ld (mflag),a		;13	;deactivate table execution
 	jr z,_skip		;12/7
-	ld a,#eb		;7	;ex de,hl
+	ld a,#eb		;7	;activate slide (#eb = ex de,hl)
 _skip
 	ld (slideswitch),a	;13
 	
@@ -193,7 +194,6 @@ _skip
  	jp nz,drums		;10
 	
 	ld a,#ee		;7	;deactivate drum (#ee = xor n)
-
 drx
 	ld (noDrum),a		;13
 	
@@ -233,11 +233,10 @@ ch1 equ $+1
 	ld sp,#0000		;10	;load base frequency counter val
 	ld (counterSP),sp	;20	;save reload value (to be used after keyhandling)
 
-drumres equ $+1	
 	ld hl,0			;10	;HL holds "add" value for ch1, zero it
 
 maskD equ $+1				;panning switch for drum ch
-	ld a,lp_off			;initialize output mask for drum channel
+	ld a,lp_off			;initialize output mask for drum channel TODO: check if using lp_on improves sound
 	ex af,af'
 
 ;*************************************************************************************
@@ -248,7 +247,7 @@ drumswap2
 	nop			;4	;daa/cpl/etc
 noDrum
 dru equ $+1
-	add a,0			;7	;add current drum pitch counter - swapped out with xor n (#ee) to not play a drum (add a,n = #c6)
+	add a,0			;7	;add current drum pitch counter - swapped out with xor n (#ee) when not playing a drum (add a,n = #c6)
 	ld (dru),a		;13	;and save it as current pitch counter
 
 muteD					;mute switch for drums
@@ -400,6 +399,10 @@ nLengthBackup equ $+1
 	jr keyPressed
 ;*************************************************************************************
 execTable				;execute note table effect ch3
+mflag equ $+1
+	ld a,0				;skip table execution on rests
+	or a
+	jr z,_ret
 	exx		
 	ld h,HIGH(NoteTab)		;point to frequency table
 	ld a,(ix+0)			;read note byte
@@ -410,6 +413,7 @@ execTable				;execute note table effect ch3
 	inc l
 	ld d,(hl)
 	exx
+_ret
 	dec d				;update speed counter
 	jp nz,playnote			;and resume playback
 	jr keyPressed
@@ -575,7 +579,7 @@ fx8					;execute note table ch2
 	;exx
 	ld h,HIGH(ptntab)		;point to pattern position LUT
 	add a,a				;A=A*2
-	jr c,disableExt+1
+	jr c,disableExt
 
 	ld l,a			
 	ld a,(hl)			;lo-byte pattern pointer
