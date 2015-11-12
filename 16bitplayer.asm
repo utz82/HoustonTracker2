@@ -236,7 +236,7 @@ ch1 equ $+1
 	ld hl,0			;10	;HL holds "add" value for ch1, zero it
 
 maskD equ $+1				;panning switch for drum ch
-	ld a,lp_off			;initialize output mask for drum channel TODO: check if using lp_on improves sound
+	ld a,lp_off			;initialize output mask for drum channel
 	ex af,af'
 
 ;*************************************************************************************
@@ -843,11 +843,9 @@ resetFX3
 	ld (pitchslide),a
 	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
-	
-	;exx				;reset extended FX
-	ld hl,noXFX
+				
+	ld hl,noXFX			;reset extended FX
 	ld (xFX),hl
-	;exx
 
 	ret				;must return with Z-flag set
 ;*************************************************************************************

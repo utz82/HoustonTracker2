@@ -33,7 +33,7 @@ IF MODEL = TI8XS
 include "_include/ti8xs.inc"
 ENDIF
 
-	db "HT 2.00", 0
+	db "HT 2.09", 0
 
 ;************************************************************************************
 ;APD_BUF scratch pad and other equates
@@ -255,13 +255,9 @@ confirmAction					;wait for confirmation/abortion of user action
 	ld de,#110f
 	call printDE
 
-	;call waitForKeyRelease			;DEBUG new against bank 0 clearout
-	
 _rdkeys
 	ld a,#ef				;read key 0
 	out (kbd),a
-	;nop
-	;nop
 	key_delay
 	in a,(kbd)
 	rra
@@ -269,8 +265,6 @@ _rdkeys
 
 	ld a,#f7				;read key .
 	out (kbd),a
-	;nop
-	;nop
 	key_delay
 	in a,(kbd)
 	rra
@@ -491,8 +485,6 @@ _skip
 	jr nc,_skip2
 	ld e,#16
 _skip2
-	;call printDE
-	;ret	
 	jp printDE
 	
 
@@ -510,14 +502,11 @@ _skip
 	jr nc,_skip2
 	ld d,#16
 _skip2
-	;call printDE
-	;ret
 	jp printDE
 
 ;************************************************************************************
 initSeqCsr
-	;xor a				;reset cursor pos
-	ld a,(OldCsrPos)
+	ld a,(OldCsrPos)		;reset cursor pos
 	ld (CsrPos),a
 
 printCsr				;print the cursor
@@ -541,11 +530,7 @@ _skip
 	call setXY
 
 IF MODEL = TI82	
-	;nop
-	;nop
-	;nop
-	;nop
-	ld a,(hl)			;TODO: optimized timewaster, needs testing
+	ld a,(hl)			;waste some time
 	ld a,(hl)
 ELSE
 	call lcdWait3
@@ -576,10 +561,6 @@ delCsr					;delete the cursor
 	call setXY
 
 IF MODEL = TI82	
-	;nop
-	;nop
-	;nop
-	;nop
 	ld a,(hl)
 	ld a,(hl)
 ELSE
@@ -1090,8 +1071,6 @@ printDE					;printing with custom value in DE
 printBuf	
 	ld hl,PrintBuf			;print a pair of characters
 	ld b,6
-	;call drawlp2
-	;ret
 	jp drawlp2
 
 ;************************************************************************************
@@ -1191,7 +1170,6 @@ lcdWait2				;waste some time till LCD controller can receive next command
 lcdWait3
 
 IF MODEL != TI82			;lcdWait for slow display drivers
-; _lp
 	ex (sp),hl
 	ex (sp),hl
 	ex (sp),hl
