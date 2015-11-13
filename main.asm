@@ -248,11 +248,11 @@ confirmAction					;wait for confirmation/abortion of user action
 
 	ld de,#29b8				;print CONF message
 	call setXY
-	ld de,#0c00
+	ld de,#0c00				;CO
 	call printDE
 	ld de,#2ab8
 	call setXY
-	ld de,#110f
+	ld de,#110f				;NF
 	call printDE
 
 _rdkeys
@@ -288,7 +288,7 @@ clrMsgArea					;clear message area
 	call printBuf
 	ld de,#2bb2
 	call setXY
-	call printBuf	
+	call printBuf
 
 	pop af
 	ret
@@ -395,13 +395,20 @@ isPtnFree					;check if a pattern is free
 						;IN: ptn # in A | OUT: Z if free, NZ if not free
 						
 	add a,a					;calculate offset
-	ld l,a					;pattern # *2 to HL
-	ld h,0			
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	ld de,ptn00				;add base pointer
-	add hl,de
+; 	ld l,a					;pattern # *2 to HL
+; 	ld h,0			
+; 	add hl,hl
+; 	add hl,hl
+; 	add hl,hl
+; 	ld de,ptn00				;add base pointer
+; 	add hl,de
+
+	ld h,HIGH(ptntab)			;look up pattern address			
+	ld l,a
+	ld a,(hl)
+	inc hl
+	ld h,(hl)
+	ld l,a
 	
 	ld b,#10
 	xor a
@@ -437,15 +444,28 @@ _used
 isFxPtnFree					;check if a pattern is free
 						;IN: ptn # in A | OUT: Z if free, NZ if not free
 						
-	add a,a					;calculate offset
-	add a,a
-	ld l,a					;pattern # *4 to HL
-	ld h,0
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	ld de,fxptn00				;add base pointer
-	add hl,de
+; 	add a,a			;4		;calculate offset		;TODO: can use pattern lookup table instead of this!
+; 	add a,a			;4
+; 	ld l,a			;4		;pattern # *4 to HL
+; 	ld h,0			;7
+; 	add hl,hl		;11
+; 	add hl,hl		;11
+; 	add hl,hl		;11
+; 	ld de,fxptn00		;10		;add base pointer
+; 	add hl,de		;11
+; 				;73
+	
+	
+	ld de,fxptntab		;10
+	add a,a			;4
+	ld h,0			;7
+	ld l,a			;4
+	add hl,de		;11
+	ld a,(hl)		;7
+	inc hl			;6
+	ld h,(hl)		;7
+	ld l,a			;4
+				;60t
 	
 	ld b,#20
 	jr chklp-1
@@ -460,7 +480,7 @@ printMsg				;print a message to the message area
 					;IN: DE - message	
 	push de				
 					
-	ex af,af'
+	ex af,af'			;TODO: preserving A for what?
 	ld de,#29b2
 	call setXY
 	ex af,af'
