@@ -20,7 +20,7 @@ ENDIF
 	ld (exitSP),sp				;preserve stack
 
 ;IF MODEL != TI8X				;setting ROM to a different page crashes TI83
-IF MODEL = TI82
+IF MODEL = TI82 ;|| MODEL = TI8P
 	ld a,%10001001				;set ROM page 1
 	out (rom),a
 ENDIF
@@ -59,6 +59,31 @@ reinit
 	ldir
 
 ;************************************************************************************
+; genDrum					;generate kick drum sample in text_mem
+; 	ld d,1			;1
+; 	ld a,#80		;2
+; 	ld hl,text_mem		;3
+; _xlp
+; 	ld b,d			;1
+; _lp
+; 	ld (hl),a		;1
+; 	inc hl			;1
+; 	djnz _lp		;2
+; 	
+; 	inc d			;1
+; 	sub #11			;2
+;
+; 	jr nc,_xlp		;2
+; 	
+; 	add a,#11		;2
+; 	srl a			;2
+; 	
+; 	jr nz,_xlp		;2
+; 	
+; _exit
+; 	ld (hl),a		;1
+; 				;23b
+
 generatePtnTabs					;generate pattern table and fx pattern table
 
 	ld (_restSP),sp				;save stack pointer
@@ -316,10 +341,15 @@ _drawlp					;draw fancy block left of the black block
 
 printVarNames				;create global var names on the right side
 
+	ld de,#2aac			;reset RowPlay indicator
+	call setXY
+	call clearPrintBuf		;clear print buffer
+	call printBuf
+
 	ld de,#2988			;update screen pointer
 	call setXY
 	
-	call clearPrintBuf
+	;call clearPrintBuf
 	ld a,#19			;print STOP char
 	call printCharLNC
 	
@@ -344,14 +374,24 @@ _rdlp
 	ld a,#d				;print a "D" (as in usr Drum)
 	call printCharL
 	
-	ld de,#0a01			;print AutoInc indicator
+	ld a,1
+	ld (AutoInc),a
+	
+	ld de,#0a00			;print AutoInc indicator
 	call printDE
 	
-p123D					;print channel active/mute info (123D)
-	call printMute12
+p123D					
+	ld a,#9f			;reset mute states
+	ld (mute1),a
+	ld (mute2),a
+	ld (mute3),a
+	ld a,#d2			
+	ld (muteD),a
+	
+	call printMute12		;print channel active/mute info (123D)
 	call printMute3D
 
-	
+
 ;end of screen initialization
 ;************************************************************************************
 

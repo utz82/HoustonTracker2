@@ -573,7 +573,7 @@
       <td><b>[MODE]</b></td>
       <td>TOGGLE AUTOINC</td>
       <td>TOGGLE ROWPLAY</td>
-      <td>Toggle automatic cursor increment on/off (on by default).<br>
+      <td>Toggle automatic cursor increment on/off (off by default).<br>
           In ALPHA mode, toggle playing notes while editing (off by default). Beware that RowPlay may ignore effect settings under certain circumstances.</td>
      </tr>
      <tr><td>&nbsp;</td><tr>
@@ -1001,7 +1001,7 @@
         <th>description</th>
       </tr>
       <tr>
-        <td>1xy</td>
+        <td>1xx</td>
         <td>SET PAN</td>
         <td>Set panning for all channels. To determine how the panning will be set, you need to look at the individual bits of the effect parameter, starting
 	   at the rightmost one (aka bit 0).<br><br>
@@ -1121,7 +1121,7 @@
 	  E03 - reset all effects except speed, duty cycles, and panning settings.<br></td>
       </tr>
       <tr>
-        <td>Fxy</td>
+        <td>Fxx</td>
         <td>SET SPEED</td>
         <td>Set the current speed. xy can be any hexadecimal number between 0x01 and 0xFF. The higher the value, the slower the speed. This command 
 	temporarily overrides the global speed setting, but does not permanently change it.<br>
