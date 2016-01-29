@@ -48,7 +48,12 @@
     <a href="#thanks"><b>5. Thanks, Credits, and Greetings</b></a><br><br>
     <a href="#source"><b>Appendix A: Building from Source</b></a><br>
     <a href="#dataformat"><b>Appendix B: Data Format Specification</b></a><br>
-    <a href="#technotes"><b>Appendix C: Synthesis Techniques</b></a><br><br><br><br><br>
+    <a href="#technotes"><b>Appendix C: Synthesis Techniques</b></a><br><br>
+    <a href="#troubles"><b>Appendix D: Troubleshooting</b></a><br>
+    &nbsp;&nbsp; <a href="#graywin">How do I configure my GrayLink cable under Windows?</a><br>
+    &nbsp;&nbsp; <a href="#tilpmac">I can't figure out how to install TiLP on OS X.</a><br>
+    &nbsp;&nbsp; <a href="#ticonnect">TI-Connect won't let me transfer files to my TI82.</a><br>
+    <br><br><br><br>
   </div>
   
   <a name="about"></a>
@@ -1387,29 +1392,20 @@
     different volume levels needed to mix HT2's four software channels are achieved. <br><br>
     The average time taken to interlace one sample of all 4 channels is (1/16300)s, meaning channel states are swapped
     at a rate of about 65200 Hz. The exact timings depend on various factors such as actual tone frequencies, effect and drum settings, hardware model,
-    and battery state.<br><br>
-    Internally, three different methods are applied to generate the software channel outputs. Tone channel 2 and 3 share the same method, while channel 1 and
-    the drum channel use their own respective techniques.<br><br><br>
+    and battery state.<br><br><br>
   </div>
   <div class="minor">
-    Tone Channel 1<br><br>
+    Tone Channels<br><br>
   </div>
   <div class="main">
-    Once per interlacing cylce, a 16-bit constant (the "frequency base value") is added to a 16-bit counter. When the addition produces an overflow 
-    (carry, result >0xFFFF), the channels' output stated will be toggled. This means of course that channel 1 has to keep a record of its own output state.
-    <br><br>
-    The A01 effect (noise/glitch) is achieved by constantly rotating the hi-byte of the add counter. This may or may not generate enough pseudo-randomness to
-    produce a noise-like effect, depending on the frequency base value. Likewise, the A02 effect will rotate the lo-byte of the add counter.<br><br><br>   
-  </div>
-  <div class="minor">
-    Channels 2 and 3<br><br>
-  </div> 
-  <div class="main">
-    Tone channels 2 and 3 do not keep a record of their own output state. Instead, they recalculate the output state on every interlacing cycle. In order to
-    do this, the hi-byte of the add counter is compared against a threshold value. If the threshold constant is greater than the hi-byte of the add counter,
+    Once per interlacing cycle, a 16-bit constant (the "frequency base value") is added to a 16-bit counter. The hi-byte of the counter is then compared 
+    against a threshold value. If the threshold constant is greater than the hi-byte of the add counter,
     the output state will be high (1), otherwise it will be low (0).<br><br>
     The threshold value determines the duty cycle ratio. When the threshold is 0x80, the output state will be high 50% of the time, and low for the 
     other 50%. When the threshold is, say, 0x40, the ratio will be 25%:75%.<br><br>
+    The 9xx effect (glitch channel 3) is achieved by constantly rotating the hi-byte of the base frequency value. 
+    Similarly, the A01 effect (noise/glitch channel 1) is achieved by rotating the hi-byte of the add counter. This may or may not generate enough pseudo-randomness to
+    produce a noise-like effect, depending on the frequency base value.<br><br>
     The D01 effect (duty cycle sweep) is achieved by incrementing the threshold value once every interlacing cycle. As it is an 8-bit value, it will wrap to
     0 once it reaches 0xFF.<br><br>
     The pitch slides are achieved by adding a constant to the frequency base value once per interlacing cycle.<br><br><br>
@@ -1449,10 +1445,69 @@
     </table>
     <br><br>
     In some drum modes, the drum channel will produce sound even if a 0-byte is encountered in the data. This is due to the fact that the modifications 
-    are applied before checking if the value read from memory is 0.<br><br><br>
+    are applied before checking if the value read from memory is 0.<br><br><br><br><br>
+  </div>
+  <a name="troubles"></a>
+  <div class="header">
+    Appendix D: Troubleshooting<br><br>
+  </div>
+  <a name="graywin"></a>
+  <div class="subsubheader">
+    How do I configure my GrayLink cable under Windows?<br><br>
+  </div>
+  <div class="main">
+	<b>#1 = install driver for graylink</b><br>
+	- boot computer and do not plug your link device<br>
+	- If your graylink cable is PL2303TA based, you need <a href="http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=153&pcid=41" target="_blank">
+	this specific usb-serial driver</a> (others will not work)<br>
+	- plug your link device then check in your device Manager to see if everything is ok, set the COM port to 1, 2, 3 or 4... more than 4 will not work.<br>
+	- unplug your link device,<br>
+	- reboot computer<br><br>
+
+	<b>#2 = Install TILP2</b><br>
+	- do not plug the link device<br>
+	- first install <a href="http://sourceforge.net/projects/gladewin32/files/gtk%2B-win32-devel/2.12.9/" target="_blank">GTK+ 2.12.9-win32</a> dependencies<br>
+	- then install <a href="http://lpg.ticalc.org/prj_tilp/win32.html" target="_blank">TiLP</a> (be sure to uncheck GTK+ installation box, because you 
+	already did it)<br>
+	- plug the link device<br>
+	- open TILP, then 'control+D' and set your connection parameters:<br>
+	&nbsp;&nbsp;&nbsp;cable -> graylink<br>
+	&nbsp;&nbsp;&nbsp;port -> the COM port you just set in #1<br>
+	&nbsp;&nbsp;&nbsp;calc -> your calc model (TI82)<br>
+	- then 'OK'<br><br>
+
+	Try to send some program from your TI (in link mode), TILP should automatically ask you to save the file somewhere,
+	which means linking finally works ;)
+	<br><br>
+	Thanks to jankenpopp for coming up with the solution to this problem.
+	<br><br><br><br>
+  </div>
+  <a name="tilpmac"></a>
+  <div class="subsubheader">
+    I can't figure out how to install TiLP on OS X.<br><br>
+  </div>
+  <div class="main">
+	Use the official <a href="https://education.ti.com/en/us/products/computer_software/connectivity-software/ti-connect-software/tabs/overview" target="_blank">TI-Connect</a>
+	linking software. However, TI-Connect does not fully support the TI82, so you won't be able to upload HT2 on that model. 
+	Alternatively, you can of course run Linux in a virtual machine, and use TiLP from there.<br><br>
+	<br><br>
+  </div>
+  <a name="ticonnect"></a>
+  <div class="subsubheader">
+    TI-Connect won't let me transfer files to my TI82.<br><br>
+  </div>
+  <div class="main">
+	<b>Are you using a SilverLink USB cable?</b> <br>Sorry, that won't work with TI-Connect.<br><br>
+	<b>Are you using a serial or parallel cable?</b><br>
+	TI-Connect has problems with CrASH's file naming conventions. One work-around is to <br>
+	- install an emulator to emulate a TI82, using the same ROM version that your calculator runs<br>
+	- install CrASH and HT2 on the emulator<br>
+	- dump a TI82 backup file (.82b) from the emulator<br>
+	You can now upload the .82b file you created to your real TI82, using TI-Connect.
+	<br><br><br>
   </div>
   <div class="header">
-    eof.
+    <br><br>eof.<br>
   </div>
 </body>
 </html>
