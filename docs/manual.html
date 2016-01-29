@@ -498,8 +498,11 @@
     <table><tr>
     <td><img src="data/warn.jpg"></td><td>Always plug in headphones <b>after</b> you've started HT2.</td>
     </tr></table><br><br>
-    <b>Step 2:</b> Enter some patterns into the song sequence. To do so, press the following keys: <b>[0],[0],[0],[1],[0],[2],[0],[0]</b>. 
-    Your main screen should now look like this:<br><br><img src="data/tut1.png"><br><br><br>
+    <b>Step 2:</b> Activate AutoInc mode by pressing <b>[MODE]</b>. Now, let's enter some patterns into the song sequence. To do so, press the following keys: <b>[0],[0],[0],[1],[0],[2],[0],[0]</b>. 
+    Your main screen should now look like this:<br><br><img src="data/tut1.png"><br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>Always fill all four positions of a sequence row to avoid glitches and unwanted effects.</td>
+    </tr></table><br><br>
     <b>Step 3:</b> Move the cursor up to the first position in the sequence again. Now press <b>[2nd]</b>. This will bring up the pattern screen.<br><br>
     <img src="data/tut2.png"><br><br><br>
     <b>Step 4:</b> Let's activate RowPlay mode, so we can hear what we're doing. Press <b>[ALPHA],[MODE],[ALPHA].</b><br><br><br>
@@ -789,9 +792,9 @@
     will find four positions which normally read "123D" (for channel 1, 2, 3, and drums respectively). These positions indicate which channels are currently 
     muted. Muted channels will display a "-" instead of their channel number/letter.<br><br>
     The <b style="background:#f378c5">AutoInc/RowPlay</b> indicators tell you whether the auto-incrementing and RowPlay functions are currently activated. They
-    are located in the lower third of the right screen side, just below the the global variables. The <b>AutoInc indicator</b> displays "A1" when 
+    are located in the lower third of the right screen side, just below the the global variables. The <b>AutoInc indicator</b> displays "A0" when 
     auto-incrementing is
-    active, and A0 when inactive. Auto-incrementing means that after you enter a value or note in HT2, the cursor will automatically advance to the next position.
+    deactivated (default), and A1 when activated. Auto-incrementing means that after you enter a value or note in HT2, the cursor will automatically advance to the next position.
     You can toggle AutoInc with key <b>[MODE]</b>. The <b>RowPlay indicator</b> tells you whether RowPlay mode is currently active. If so, it will display the 
     capital letter P. When entering a note, HT2 will
     automatically play the current pattern position (including all channels that are not muted). You can toggle RowPlay by pressing <b>[ALPHA], [MODE]</b>.<br><br>
@@ -870,7 +873,8 @@
     You can press <b>[-]</b> to copy the current row. This will insert the copy at the current position.<br><br>
     Press <b>[&div;]</b> to delete the current row.<br><br>
     <table><tr>
-    <td><img src="data/warn.jpg"></td><td>Pressing play on a sequence row that has empty positions will have undesired side effects.</td>
+    <td><img src="data/warn.jpg"></td><td>Always fill all four sequence positions in a given row. Pressing play on a sequence row that has empty positions will 
+    have undesired side effects.</td>
     </tr></table><br>
     <br><br>
   </div>
@@ -1143,7 +1147,11 @@
     to cancel.)<br><br>
     If the save was successful, error code E0 will be displayed in the message area. If the save was unsuccessful due to insufficient memory, error code
     E2 will be displayed instead. Note that you may run out of memory rather quickly. You will always be able to maintain at least two save slots, however.
-    <br><br><br>
+    <br><br>
+    <table><tr>
+    <td><img src="data/warn.jpg"></td><td>Any data after the first unfilled position (--) in the sequence is <b>not</b> saved.</td>
+    </tr></table>
+    <br><br>
   </div>
   <div class="minor">
     Loading<br><br>
