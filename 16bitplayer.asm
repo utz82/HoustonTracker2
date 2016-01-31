@@ -76,7 +76,7 @@ ptnselect				;FIRST, set up ptn sequence pointers and push them (preserve song s
 	add a,a			;4	;A=A*2
 	ld l,a			;4
 	ld c,(hl)		;7	;seq pointer ch1 to bc
-	inc hl			;6
+	inc hl			;6	;TODO: in theory inc l should be sufficient?
 	ld b,(hl)		;7
 	push bc			;11
 
@@ -104,13 +104,14 @@ ptnselect				;FIRST, set up ptn sequence pointers and push them (preserve song s
 	add a,a			;4
 	add a,l			;4
 	ld l,a			;4
+IF MODEL != TI8X || MODEL != TI8XS	;fx ptn table crosses page boundary on 82/83
 	jr nc,psskip4		;12/7
 	inc h			;4
 psskip4
+ENDIF
 	ld c,(hl)		;7	;seq pointer fx to bc
 	inc hl			;6
-	ld b,(hl)		;7
-	
+	ld b,(hl)		;7 54t
 	
 	inc de			;6	;point to next row
 	
@@ -306,7 +307,7 @@ ch3 equ $+1				;misnomer, this is ch2
 phaseshift2 equ $+1
 	ld a,#80		;7
 pwmswitch				;ch2 PWM effect switch	
-	add a,0			;7	;add a,n = #c6; adc a,n = #ce
+	add a,#0		;7	;add a,n = #c6; adc a,n = #ce
 	ld (phaseshift2),a	;13	
 	cp b			;4
 mute2
@@ -400,7 +401,7 @@ nLengthBackup equ $+1
 ;*************************************************************************************
 execTable				;execute note table effect ch3
 mflag equ $+1
-	ld a,0				;skip table execution on rests
+	ld a,0				;skip table execution on rests	TODO: perhaps replace this with ld a,i (which sets z flag)?
 	or a
 	jr z,_ret
 	exx		
@@ -864,6 +865,7 @@ ENDIF
 	
 samples				;sample table may not cross page boundary
 	dw kickdr		;1 kick
+	;dw text_mem
 IF MODEL = TI82 || MODEL = TI8P
 	dw 0			;2 snare/hat
 	dw #569b		;3 metallic snare + low end

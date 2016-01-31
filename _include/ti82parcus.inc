@@ -19,16 +19,15 @@ lcd_data	equ	#11		;ldc data port
 ;**********************************************************************************
 ;link port states
 
-lp_on		equ	#d3		;link port off
-lp_off		equ	#d0		;link port on
-lp_l		equ	#d1		;link port left on
-lp_r		equ	#d2		;link port right on
+lp_on		equ	#c3		;link port off
+lp_off		equ	#c0		;link port on
+lp_l		equ	#c1		;link port left on
+lp_r		equ	#c2		;link port right on
 lp_sw		equ	#03		;toggle link port state
 lp_swl		equ	#01		;toggle link port state left
 lp_swr		equ	#02		;toggle link port state right
-;lp_msk		equ	#d3d3		;link port mask
-lp_msk		equ	#d0d0		;link port mask
-lp_smsk		equ	#d1d2		;link port stereo mask
+lp_msk		equ	#c0c0		;link port mask
+lp_smsk		equ	#c1c2		;link port stereo mask
 
 ;**********************************************************************************
 ;saferam addresses
@@ -45,8 +44,6 @@ mem_end		equ	#f600		;user memory end (excl. safety margin)
 ;rom_call macro
 
 macro rom_call,addr
-		;call #8d74
-		;dw addr
 		call addr
 endm
 

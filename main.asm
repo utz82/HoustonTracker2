@@ -1251,7 +1251,8 @@ _waitlp					;waiting for keypad bounce
 	ex (sp),hl
 	ex (sp),hl
 	ld a,(hl)
-IF MODEL = TI83 || MODEL = TI8X || MODEL = TI8XS
+;IF MODEL = TI83 || MODEL = TI8X || MODEL = TI8XS
+IF MODEL != TI82
 	ld a,(hl)
 ENDIF
 	djnz _waitlp

@@ -584,7 +584,7 @@ ldfxpnts
 	inc hl				;adjust pointer to savestate
 	;ld de,fxptn00			;adjust pointer to work area
 	
-_ldfxptnlp
+_ldfxptnlp				;TODO: optimize ptn address finding by using fxptntab lookup
 	ld de,fxptn00			;adjust pointer to work area	
 	ld a,(hl)			;load ptn #
 	
