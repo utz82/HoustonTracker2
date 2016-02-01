@@ -20,7 +20,7 @@ ENDIF
 	ld (exitSP),sp				;preserve stack
 
 ;IF MODEL != TI8X				;setting ROM to a different page crashes TI83
-IF MODEL = TI82 ;|| MODEL = TI8P
+IF MODEL = TI82 || MODEL = TI8P
 	ld a,%10001001				;set ROM page 1
 	out (rom),a
 ENDIF
