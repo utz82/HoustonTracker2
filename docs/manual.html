@@ -138,16 +138,16 @@
      <tr>
       <td>TI-82</td>
       <td>16.0-19.0</td>
-      <td>CrASH</td>
+      <td>CrASH 1.6</td>
       <td>ht2.82p</td>
       <td style="color: #00a000;">supported</td>
      </tr>
      <tr>
       <td>TI-82 Parcus</td>
       <td>19.006</td>
-      <td>CrASH196</td>
+      <td>CrASH_19006</td>
       <td>ht2p.82p</td>
-      <td style="color: #444444;">broken</td>
+      <td style="color: #00a000;">supported</td>
      </tr>
      <tr>
       <td>TI-82 Advanced</td>
@@ -212,13 +212,7 @@
       <td>-</td>
       <td style="color: #ff0000;">not supported</td>
      </tr>
-    </table><br>
-    <div class="warn">
-    <table><tr>
-    <td><img src="data/warn.jpg"></td><td>Note that the <a href="http://www.datamath.org/Graphing/TI-82_1.htm" target="_blank">TI-82 Parcus</a> is currently not
-    supported by HT2. The TI-83 Parcus model works fine, though.</td>
-    </tr></table><br><br>
-    </div>
+    </table><br><br>
     Models marked as "not supported" have differences in architecture that would require a major rewrite of HT2. There are no plans to support these models
     in the near future, especially not the 84+ Color models.<br>
     <br><br>
@@ -363,6 +357,14 @@
    </tr>
    <tr>
     <td>
+      TI-82 Parcus
+    </td>
+    <td>
+      <a href="http://www.ticalc.org/pub/82/asm/shells/crash19006.zip">CrASH_19.006</a>
+    </td>
+   </tr>
+   <tr>
+    <td>
       TI-83, TI-82Stats
     </td>
     <td>
@@ -404,16 +406,18 @@
     know what to do...<br><br><br>
   </div>
   <div class="minor">
-    Installing on TI82<br><br>
+    Installing on TI82/82 Parcus<br><br>
   </div>
   <div class="main">
+    Step 0: If you aren't sure which TI82 version you have, press <b>[MODE]</b>, <b>[ALPHA]</b>, <b>[LN]</b> to check the ROM version. If it says "19.006", you
+    have a 82 Parcus, else you have a regular 82. Afterwards, press any key <b>except</b> Enter. <br>
     Step 1: Reset your calculator by pressing <b>[2nd]</b>, <b>[+]</b>, <b>[3]</b>.<br>
     Step 2: Switch off your calculator, and connect it to your computer with a link cable.<br>
     Step 3: Switch the calculator back on.<br>
     Step 4: On your computer, open TiLP. Make sure your calculator and link cable settings are correct - if not, press Ctrl+D to reconfigure.<br>
     Step 5: Put your calculator into transmission mode by pressing <b>[2nd]</b>, <b>[X,T,&#920;]</b>, <b>[&#9656;]</b>, <b>[ENTER]</b>.<br>
-    Step 6: In Tilp, go to "File"->"Restore", and select CRASH.82B from the CrASH package. Doing so will prompt for confirmation on both TiLP and your calc.<br>
-    Step 7: Assuming all went good, you can now put your calc in transmission mode again, and send ("File"->"Send Files") ht2.82p.<br><br>
+    Step 6: In Tilp, go to "File"->"Restore", and select CRASH.82B (regular TI82) resp. CRASH19006.82b (82 Parcus). Doing so will prompt for confirmation on both TiLP and your calc.<br>
+    Step 7: Assuming all went good, you can now put your calc in transmission mode again, and send ("File"->"Send Files") ht2.82p (regular) resp. ht2p.82p (Parcus).<br><br>
   </div>
   <div class="warn">
     <table><tr>
