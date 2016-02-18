@@ -1,0 +1,38 @@
+
+version 2.1
+===========
+
+NEW/CHANGES
+
+- channel 1 now has variable duty cycle, too
+- new effect: 4xx - set duty/noise mode ch1
+- old 4xx (toggle duty cycle sweep) has been merged in to 5xx (set duty ch2)
+- old Cxx (set drum mode) is now Dxx
+- old Dxx (set vol ch1/drums) has been removed (no longer possible for technical reasons)
+- new effect: 8xx - execute note table ch3
+- new effect: 9xx - glitch channel 3.
+- new Cxx effect: note cut ch1
+- TI-82 Parcus/OS 19.006 support
+- ALPHA mode is now one-shot, ie. it is turned off after an ALPHA mode action has been performed
+- sound loop now has cycle-exact timing except if drum modes 2x-4x are used
+- 3xx now uses inverse values (0xff = slowest setting), and is deactivated with 300 instead of 200.
+  The old 300 effect can be achieved with command 9FF instead.
+- 2xx/3xx no longer trigger on rest notes.
+- "glitchy" drum modes no longer output sound on rows without a drum trigger
+- AutoInc is now off by default
+
+
+BUGFIXES
+
+- fixed recovery from failed save attempt
+- fx pattern 0x3f was previously lost during save, fixed
+- note pattern 0x7f was inaccessible from sequence screen, fixed
+- fixed broken loop point setting
+- improved keypad debouncing on Plus models
+- mode indicators were incorrect after loading/zapping a tune, fixed
+
+
+version 2.0
+===========
+
+- initial public release
