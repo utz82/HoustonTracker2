@@ -790,7 +790,7 @@ setleft3
 	
 setrightD
 	;ex af,af'
-	ld a,lp_swr
+	ld a,lp_swl
 	ld (panD),a
 	ld a,lp_r
 	ld (maskD),a
@@ -800,7 +800,7 @@ setrightD
 
 setleftD
 	;ex af,af'
-	ld a,lp_swl
+	ld a,lp_swr
 	ld (panD),a
 	ld a,lp_l
 	ld (maskD),a
