@@ -102,7 +102,7 @@ int main(int argc, char *argv[]){
 	checksum += outb;
 	OUTFILE << nullbyte;
 	
-	int binsizelong;
+	unsigned binsizelong;
 	
 	if (ext == ".82p") binsizelong = binsize + 5;
 	if (ext == ".83p" || ext == ".8xp") binsizelong = binsize + 2;
@@ -168,12 +168,12 @@ int main(int argc, char *argv[]){
 	
 	//write checksum
 	for (i = 0; i < binsize; i++) {
-		checksum += buffer[i];
+		checksum += (unsigned char)buffer[i];
 	}
 	//checksum = checksum - 86;		//seems TI82 actually doesn't give a sh*t about the checksum, so whatever...
 	outb = checksum & 0xff;
 	OUTFILE << outb;
-	outb = char(checksum/256) & 0xff;
+	outb = (unsigned char)(checksum/256);	// & 0xff;
 	OUTFILE << outb;
 	
 	
