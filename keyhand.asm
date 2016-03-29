@@ -1261,7 +1261,7 @@ _unmuteAll
 	ld (mute1),a
 	ld (mute2),a
 	ld (mute3),a
-	ld a,#d2				;#30 jr nc / #18 jr
+	ld a,#d2				;jp nc = #d2, jp = #c3
 	;ld (mute1),a
 	ld (muteD),a
 	call printMute12
@@ -1431,7 +1431,7 @@ _muteAll
 	ld (mute1),a
 	ld (mute2),a
 	ld (mute3),a
-	ld a,#18				;#30 jr nc / #18 jr
+	ld a,#c3				;jp nc = #d2, jp = #c3
 	;ld (mute1),a
 	ld (muteD),a
 	call printMute12
