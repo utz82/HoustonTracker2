@@ -181,8 +181,8 @@ rdnotesRP				;entry point for RowPlay
 	ld l,a			;4
 	ld (ch2),hl		;16
 		
-	or h			;4	;deactivate pitch slide and table execution on rest notes, else activate
-	ld (mflag),a		;13	;deactivate table execution
+	or h			;4	;deactivate pitch slide and table execution on rest notes, else activate	
+	ld i,a			;9	;(de)activate table execution
 	jr z,_skip		;12/7
 	ld a,#eb		;7	;activate slide (#eb = ex de,hl)
 _skip
@@ -400,9 +400,8 @@ nLengthBackup equ $+1
 	jr keyPressed
 ;*************************************************************************************
 execTable				;execute note table effect ch3
-mflag equ $+1
-	ld a,0				;skip table execution on rests	TODO: perhaps replace this with ld a,i (which sets z flag)?
-	or a
+
+	ld a,i				;skip table execution on rests
 	jr z,_ret
 	exx		
 	ld h,HIGH(NoteTab)		;point to frequency table
