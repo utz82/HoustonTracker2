@@ -232,7 +232,6 @@ cspeed equ $+2
 	ld (oldSP),sp		;20	;preserve SP  --> TODO: calculate this on entering player
 ch1 equ $+1
 	ld sp,#0000		;10	;load base frequency counter val
-	ld (counterSP),sp	;20	;save reload value (to be used after keyhandling)
 
 	ld hl,0			;10	;HL holds "add" value for ch1, zero it
 
@@ -241,6 +240,7 @@ maskD equ $+1				;panning switch for drum ch
 	ex af,af'
 
 ;*************************************************************************************
+noXFX
 playnote				;synthesize and output current step
 					
 	ld a,(bc)		;7	;load sample byte
@@ -327,21 +327,54 @@ readkeys				;check if a key has been pressed
 reentry	
 	exx			;4
 
-	dec e			;4	;update speed counter - slightly inefficient, but faster on average than dec de\ld a,d\or e, and gives better sound
+	dec e			;4	;update timer - slightly inefficient, but faster on average than dec de\ld a,d\or e, and gives better sound
 	jp nz,playnote		;10
 
-xFX equ $+1	
-	jp noXFX		;	;TODO: swap out with jp nz to disable 8xx on rests, maybe?
-noXFX
-	dec d			;4
-	jp nz,playnote		;10
-				;
-;*************************************************************************************
-keyPressed
+	dec d				;update timer hi-byte
+xFX equ $+1
+	jp nz,noXFX
+
 oldSP equ $+1
 	ld sp,0				;retrieve SP
-rowplaySwap equ $+1			;switch for jumping to exitRowplay instead, jp z = #ca, ret = #c9
-	jp z,rdnotes			;z-flag will be set when speed counter has reached 0
+rowplaySwap equ $+1			;switch for jumping to exitRowplay instead
+	jp rdnotes
+
+;*************************************************************************************
+noteCut					;note cut effect for ch1
+nLength equ $+1
+	ld a,0				;update length counter
+	dec a
+	ld (nLength),a
+	jr nz,noXFX			;resume playback if length counter != 0
+	ld hl,0				;else, zero freq. counters
+	ld sp,hl
+nLengthBackup equ $+1
+	ld a,0				;reset length counter
+	ld (nLength),a
+	jp playnote			;resume playback
+	
+;*************************************************************************************
+execTable				;execute note table effect ch3
+
+	ld a,i				;skip table execution on rests
+	jr z,playnote
+	exx		
+	ld h,HIGH(NoteTab)		;point to frequency table
+	ld a,(ix+0)			;read note byte
+	inc ix				;inc pattern pointer
+	add a,a				;fetch new freq.counter value
+	ld l,a
+	ld e,(hl)
+	inc l
+	ld d,(hl)
+	exx
+
+	jp playnote			;resume playback
+	
+;*************************************************************************************
+keyPressed
+	ld (counterSP),sp	;20	;save reload value (to be used after keyhandling)
+	ld sp,(oldSP)
 	
 	push de				;preserve all counters
 	push bc
@@ -382,41 +415,6 @@ fxswap2 equ $+1
 	dw 0			;8	;swap with rlc h (cb 04) for noise/glitch effect, with rlc l (cb 05) for phase effect
 	jp outdr		;10
 				;15+18+10=43
-
-;*************************************************************************************
-noteCut					;note cut effect for ch1
-nLength equ $+1
-	ld a,0				;update length counter
-	dec a
-	ld (nLength),a
-	jr nz,noXFX			;resume playback if length counter != 0
-	ld hl,0				;else, zero freq. counters
-	ld sp,hl
-nLengthBackup equ $+1
-	ld a,0				;reset length counter
-	ld (nLength),a
-	dec d				;update speed counter
-	jp nz,playnote			;and resume playback
-	jr keyPressed
-;*************************************************************************************
-execTable				;execute note table effect ch3
-
-	ld a,i				;skip table execution on rests
-	jr z,_ret
-	exx		
-	ld h,HIGH(NoteTab)		;point to frequency table
-	ld a,(ix+0)			;read note byte
-	inc ix				;inc pattern pointer
-	add a,a				;fetch new freq.counter value
-	ld l,a
-	ld e,(hl)
-	inc l
-	ld d,(hl)
-	exx
-_ret
-	dec d				;update speed counter
-	jp nz,playnote			;and resume playback
-	jr keyPressed
 
 ;*************************************************************************************
 
