@@ -708,7 +708,7 @@
       <td><b>[TRACE]</b></td>
       <td>SET SPEED</td>
       <td>SET USR DRUM</td>
-      <td>Set the global song speed. Refer to the section on <a href="#songsettings">global variables</a> for details on this setting.
+      <td>Set the global song speed. Refer to the section on <a href="#globalvars">global variables</a> for details on this setting.
           <br>  In ALPHA mode, set the user drum pointer. Any value between 0x0000 and 0xFFFF is permitted. However,
           it is recommended to stick with values in the range of 0x0000 - 0x7FFF, as higher values may produce unpredictable results.</td>
      </tr>
@@ -818,6 +818,7 @@
     <b>[0]</b>.
     <br><br><br>
   </div>
+  <a name="globalvars"></a>
   <div class="minor">
     Global Variables<br><br>
   </div>
@@ -831,6 +832,8 @@
     Any number in the range of 0x01 - 0x3F will set the number of ticks directly. Adding 0x40 to the value will reduce the length of the first tick by &frac34;,
     adding 0x80 will reduce it by &frac12;, and adding 0xc0 will reduce it by &frac14;. Thus, setting the speed to 0x08 will result in a row length of 8 ticks, 
     0xc8 will result in a row length of 7&frac34; ticks, 0x88 will result in a row length of 7&frac12; ticks, and 0x48 will result in a row length of 7&frac14; ticks.
+    Note that reducing the length of the first tick will have a noticable impact on various effects including 2xx/3xx (pitch slides), 8xx (execute note table), and 
+    Cxx (note cut).
     <br><br>    
     0x00 (aka the "drone mode") is an exception. It is the slowest possible setting, equivalent to a row length of 256 ticks (minus a fraction of a tick when adding
     using 0x40/0x80/0xc0).<br><br>
@@ -1144,7 +1147,7 @@
         <td>Fxx</td>
         <td>SET SPEED</td>
         <td>Set the current speed. This command temporarily overrides the global speed setting, but does not permanently change it. For details on how the 
-	  speed setting works, refer to the section on <a href="#songsettings">global variables</a>.<br>
+	  speed setting works, refer to the section on <a href="#globalvars">global variables</a>.<br>
 	  TIP: When entering this effect while the player is running, make sure to enter the parameter first, and then the F command.</td>
       </tr>
     </table>
@@ -1269,7 +1272,8 @@
   </div>
   <div class="main">
     Thanks to...<br><br>
-    ... TylerBarnes, Tronimal, garvalf, and Flashbob for beta testing<br>
+    ... TylerBarnes, Tronimal, garvalf, Flashbob, giako9000, nonfinite, and Imaginary for beta testing<br>
+    ... Jankenpopp and unexpectedbowtie for figuring out the install process under non-standard configurations<br>
     ... extra thanks to garvalf for preparing the HT2 cheatsheet<br>
     ... Shiru, introspec, and Alone Coder for their expertise and advice<br>
     ... Brandon Wilson, Lionel Debroux, and everybody who has been hacking/documenting TI calcs<br><br>
@@ -1516,7 +1520,11 @@
     I can't figure out how to install TiLP on OS X.<br><br>
   </div>
   <div class="main">
-	Use the official <a href="https://education.ti.com/en/us/products/computer_software/connectivity-software/ti-connect-software/tabs/overview" target="_blank">TI-Connect</a>
+        An easy way to install TiLP is by using <a href="https://guide.macports.org" target="_blank">MacPorts</a>. After you have set up MacPorts, you can use
+	<a href="https://trac.macports.org/ticket/13227" target="_blank">this package</a> to install TiLP and the necessary libraries. The port is using a
+	very outdated version, but it should do the trick. Thanks to unexpectedbowtie for coming up with this solution!<br><br>
+	Alternatively, you can use the official 
+	<a href="https://education.ti.com/en/us/products/computer_software/connectivity-software/ti-connect-software/tabs/overview" target="_blank">TI-Connect</a>
 	linking software. However, TI-Connect does not fully support the TI82, so you won't be able to upload HT2 on that model. 
 	Alternatively, you can of course run Linux in a virtual machine, and use TiLP from there.<br><br>
 	<br><br>
