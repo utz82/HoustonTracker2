@@ -474,7 +474,12 @@ fxJumpTab
 
 fxF					;#0f = set speed
 	ld a,(de)
+	ld l,a
+	and #3f
 	ld (cspeed),a
+	ld a,l
+	and #c0
+	ld (cspeed-1),a
 	jp fxcont
 
 fxB					;#0b = break cmd
@@ -808,7 +813,12 @@ setleftD
 resetFX					;reset all fx
 
 	ld a,(musicData)		;reset speed
+	ld l,a
+	and #3f
 	ld (cspeed),a
+	ld a,l
+	and #c0
+	ld (cspeed-1),a
 
 resetFX1
 	ld a,#80			;reset phase shift

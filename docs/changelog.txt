@@ -2,6 +2,12 @@
 version 2.11.1beta
 ==================
 
+NEW/CHANGES
+
+- more fine-grained tempo control
+- (somewhat) reduced noise during row transitions
+- improved handling of extended fx
+
 BUGFIXES
 
 - fixed wrong Drum panning (was inverted)

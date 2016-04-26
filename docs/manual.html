@@ -708,7 +708,8 @@
       <td><b>[TRACE]</b></td>
       <td>SET SPEED</td>
       <td>SET USR DRUM</td>
-      <td>Set the global song speed.<br>  In ALPHA mode, set the user drum pointer. Any value between 0x0000 and 0xFFFF is permitted. However,
+      <td>Set the global song speed. Refer to the section on <a href="#songsettings">global variables</a> for details on this setting.
+          <br>  In ALPHA mode, set the user drum pointer. Any value between 0x0000 and 0xFFFF is permitted. However,
           it is recommended to stick with values in the range of 0x0000 - 0x7FFF, as higher values may produce unpredictable results.</td>
      </tr>
      <tr>
@@ -825,8 +826,14 @@
     Pressing <b>[x&sup2;]</b> will set the loop point to the row currently highlighted by the cursor. To set it to another row, press <b>[ALPHA], [x&sup2;]</b>,
     then enter a 2-digit hex number.<br><br>
     
-    The <b style="background:#ffff6b">global song speed</b> can be changed by pressing <b>[TRACE]</b>, followed by a 2-digit hex number. Generally, the higher 
-    the number, the lower the speed. However, 0x00 is an exception. It is the slowest possible setting, equivalent to a speed of 0x100.<br><br>
+    The <b style="background:#ffff6b">global song speed</b> can be changed by pressing <b>[TRACE]</b>, followed by a 2-digit hex number. The number refers to
+    the number of ticks one row will last. So generally speaking, a higher number means lower speed.<br><br>
+    Any number in the range of 0x01 - 0x3F will set the number of ticks directly. Adding 0x40 to the value will reduce the length of the first tick by &frac34;,
+    adding 0x80 will reduce it by &frac12;, and adding 0xc0 will reduce it by &frac14;. Thus, setting the speed to 0x08 will result in a row length of 8 ticks, 
+    0xc8 will result in a row length of 7&frac34; ticks, 0x88 will result in a row length of 7&frac12; ticks, and 0x48 will result in a row length of 7&frac14; ticks.
+    <br><br>    
+    0x00 (aka the "drone mode") is an exception. It is the slowest possible setting, equivalent to a row length of 256 ticks (minus a fraction of a tick when adding
+    using 0x40/0x80/0xc0).<br><br>
     
     To set the <b style="background:#c06bf2">user drum pointer</b>, press <b>[ALPHA], [TRACE]</b>, followed by a 4-digit hex number. 
     See the section on <a href="#drums">drums</a> for
@@ -1136,8 +1143,8 @@
       <tr>
         <td>Fxx</td>
         <td>SET SPEED</td>
-        <td>Set the current speed. xy can be any hexadecimal number between 0x01 and 0xFF. The higher the value, the slower the speed. This command 
-	temporarily overrides the global speed setting, but does not permanently change it.<br>
+        <td>Set the current speed. This command temporarily overrides the global speed setting, but does not permanently change it. For details on how the 
+	  speed setting works, refer to the section on <a href="#songsettings">global variables</a>.<br>
 	  TIP: When entering this effect while the player is running, make sure to enter the parameter first, and then the F command.</td>
       </tr>
     </table>
