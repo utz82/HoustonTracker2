@@ -5,6 +5,10 @@ play
 init					;sandboxing the actual player so we can handle keypresses vs looping quickly
 	ld de,ptns
 initrp					;init point for row play
+	ld hl,-12			;calculate stack restore point
+	add hl,sp
+	ld (oldSP),hl
+
 	push de
 	call resetFX
 
@@ -104,7 +108,7 @@ ptnselect				;FIRST, set up ptn sequence pointers and push them (preserve song s
 	add a,a			;4
 	add a,l			;4
 	ld l,a			;4
-IF MODEL != TI8X || MODEL != TI8XS	;fx ptn table crosses page boundary on 82/83
+IF MODEL != TI8X || MODEL != TI8XS	;fx ptn table crosses page boundary on 82/83 TODO: conditional should depend on the table crossing the page bound
 	jr nc,psskip4		;12/7
 	inc h			;4
 psskip4
@@ -229,7 +233,6 @@ drumtrig equ $+1
 cspeed equ $+2
 	ld de,#1000		;10	;speed
 	
-	ld (oldSP),sp		;20	;preserve SP  --> TODO: calculate this on entering player
 ch1 equ $+1
 	ld sp,#0000		;10	;load base frequency counter val
 
@@ -306,7 +309,7 @@ ch3 equ $+1				;misnomer, this is ch2
 	ld c,l			;4	
 phaseshift2 equ $+1
 	ld a,#80		;7
-pwmswitch				;ch2 PWM effect switch	
+pwmswitch				;ch2 PWM effect switch	TODO: chord effect by manipulating the +0 value?
 	add a,#0		;7	;add a,n = #c6; adc a,n = #ce
 	ld (phaseshift2),a	;13	
 	cp b			;4

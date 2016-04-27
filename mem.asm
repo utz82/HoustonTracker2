@@ -490,7 +490,8 @@ load					;load a song from a backup savestate.
 	call zap			;clear work area					
 
 	ld a,(version)			;check savestate format version
-	or a
+	;or a
+	dec a
 	jr z,_ldstart
 	ld a,6				;if version != 0, abort loading and generate error
 	jp errorHand
@@ -620,44 +621,7 @@ _ldfxptnlp				;TODO: optimize ptn address finding by using fxptntab lookup
 	ldir
 	
 	pop af
-	;rla				;check if bit 7 of ptn# was set
 	cp #3f				;check if bit 7 of ptn# was set or ptn# was >#3f
-	;jr nc,_ldfxptnlp		;???read next ptn if it wasn't
 	jr c,_ldfxptnlp			;TEST DEBUG
 	ret				;else we're done.
-;************************************************************************************
-;
-; ; isFxPtnFree
-; ; 	ld b,#20
-; ; 	ld hl,fxptntab
-; ; 	jr isPtnFree
-;
-; isNotePtnFree				;determine if a pattern is unused
-; 					;IN: A = ptn # | OUT: Z if ptn is empty; AF,BC,DE,HL,BC' destroyed
-; 	ld b,#10
-; isPtnFree
-; 	push de
-; 	push hl
-; 	push bc
-; 	
-; 	call findPtn			;ptn pointer now in DE
-; 	ld hl,0
-; 	ld b,0
-; 	exx
-; 	pop bc
-;
-; _lp
-; 	exx
-; 	ld a,(de)
-; 	ld c,a
-; 	add hl,bc	
-; 	exx
-; 	djnz _lp	
-; 	
-; 	exx
-; 	ld a,h
-; 	or l				;set flags
-; 	pop hl
-; 	pop de
-; 	ret
-; ;************************************************************************************	
+;************************************************************************************	

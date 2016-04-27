@@ -1,5 +1,5 @@
 ;************************************************************************************
-;HOUSTONTRACKER 2.00.01
+;HOUSTONTRACKER 2.11.03
 ;by utz * irrlichtproject.de/houston
 ;************************************************************************************
 
@@ -33,7 +33,7 @@ IF MODEL = TI8XS
 include "_include/ti8xs.inc"
 ENDIF
 
-	db "HT 2.09", 0
+	db "HT 2.11", 0
 
 ;************************************************************************************
 ;APD_BUF scratch pad and other equates
@@ -211,7 +211,9 @@ _skipdiv
 	push hl					;ch2
 	
 	call calcPtnOffset
-	push hl					;ch1				
+	push hl					;ch1
+	
+	ld (oldSP),sp				
 	
 	ld hl,_next
 	ld (rowplaySwap),hl
@@ -1401,6 +1403,7 @@ ttest equ $-1
 mplay
 	include "16bitplayer.asm"
 
+	db 'XSAVE'
 savestateLUT				;32 byte save state lookup table
 	dw savestates			;DEBUG
 	dw firstend-1			;DEBUG
@@ -1414,7 +1417,7 @@ firstend equ $				;DEBUG
 ;memend equ $+2
 	org mem_end-2
 version
-	db 0,2				;savestate format version
+	db 1,2				;savestate format version
 
 
 ; IF ((MODEL != TI82))			; && (MODEL != TI8P))
