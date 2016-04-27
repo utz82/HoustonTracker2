@@ -4,6 +4,7 @@ version 2.11.1beta
 
 NEW/CHANGES
 
+- new effect: 7xx - auto chord ch2
 - more fine-grained tempo control
 - (somewhat) reduced noise during row transitions
 - improved handling of extended fx

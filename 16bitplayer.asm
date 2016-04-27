@@ -310,6 +310,7 @@ ch3 equ $+1				;misnomer, this is ch2
 phaseshift2 equ $+1
 	ld a,#80		;7
 pwmswitch				;ch2 PWM effect switch	TODO: chord effect by manipulating the +0 value?
+fastpwmswitch equ $+1
 	add a,#0		;7	;add a,n = #c6; adc a,n = #ce
 	ld (phaseshift2),a	;13	
 	cp b			;4
@@ -458,7 +459,7 @@ fxJumpTab
 	nop
 	jp fx6
 	nop
-	jp fxcont			;fx7
+	jp fx7			;fx7
 	nop
 	jp fx8			;fx8
 	nop
@@ -579,6 +580,11 @@ fx6					;duty cycle ch3
 	ld a,(de)
 	ld (phaseshift3),a
 	jp fxcont
+	
+fx7
+	ld a,(de)
+	ld (fastpwmswitch),a
+	jp fxcont	
 	
 fx8					;execute note table ch2
 	ld a,(de)
@@ -854,6 +860,7 @@ resetFX3
 	ld (pitchslide),a
 	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
+	ld (fastpwmswitch),a		;reset fastpwm
 				
 	ld hl,noXFX			;reset extended FX
 	ld (xFX),hl
