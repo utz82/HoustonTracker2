@@ -207,7 +207,7 @@ drx
 	inc de			;6	;point to fx parameter
 	jp nz,fxselect		;10
 	
-fxcont
+fxreturn
 	inc de			;6	;point to next row
 
 	push de			;11	;stack 2			
@@ -309,8 +309,8 @@ ch3 equ $+1				;misnomer, this is ch2
 	ld c,l			;4	
 phaseshift2 equ $+1
 	ld a,#80		;7
-pwmswitch				;ch2 PWM effect switch	TODO: chord effect by manipulating the +0 value?
-fastpwmswitch equ $+1
+pwmswitch				;ch2 PWM effect switch
+fastpwmswitch equ $+1			;ch2 fastPWM/auto chord switch
 	add a,#0		;7	;add a,n = #c6; adc a,n = #ce
 	ld (phaseshift2),a	;13	
 	cp b			;4
@@ -488,9 +488,10 @@ fxF					;#0f = set speed
 
 fxB					;#0b = break cmd
 	ld a,(reptpos)
-	cp #10
+	cp #10				;ignore cmd if triggered on the first pattern row
 	jp nz,ptnselect		;10	;select next ptn if found  ATTN: leaves register set swapped!
-	jp fxcont
+	;jp fxcont
+	jp fxreturn
 	
 fx1					;#01 = set panning
 	ld a,(de)
@@ -745,14 +746,107 @@ _fxDyy
 
 fxE					;reset all fx
 	ld a,(de)
-	or a
+	
+	cp #80				;if fx param >= 0x80, it's a reset fx
+	jr c,_extfx
+
+	and #7f
 	call z,resetFX			;resetFX always returns with A=0 and Z-flag set	
 	dec a
 	call z,resetFX1
 	dec a
 	call z,resetFX2
 	call nz,resetFX3
-	jp fxcont
+	jp fxreturn
+_extfx
+	and #3f				;make sure ptn # is valid
+	push de				;preserve original fx ptn pointer
+	
+	ld hl,fxptntab
+	add a,a
+	add a,l
+	ld l,a
+IF MODEL != TI8X || MODEL != TI8XS	;fx ptn table crosses page boundary on 82/83
+	jr nc,_skip
+	inc h
+_skip
+ENDIF
+	ld e,(hl)			;seq pointer fx to de
+	inc hl
+	ld d,(hl)
+	
+	ld a,#c9			;modify fxcont to contain a RET
+	ld (fxcont),a
+	
+	ld a,(de)			;read fx #
+	and #f				;mask out drum value
+	inc de				;inc fx pointer
+	call nz,fxextselect		;execute fx command
+	inc de
+	ld a,(de)
+	and #f
+	inc de
+	call nz,fxextselect
+	inc de
+	ld a,(de)
+	and #f
+	inc de
+	call nz,fxextselect
+	inc de
+	ld a,(de)
+	and #f
+	inc de
+	call nz,fxextselect
+	inc de
+	ld a,(de)
+	and #f
+	inc de
+	call nz,fxextselect
+	
+	ld a,#c3			;restore jump at fxcont
+	ld (fxcont),a
+	pop de				;restore fx ptn pointer
+	jp fxreturn
+
+	
+fxextselect				;select fx
+	dec a				;calculate jump
+	add a,a				
+	add a,a
+	ld (_jump),a
+_jump equ $+1
+	jr $
+	
+fxExtJumpTab
+	jp fx1
+	nop
+	jp fx2
+	nop
+	jp fx3
+	nop
+	jp fx4
+	nop
+	jp fx5
+	nop
+	jp fx6
+	nop
+	jp fx7			;fx7
+	nop
+	jp fx8			;fx8
+	nop
+	jp fx9			;fx9
+	nop
+	jp fxA
+	nop
+	ret			;fxB
+	ds 3
+	jp fxC
+	nop
+	jp fxD
+	nop
+	ret			;fxE
+	ds 3
+	jp fxF	
 		
 setright1
 	ex af,af'
@@ -817,6 +911,9 @@ setleftD
 	ld (maskD),a
 	;ex af,af'
 	jp fxcont
+	
+fxcont
+	jp fxreturn			;jp = #c3, ret = #c9
 
 ;*************************************************************************************	
 resetFX					;reset all fx
@@ -865,7 +962,7 @@ resetFX3
 	ld hl,noXFX			;reset extended FX
 	ld (xFX),hl
 
-	ret				;must return with Z-flag set
+	ret				;must return with A=0 and Z-flag set
 ;*************************************************************************************
 lpInvalidErr				;handle error caused by invalid loop point created by deleting row to loop to in livemode
 	pop hl				;clean stack

@@ -1118,7 +1118,7 @@
         <td>A0x</td>
         <td>ADD SFX CH1</td>
         <td>Add a sound effect to channel 1.<br>
-	   A00 deactivates the effect.<br>
+	   A00 deactivates the effect. Additionally, setting 4xx to a value &lt;= 0x80 will deactivate the A01 effect.<br>
 	   A01 adds noise or glitchy sounds to channel 1. The actual outcome depends on the current pitch of ch1. To some extend, it's also influenced by the
 	   currently active drum sound. It works best with high notes, especially A-5 and A-6.<br>
 	   A02 adds slight random inaccuracies to the pitch of channel 1. It has little effect by itself, but can be used to produce a phasing effect in 
@@ -1143,13 +1143,14 @@
         <td>Set the drum mode, where xx is 0x00..0x4F. Refer to the <a href="#drums">drums section</a> for details.<br></td>
       </tr>
       <tr>
-        <td>E0x</td>
-        <td>RESET FX</td>
-        <td>Reset previous FX commands to default settings. This effect causes a slightly longer than normal delay when triggered.<br> 
-	  E00 - reset all effects.<br>
-	  E01 - reset all effects except speed.<br>
-	  E02 - reset all effects except speed and duty cycles.<br>
-	  E03 - reset all effects except speed, duty cycles, and panning settings.<br></td>
+        <td>Exx</td>
+        <td>EXTENDED FX</td>
+        <td>Various extended effects. Using this effect causes a slightly longer than normal delay when triggered, leading to additional transition noise.<br>
+	  Exx with xx &lt; 0x40 - execute up to 5 effects stored at the start of effects pattern xx at once. Effects Bxx and Exx will be ignored.<br>
+	  E80 - reset all effects and restore global variables to their defaults.<br>
+	  E81 - as above, but does not reset speed.<br>
+	  E82 - as above, but does not reset speed and duty cycles.<br>
+	  E83 - as above, but does not reset speed, duty cycles, and panning settings.<br></td>
       </tr>
       <tr>
         <td>Fxx</td>
