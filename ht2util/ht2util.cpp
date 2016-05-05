@@ -19,6 +19,7 @@ int decompressState(int model, char statev);
 string getOutfileName(string suffix);
 string getInfileName();
 int getSavestateNo();
+unsigned getHTVersionNo();
 
 unsigned statebeg[8], statelen[8];
 const string calcversion[4] = { "82", "83", "83+/84+", "83+/84+" };
@@ -84,10 +85,6 @@ int main(int argc, char *argv[]){
 
 		HTFILE.seekg(-4, ios::end);		//read savestate version
 		HTFILE.read((&statever), 1);
-		HTFILE.seekg(0x50, ios::beg);		//read ht2 version upper val
-		HTFILE.read((&htverh), 1);
-		HTFILE.seekg(0x51, ios::beg);		//read ht2 version lower val
-		HTFILE.read((&htverl), 1);
 		
 	}
 	if (ext == ".83p" || ext == ".83P") {
@@ -103,10 +100,6 @@ int main(int argc, char *argv[]){
 			HTFILE.seekg(-6, ios::end);
 			HTFILE.read((&statever), 1);
 		}
-		HTFILE.seekg(0x51, ios::beg);		//read ht2 version upper val
-		HTFILE.read((&htverh), 1);
-		HTFILE.seekg(0x52, ios::beg);		//read ht2 version lower val
-		HTFILE.read((&htverl), 1);
 	}
 	if (ext == ".8xp" || ext == ".8XP" || ext == ".8xP" || ext == ".8Xp") {
 		tmodel = 2;
@@ -121,10 +114,6 @@ int main(int argc, char *argv[]){
 			HTFILE.seekg(-6, ios::end);
 			HTFILE.read((&statever), 1);
 		}
-		HTFILE.seekg(0x55, ios::beg);		//read ht2 version upper val
-		HTFILE.read((&htverh), 1);
-		HTFILE.seekg(0x56, ios::beg);		//read ht2 version lower val
-		HTFILE.read((&htverl), 1);
 	}
 	
 	if (statever > 1) {
@@ -141,20 +130,10 @@ int main(int argc, char *argv[]){
 	}
 	lutOffset = static_cast<unsigned>(fOffset) + 1;
 	
-	htverh = htverh - 0x30;
-	htverl = htverl - 0x30;
-	htver = htverh * 10 + htverl;
-	
-	
-// 	if (htver == 0) {
-// 		basediff[0] = 0x90B9;
-// 		basediff[1] = 0x92DF;
-// 		basediff[2] = 0x9D49;
-// 		basediff[3] = 0x9D49;
-// 	}
+	htver = getHTVersionNo();
 	
 	cout << "TI version.............." << calcversion[tmodel] << "\n";
-	cout << "HT version..............2." << +htverh << +htverl << "\n";
+	cout << "HT version..............2." << +htver << "\n";
 	cout << "savestate version......." << +statever << "\n\n";
 	cout << "no.\tbegin\tend\tlength\n";
 	
@@ -182,13 +161,50 @@ int main(int argc, char *argv[]){
 		if (cmd == "i" || cmd == "I") insertState(tmodel, lutOffset, statever);
 //		if (cmd == "t" || cmd == "T" || cmd == "u" || cmd == "U") cout << "This feature is not implemented yet.\n";
 	}
-	//TODO: ATTN: seems savestate version is still killed in 8x version
 	//TODO: ext. ops: retune freq.tab, change samples
 	
 	
 	//close open file(s) and exit
 	HTFILE.close();
 	return 0;
+}
+
+//get HT2 version number
+unsigned getHTVersionNo() {
+	char htverh, htverl;
+	unsigned htver;
+	const char vstr[5] = { 0x48, 0x54, 0x20, 0x32, 0x2e };	//"HT 2."
+	int vno = 0;
+	int fileoffset = 0x40;
+	bool foundversion = false;
+	
+	while ((!foundversion) && (fileoffset < 0x80)) {
+		fileoffset++;
+		HTFILE.seekg(fileoffset, ios::beg);
+		HTFILE.read(&htverl, 1);
+		
+		if (htverl == vstr[vno]) vno++;
+		else vno = 0;
+		
+		if (vno == 5) foundversion = true;
+	}
+	if (!foundversion) return -1;
+	
+	
+	fileoffset++;
+	HTFILE.seekg(fileoffset, ios::beg);
+	HTFILE.read(&htverh, 1);
+	
+	fileoffset++;
+	HTFILE.seekg(fileoffset, ios::beg);
+	HTFILE.read(&htverl, 1);
+	
+	
+	htverh = htverh - 0x30;
+	htverl = htverl - 0x30;
+	htver = htverh * 10 + htverl;
+	
+	return htver;
 }
 
 //determine savestate LUT offset
