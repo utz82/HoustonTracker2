@@ -9,21 +9,23 @@
 using namespace std;
 
 
-void readLUT(int fileoffset, int htv, char statev, int model);
+void readLUT(int fileoffset, int htv, char statev);
 void writeChecksum();
 int getLUToffset(char statev, unsigned filesize);
-int insertState(int model, unsigned lutOffset, char statev);
-int removeState(int model, unsigned lutOffset, char statev);
-int extractState(int model, char statev);
-int decompressState(int model, char statev);
+int insertState(unsigned lutOffset, char statev);
+int removeState(unsigned lutOffset, char statev, int model);
+int extractState(char statev);
+int decompressState(char statev);
 string getOutfileName(string suffix);
 string getInfileName();
 int getSavestateNo();
-unsigned getHTVersionNo();
+unsigned getHTVersionNo(int fileoffset);
+int getBaseOffset();
+unsigned getBaseDiff(int model, int baseOffset);
 
 unsigned statebeg[8], statelen[8];
-const string calcversion[4] = { "82", "83", "83+/84+", "83+/84+" };
-const unsigned basediff[4] = {0x90B9, 0x92DF, 0x9D49, 0x9D49};	//the values that need to be subtracted from LUT entries to get the actual savestate offsets
+const string calcversion[3] = { "82", "83", "83+/84+" };
+unsigned basediff;
 
 fstream HTFILE;
 
@@ -52,6 +54,9 @@ int main(int argc, char *argv[]){
 		cout << "analyzing " << filename << "...\n\n";	
 	}
 
+	//check filesize
+	HTFILE.seekg(0,ios_base::end);
+	unsigned filesize = HTFILE.tellg();
 	
 	//extract file extension
 	string ext = "";
@@ -60,7 +65,6 @@ int main(int argc, char *argv[]){
 	if (dot != std::string::npos) {
 		ext = filename.substr(dot, filename.size() - dot);
 	}
-
 	
 	//exit if file is not an 8*p program
 	if (ext != ".82p" && ext != ".83p" && ext != ".8xp" && ext != ".82P" && ext != ".83P" && ext != ".8XP" && ext != ".8xP"  && ext != ".8Xp") {
@@ -68,60 +72,68 @@ int main(int argc, char *argv[]){
 		HTFILE.close();
 		return -1;
 	}
-
 	
-	//check filesize
-	HTFILE.seekg(0,ios_base::end);
-	unsigned filesize = HTFILE.tellg();
-	
-	char statever, htverh, htverl;
-	unsigned lutOffset, htver;
-	int tmodel, fOffset;
-	
-	
-	//unify file name extension and perform validity checks
-	if (ext == ".82p" || ext == ".82P") { 
-		tmodel = 0;
-
-		HTFILE.seekg(-4, ios::end);		//read savestate version
-		HTFILE.read((&statever), 1);
-		
-	}
-	if (ext == ".83p" || ext == ".83P") {
-		tmodel = 1;
-		
-		HTFILE.seekg(-3, ios::end);		//detect legacy HT2 version: if val at offset -3 is 0, it's a legacy binary
-		HTFILE.read((&statever), 1);
-		
-		if (statever != 0) {			//read actual savestate version
-			HTFILE.seekg(-4, ios::end);
-			HTFILE.read((&statever), 1);
-		} else {
-			HTFILE.seekg(-6, ios::end);
-			HTFILE.read((&statever), 1);
-		}
-	}
-	if (ext == ".8xp" || ext == ".8XP" || ext == ".8xP" || ext == ".8Xp") {
-		tmodel = 2;
-
-		HTFILE.seekg(-3, ios::end);		//detect legacy HT2 version: if val at offset -3 is 0, it's a legacy binary
-		HTFILE.read((&statever), 1);
-		
-		if (statever != 0) {			//read actual savestate version
-			HTFILE.seekg(-4, ios::end);
-			HTFILE.read((&statever), 1);
-		} else {
-			HTFILE.seekg(-6, ios::end);
-			HTFILE.read((&statever), 1);
-		}
-	}
-	
-	if (statever > 1) {
-		cout << "Error: " << filename << " is of a newer version than supported by this version of ht2util.\n";
-		HTFILE.close();
+	//get base offset
+	int baseOffset = getBaseOffset();
+	if (baseOffset == -1) {
+		cout << "Error: Not a valid HT2 program file.\n";
 		return -1;
 	}
+		
+	//get HT2 version number
+	unsigned htver;
+	htver = getHTVersionNo(baseOffset);
+
+	//determine calc type by file extension
+	int tmodel;
+	if (ext == ".82p" || ext == ".82P") tmodel = 0;
+	if (ext == ".83p" || ext == ".83P") tmodel = 1;
+	if (ext == ".8xp" || ext == ".8XP" || ext == ".8xP" || ext == ".8Xp") tmodel = 2;
 	
+	//check if user accidentally dumped an 8xp file as 83p
+	if (tmodel == 1) {
+		int tempfo = baseOffset - 11;
+		char temp1, temp2;
+		
+		HTFILE.seekg(tempfo, ios::beg);
+		HTFILE.read((&temp1), 1);
+		tempfo++;
+		HTFILE.seekg(tempfo, ios::beg);
+		HTFILE.read((&temp2), 1);
+		
+		if (((temp1&0xff) == 0xbb) && (temp2 == 0x6d)) {	//if 8xp asmPRGM header found
+			cout << "Error: TI-8x Plus file dumped as TI-83 file. Redump as .8xp.\n";
+			return -1;
+		}
+	
+	}
+	
+	//determine savestate version
+	char statever;
+	if (tmodel > 0) {
+		HTFILE.seekg(-4, ios::end);		//read savestate version
+		HTFILE.read((&statever), 1);
+	} else {
+		HTFILE.seekg(-3, ios::end);		//detect legacy HT2 version: if val at offset -3 is 0, it's a legacy binary
+		HTFILE.read((&statever), 1);
+		
+		if (statever != 0) {			//read actual savestate version
+			HTFILE.seekg(-4, ios::end);
+			HTFILE.read((&statever), 1);
+		} else {
+			HTFILE.seekg(-6, ios::end);
+			HTFILE.read((&statever), 1);
+		}
+	}	
+	if (statever > 1) {
+		cout << "Warning: " << filename << " is of a newer version than supported by this version of ht2util.\nSome functionality may not perform as expected.";	
+	}
+	
+	//get basediff
+	basediff = getBaseDiff(tmodel, baseOffset);
+	
+	unsigned lutOffset;
+	int fOffset;
 	fOffset = getLUToffset(statever, filesize);
 	
 	if (fOffset == -1) {
@@ -129,8 +141,6 @@ int main(int argc, char *argv[]){
 		return -1;
 	}
 	lutOffset = static_cast<unsigned>(fOffset) + 1;
-	
-	htver = getHTVersionNo();
 	
 	cout << "TI version.............." << calcversion[tmodel] << "\n";
 	cout << "HT version..............2." << +htver << "\n";
@@ -144,22 +154,18 @@ int main(int argc, char *argv[]){
 	
 	string cmd = "";
 	
-	//cout << "tmodel=" << tmodel << "htver=" << htver << "\n";	//DEBUG
-	
 	while (cmd != "q" && cmd != "Q") {
 		cout << "\n";
-		readLUT(lutOffset, htver, statever, tmodel);
-//		cout << "\nWhat would you like to do?\n(U)pgrade " << filename << " to latest version (2.10)\n(T)ransfer savestates to another TI model\n(E)xtract a savestate\n(D)ecompress and disassemble a savestate\n(I)nsert a savestate\n(R)emove a savestate\n(Q)uit\n";
+		readLUT(lutOffset, htver, statever);
+
 		cout << "\nWhat would you like to do?\n(E)xtract a savestate\n(D)ecompress and disassemble a savestate\n(I)nsert a savestate\n(R)emove a savestate\n(Q)uit\n";
 		cin >> cmd;
 		end = find(keys, keys+14, cmd);
-//		if (end == keys+14) cout << "u|t|e|d|i|r|q only, please.\n";
 		if (end == keys+14) cout << "e|d|i|r|q only, please.\n";
-		if (cmd == "e" || cmd == "E") extractState(tmodel, statever);
-		if (cmd == "d" || cmd == "D") decompressState(tmodel, statever);
-		if (cmd == "r" || cmd == "R") removeState(tmodel, lutOffset, statever);
-		if (cmd == "i" || cmd == "I") insertState(tmodel, lutOffset, statever);
-//		if (cmd == "t" || cmd == "T" || cmd == "u" || cmd == "U") cout << "This feature is not implemented yet.\n";
+		if (cmd == "e" || cmd == "E") extractState(statever);
+		if (cmd == "d" || cmd == "D") decompressState(statever);
+		if (cmd == "r" || cmd == "R") removeState(lutOffset, statever, tmodel);
+		if (cmd == "i" || cmd == "I") insertState(lutOffset, statever);
 	}
 	//TODO: ext. ops: retune freq.tab, change samples
 	
@@ -169,37 +175,52 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
-//get HT2 version number
-unsigned getHTVersionNo() {
-	char htverh, htverl;
-	unsigned htver;
+//get baseDiff
+unsigned getBaseDiff(int model, int baseOffset) {
+	const unsigned basediff[3] = { 0x9104, 0x932b, 0x9d99 };
+	unsigned diff;
+	
+	diff = basediff[model] - baseOffset + 5;
+	return diff;
+}
+
+//determine base offset by header length
+//returns the first file position after the internal file name
+int getBaseOffset() {
 	const char vstr[5] = { 0x48, 0x54, 0x20, 0x32, 0x2e };	//"HT 2."
 	int vno = 0;
 	int fileoffset = 0x40;
-	bool foundversion = false;
-	
-	while ((!foundversion) && (fileoffset < 0x80)) {
+	bool foundPrgmHeader = false;
+	char temp;
+
+	while ((!foundPrgmHeader) && (fileoffset < 0x80)) {
 		fileoffset++;
 		HTFILE.seekg(fileoffset, ios::beg);
-		HTFILE.read(&htverl, 1);
+		HTFILE.read(&temp, 1);
 		
-		if (htverl == vstr[vno]) vno++;
+		if (temp == vstr[vno]) vno++;
 		else vno = 0;
 		
-		if (vno == 5) foundversion = true;
+		if (vno == 5) foundPrgmHeader = true;
 	}
-	if (!foundversion) return -1;
 	
-	
+	if (!foundPrgmHeader) return 0xffff;
 	fileoffset++;
+	return fileoffset;
+}
+
+//get HT2 version number
+unsigned getHTVersionNo(int fileoffset) {
+	char htverh, htverl;
+	unsigned htver;
+
 	HTFILE.seekg(fileoffset, ios::beg);
 	HTFILE.read(&htverh, 1);
 	
 	fileoffset++;
 	HTFILE.seekg(fileoffset, ios::beg);
 	HTFILE.read(&htverl, 1);
-	
-	
+		
 	htverh = htverh - 0x30;
 	htverl = htverl - 0x30;
 	htver = htverh * 10 + htverl;
@@ -255,7 +276,7 @@ int getLUToffset(char statev, unsigned filesize) {
 }
 
 //read savestate LUT and print finding to stdout
-void readLUT(int fileoffset, int htv, char statev, int model) {
+void readLUT(int fileoffset, int htv, char statev) {
 
 	int i;
 	char readb;
@@ -297,7 +318,7 @@ void readLUT(int fileoffset, int htv, char statev, int model) {
 
 
 //insert a savestate
-int insertState(int model, unsigned int lutOffset, char statev) {
+int insertState(unsigned int lutOffset, char statev) {
 
 	//check if there are free save slots available
 	if (statelen[0] != 0 && statelen[1] != 0 && statelen[2] != 0 && statelen[3] != 0 && statelen[4] != 0 && statelen[5] != 0 && statelen[6] != 0) {
@@ -361,7 +382,7 @@ int insertState(int model, unsigned int lutOffset, char statev) {
 	//check if there is sufficient space to insert the state
 	HTFILE.seekg(0, ios::end);
 	unsigned int htsize = HTFILE.tellg();
-	if ((firstfree - basediff[model] + statesize) > (htsize - 77)) {		//-checksum -padding -versionbyte -header (should be 75 on htver>1)
+	if ((firstfree - basediff + statesize) > (htsize - 77)) {		//-checksum -padding -versionbyte -header (should be 75 on htver>1)
 		cout << "Error: Not enough space to insert the savestate. Try deleting another savestate first.\n";
 		return -1;
 	}	
@@ -378,7 +399,7 @@ int insertState(int model, unsigned int lutOffset, char statev) {
 	}
 	
 	//write buffer into HT2 file
-	long fileoffset = firstfree - basediff[model];
+	long fileoffset = firstfree - basediff;
 	HTFILE.seekp(fileoffset, ios::beg);
 	HTFILE.write(fbuf, statesize);
 	
@@ -404,7 +425,7 @@ int insertState(int model, unsigned int lutOffset, char statev) {
 
 
 //remove a savestate
-int removeState(int model, unsigned int lutOffset, char statev) {
+int removeState(unsigned lutOffset, char statev, int model) {
 
 	int stateno = getSavestateNo();
 	if (statelen[stateno] == 0) {				//trap empty savestates
@@ -443,7 +464,7 @@ int removeState(int model, unsigned int lutOffset, char statev) {
 	HTFILE.seekg(0, ios::end);
 	int filesizefull = HTFILE.tellg();
 		
-	int fileoffset = statebeg[stateno] + statelen[stateno] - basediff[model] + 1;
+	int fileoffset = statebeg[stateno] + statelen[stateno] - basediff + 1;
 	int statesize = filesizefull - fileoffset;
 	
 	char buffer[statesize];
@@ -471,10 +492,10 @@ int removeState(int model, unsigned int lutOffset, char statev) {
 	
 	
 	//move data after the savestate to be deleted down in memory, replace remaining mem with zeroes	
-	fileoffset = statebeg[stateno] - basediff[model];
+	fileoffset = statebeg[stateno] - basediff;
 	int length;
 	
-	if (model == 0 || statev != 1) {
+	if (model == 0 || statev != 1) {	//TODO: this is no longer true, applies to legacy files only
 		length = statesize - 3;		//2B checksum, 1B savestate version, 2 0-bytes if model != 0 && stateversion == 1)
 	}
 	else {
@@ -498,7 +519,7 @@ int removeState(int model, unsigned int lutOffset, char statev) {
 
 
 //decompress and disassemble a savestate
-int decompressState(int model, char statev) {
+int decompressState(char statev) {
 
 	char readb;
 	unsigned char ibyte1, ibyte2;
@@ -513,7 +534,7 @@ int decompressState(int model, char statev) {
 	string outfilename = getOutfileName(".asm");
 	if (outfilename == "") return -1;			//back to main menu if user chose to not overwrite existing file
 	
-	int fileoffset = statebeg[stateno] - basediff[model];
+	int fileoffset = statebeg[stateno] - basediff;
 	
 	//create output file
 	ofstream OUTFILE;
@@ -663,7 +684,7 @@ int decompressState(int model, char statev) {
 }
 
 //extract a savestate to file
-int extractState(int model, char statev) {
+int extractState(char statev) {
 	
 	char buffer[5200];	
 	
@@ -676,7 +697,7 @@ int extractState(int model, char statev) {
 	string outfilename = getOutfileName(".ht2s");
 	if (outfilename == "") return -1;			//back to main menu if user chose to not overwrite existing file
 
-	int fileoffset = statebeg[stateno] - basediff[model];
+	int fileoffset = statebeg[stateno] - basediff;
 	
 	//create output file
 	ofstream OUTFILE;
