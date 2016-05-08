@@ -13,7 +13,7 @@ void readLUT(int fileoffset, int htv, char statev);
 void writeChecksum();
 int getLUToffset(char statev, unsigned filesize);
 int insertState(unsigned lutOffset, char statev);
-int removeState(unsigned lutOffset, char statev, int model);
+int removeState(unsigned lutOffset, char statev, bool legacyFileEnd);
 int extractState(char statev);
 int decompressState(char statev);
 string getOutfileName(string suffix);
@@ -110,7 +110,8 @@ int main(int argc, char *argv[]){
 	
 	//determine savestate version
 	char statever;
-	if (tmodel > 0) {
+	bool legacyFileEnd = false;
+	if (tmodel == 0) {
 		HTFILE.seekg(-4, ios::end);		//read savestate version
 		HTFILE.read((&statever), 1);
 	} else {
@@ -164,7 +165,7 @@ int main(int argc, char *argv[]){
 		if (end == keys+14) cout << "e|d|i|r|q only, please.\n";
 		if (cmd == "e" || cmd == "E") extractState(statever);
 		if (cmd == "d" || cmd == "D") decompressState(statever);
-		if (cmd == "r" || cmd == "R") removeState(lutOffset, statever, tmodel);
+		if (cmd == "r" || cmd == "R") removeState(lutOffset, statever, legacyFileEnd);
 		if (cmd == "i" || cmd == "I") insertState(lutOffset, statever);
 	}
 	//TODO: ext. ops: retune freq.tab, change samples
@@ -374,7 +375,8 @@ int insertState(unsigned int lutOffset, char statev) {
 	
 	//get first free mem address
 	int i;
-	unsigned int firstfree = 0;
+//	unsigned int firstfree = 0;
+	unsigned firstfree = lutOffset + basediff + 32;
 	for (i = 0; i < 8; i++) {
 		if (statebeg[i] > firstfree) firstfree = statebeg[i] + statelen[i] + 1;
 	}
@@ -425,7 +427,7 @@ int insertState(unsigned int lutOffset, char statev) {
 
 
 //remove a savestate
-int removeState(unsigned lutOffset, char statev, int model) {
+int removeState(unsigned lutOffset, char statev, bool legacyFileEnd) {
 
 	int stateno = getSavestateNo();
 	if (statelen[stateno] == 0) {				//trap empty savestates
@@ -495,12 +497,16 @@ int removeState(unsigned lutOffset, char statev, int model) {
 	fileoffset = statebeg[stateno] - basediff;
 	int length;
 	
-	if (model == 0 || statev != 1) {	//TODO: this is no longer true, applies to legacy files only
-		length = statesize - 3;		//2B checksum, 1B savestate version, 2 0-bytes if model != 0 && stateversion == 1)
-	}
-	else {
-		length = statesize - 5;
-	}
+// 	if (model == 0 || statev != 1) {	//TODO: this is no longer true, applies to legacy files only
+// 		length = statesize - 3;		//2B checksum, 1B savestate version, 2 0-bytes if model != 0 && stateversion == 1)
+// 	}
+// 	else {
+// 		length = statesize - 5;
+// 	}
+	if (legacyFileEnd) length = statesize - 5;
+	else length = statesize - 3;
+
+
 	HTFILE.seekp(fileoffset, ios::beg);
 	HTFILE.write(buffer, length);
 	
@@ -798,7 +804,7 @@ int getSavestateNo() {
 	return stateno;
 }
 
-//recalculate checksum and write it to file
+//recalculate checksum and write it to file	TODO: this does not work properly yet
 void writeChecksum() {
 	
 	HTFILE.seekg(0, ios::end);
@@ -812,7 +818,7 @@ void writeChecksum() {
 	
 	long checksum = 0;
 	for (unsigned int i = 0; i < (htsize - 55 - 2); i++) {
-		checksum += cbuf[i];
+		checksum += static_cast<unsigned char>(cbuf[i]);
 	}
 	
 	HTFILE.seekp(-2, ios::end);
