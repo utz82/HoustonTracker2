@@ -503,8 +503,8 @@ int removeState(unsigned lutOffset, char statev, bool legacyFileEnd) {
 // 	else {
 // 		length = statesize - 5;
 // 	}
-	if (legacyFileEnd) length = statesize - 5;
-	else length = statesize - 3;
+	if (legacyFileEnd) length = statesize - 6;
+	else length = statesize - 4;
 
 
 	HTFILE.seekp(fileoffset, ios::beg);
@@ -804,7 +804,7 @@ int getSavestateNo() {
 	return stateno;
 }
 
-//recalculate checksum and write it to file	TODO: this does not work properly yet
+//recalculate checksum and write it to file
 void writeChecksum() {
 	
 	HTFILE.seekg(0, ios::end);
