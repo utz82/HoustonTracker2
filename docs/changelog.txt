@@ -5,11 +5,12 @@ version 2.11.1beta
 NEW/CHANGES
 
 - new effect: 7xx - auto chord ch2
-- Exx is now the "Extended" fx command - can execute up to 5 fx commands at once
+- Exx is now the "Extended" fx command - execute up to 5 fx commands at once
 - old E00..E03 is now E80..E83
 - more fine-grained tempo control
+- Copy/Paste keys are arranged in a more consistent/safe manner (check the manual for details!)
 - (somewhat) reduced noise during row transitions
-- improved handling of extended fx
+- improved fx handling
 
 BUGFIXES
 

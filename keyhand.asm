@@ -742,6 +742,7 @@ pagescroll
 reprintX
 	ld a,(CsrPos)
 	ld (OldCsrPos),a
+reprintY
 	call printSeqScr0
 	call printCsr
 	jp waitForKeyRelease
@@ -1455,17 +1456,18 @@ kminus
 	
 	call findCurrLine			;get pointer to current line into HL
 
+	push hl
 	xor a					;clear carry
 	ld de,ptn00-5				;point DE to end of ptn sequence - 5
 	ex de,hl
 	sbc hl,de				;end - 5 - current line = copy length
-	push hl					;get it into bc
-	pop bc
+	ld b,h					;block length now in BC
+	ld c,l
+	pop hl
 	
 	ld a,(AlphaFlag)			;check if we're inserting or deleting
 	or a
-	;jr nz,_deleteline
-	jr nz,_reprint
+	jr nz,_deleteRow
 	
 	ld hl,ptn00-6				;source = end of sequence - 4
 	ld de,ptn00-2				;dest = end of sequence
@@ -1476,23 +1478,25 @@ _reprint
 	call printCsr
 	jp waitForKeyRelease
 	
-_deleteline
-	push de					;DE already holds destination, copy into HL
-	pop hl		
-	inc hl					;source = HL + 4
+_deleteRow
+	ld d,h					;dest now in DE
+	ld e,l
+	inc hl					;source = dest + 4
 	inc hl
 	inc hl
 	inc hl
 	ldir					;copy stuff
-	ld b,4					;fill last 4 bytes of sequence with #ff
-	ld a,#ff
+	
+	ld b,4					;clean up sequence end
 	ld hl,ptn00-5
+	ld a,#ff
 _lp
 	ld (hl),a
 	inc hl
-	djnz _lp
-	jr _reprint
+	djnz _lp		
 	
+	jp reprintX
+
 	
 kplus						;insert next free pattern value at cursor
 	ld a,(CScrType)				;detect current screen type
@@ -1557,11 +1561,7 @@ _copy
 	
 _return
 	jp reprintX
-; 	ld a,(CsrPos)
-; 	ld (OldCsrPos),a
-; 	call printSeqScr0
-; 	call printCsr
-; 	jp waitForKeyRelease
+
 
 _copyfx
 	ld hl,fxptntab
@@ -1597,6 +1597,74 @@ kmult						;copy/paste block
 	or a
 	jp nz,waitForKeyRelease			;and exit if not on sequence screen
 	
+	ld a,(AlphaFlag)			;check Alpha mode
+	or a
+	jr z,insertBlk
+	
+_deleteBlock
+	ld a,(CPS)				;verify that Block End >= Block Start
+	ld b,a	
+	ld a,(CPE)	
+	sub b
+	ld l,a					;save block length (lines) - 1 in L
+	ld a,1
+	jp c,errorHand				;output error if BS/BE invalid
+						
+	ld h,0					;calculate block length in memory
+	inc hl					;adjust length (always 1 line more than calculated)
+	add hl,hl
+	add hl,hl
+	
+	push hl					;block length now in HL
+	
+	ld bc,ptns
+	ld a,(CPS)				;target = (CPS)*4 + ptns
+	ld h,0
+	ld l,a
+	add hl,hl
+	add hl,hl
+	add hl,bc
+	ex de,hl				;target now in DE
+	
+	ld a,(CPE)				;source = (CPE+1)*4 + ptns
+	inc a
+	ld h,0
+	ld l,a
+	add hl,hl
+	add hl,hl
+	add hl,bc				;source now in HL								
+	
+	push hl	
+	push de
+	ex de,hl
+	
+	ld hl,ptn00-1				;copy length = ptns.end - source +1?
+	xor a
+	sbc hl,de
+	ld b,h
+	ld c,l
+	
+	pop de
+	pop hl
+	ldir
+	
+	pop bc					;retrieve block length into bc
+	ld hl,ptn00-2
+	
+_lp2
+	ld a,#ff
+	ld (hl),a
+	dec hl
+	dec bc
+	ld a,b
+	or c
+	jr nz,_lp2
+
+	jp reprintX	
+	
+	
+
+insertBlk	
 	ld a,(CPS)				;verify that Block End >= Block Start
 	exx
 	ld d,a
@@ -1630,9 +1698,6 @@ kmult						;copy/paste block
 
 
 _insertBefore
-	;ld a,(AlphaFlag)			;check Alpha mode
-	;or a
-	;jr nz,_paste				;and skip pre-shifting data if in Alpha mode
 	push bc
 	exx
 	pop bc
@@ -1692,117 +1757,17 @@ _paste
 	ldir	
 
 	jp reprintX
-; _reprint
-; 	ld a,(CsrPos)
-; 	ld (OldCsrPos),a
-; 	call printSeqScr0
-; 	call printCsr
-; 	jp waitForKeyRelease
+	
 
-kdiv						;deleting rows and blocks
+kdiv						;deleting blocks
 	ld a,(CScrType)
 	or a
 	jp nz,waitForKeyRelease
 	
 	ld a,(AlphaFlag)			;check for Alpha mode
 	or a
-	jr nz,_deleteBlock
-
-_deleteRow
-	call findCurrLine			;pointer to current line start = dest now in HL
-	push hl
-	ld de,ptn00-5				;copy block length = seq.end - curr.line + 4
-	ex de,hl
-	sbc hl,de
-	ld b,h
-	ld c,l					;copy block length now in BC
-	pop hl					;retrieve dest
-	ld d,h					;dest now in DE
-	ld e,l
-	inc hl					;source = dest + 4
-	inc hl
-	inc hl
-	inc hl
-	ldir					;copy stuff
-	
-	ld b,4					;clean up sequence end
-	ld hl,ptn00-5
-	ld a,#ff
-_lp
-	ld (hl),a
-	inc hl
-	djnz _lp
-		
-
-_reprint	
-; 	ld a,(CsrPos)
-; 	ld (OldCsrPos),a
-; 	call printSeqScr0
-; 	call printCsr	
-; 	jp waitForKeyRelease
-	jp reprintX
-
-_deleteBlock
-	ld a,(CPS)				;verify that Block End >= Block Start
-	ld b,a	
-	ld a,(CPE)	
-	sub b
-	ld l,a					;save block length (lines) - 1 in L
-	ld a,1
-	jp c,errorHand				;output error if BS/BE invalid
-						
-	ld h,0					;calculate block length in memory
-	inc hl					;adjust length (always 1 line more than calculated)
-	add hl,hl
-	add hl,hl
-	
-	push hl					;block length now in HL
-	
-	ld bc,ptns
-	ld a,(CPS)				;target = (CPS)*4 + ptns
-	ld h,0
-	ld l,a
-	add hl,hl
-	add hl,hl
-	add hl,bc
-	ex de,hl				;target now in DE
-	
-	ld a,(CPE)				;source = (CPE+1)*4 + ptns
-	inc a
-	ld h,0
-	ld l,a
-	add hl,hl
-	add hl,hl
-	add hl,bc				;source now in HL								
-	
-	push hl	
-	push de
-	ex de,hl
-	
-	ld hl,ptn00-1				;copy length = ptns.end - source +1?
-	xor a
-	sbc hl,de
-	ld b,h
-	ld c,l
-	
-	pop de
-	pop hl
-	ldir
-	
-	pop bc					;retrieve block length into bc
-	ld hl,ptn00-2
-	
-_lp2
-	ld a,#ff
-	ld (hl),a
-	dec hl
-	dec bc
-	ld a,b
-	or c
-	jr nz,_lp2
-	
-	;jr _reprint
-	jp reprintX
+	jp nz,insertBlk
+	jp waitForKeyRelease			;do nothing if Alpha not active
 
 kpot
 kclear
