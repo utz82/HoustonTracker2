@@ -10,7 +10,7 @@ initrp					;init point for row play
 	ld (oldSP),hl
 
 	push de
-	call resetFX
+	call resetFX0
 
 	ld hl,(musicData+1)		;load user (drum) sample pointer \ this will become redundant, (usrdrum) can be set on loading song
 	ld (usrdrum),hl			;save it to drum table           / and if song is already in mem, it is then also already loaded
@@ -486,12 +486,71 @@ fxF					;#0f = set speed
 	ld (cspeed-1),a
 	jp fxcont
 
-fxB					;#0b = break cmd
-	ld a,(reptpos)
+fxB					;#0b = break/ptn loop cmd
+	ld a,(de)			;if param=0
+	or a
+	jr nz,_ptnloop
+	ld a,(reptpos)			;break ptn
 	cp #10				;ignore cmd if triggered on the first pattern row
-	jp nz,ptnselect		;10	;select next ptn if found  ATTN: leaves register set swapped!
-	;jp fxcont
+	jp nz,ptnselect			;select next ptn if found  ATTN: leaves register set swapped!
 	jp fxreturn
+
+_ptnloop
+ptnreptpos equ $+1
+	ld a,0
+	sub 1
+	jp z,fxcont0			;if rept.counter is about to reach 0, all loops have been executed -> reset counter and proceed as normal
+	jp nc,execPtnRept		;if rept.counter is now -1, initialize ptn loop
+
+setupPtnRept	
+	ld a,(de)			;x = # of repeats, y = # of lines to jump back
+	and #f
+	inc a
+	ld h,a
+	ld a,(reptpos)
+	add a,h
+	cp #12
+	jp nc,fxcont			;invalidate effect if backjump crosses pattern boundary
+	
+	ld (xreptPos),a			;TODO: Need to prevent nested Bxy loops. Maybe.
+	
+	ld a,(de)
+	and #f0
+	rra
+	rra
+	rra
+	rra
+	
+execPtnRept	
+	ld (ptnreptpos),a
+xreptPos equ $+1
+	ld a,0
+	ld (reptpos),a
+	ld a,(de)
+	and #f
+	inc a				;y=0 means jump back 1 row, because pointers are already incremented
+	neg
+	exx
+	ld l,a				;load to HL and sign-extend
+	ld h,#ff
+	ex de,hl
+	add hl,de			;set ch1 pointer
+	ex de,hl
+	add hl,bc			;set ch2 pointer
+	ld b,h
+	ld c,l
+	exx
+	ld l,a
+	ld h,#ff
+	ex de,hl
+	add hl,de			;*2 because fx ptns take 2 bytes per row
+	add hl,de
+	ex de,hl
+	add hl,bc			;set ch3 pointer
+	ld b,h
+	ld c,l
+	jp fxcont
+	
 	
 fx1					;#01 = set panning
 	ld a,(de)
@@ -911,11 +970,17 @@ setleftD
 	ld (maskD),a
 	;ex af,af'
 	jp fxcont
-	
+
+fxcont0
+	ld (ptnreptpos),a	
 fxcont
 	jp fxreturn			;jp = #c3, ret = #c9
 
-;*************************************************************************************	
+;*************************************************************************************
+resetFX0				;reset Bxy effect
+	xor a
+	ld (ptnreptpos),a
+	
 resetFX					;reset all fx
 
 	ld a,(musicData)		;reset speed

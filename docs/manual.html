@@ -1126,9 +1126,12 @@
 	   set to the same note as ch1. The effect does not work equally well on all pitches, namely it won't do anything on C notes.</td>
       </tr>
       <tr>
-        <td>B00</td>
-        <td>BREAK PTN</td>
-        <td>Break pattern and jump to the next position in the sequence. This command doesn't take any parameters. Also, it is ignored on the first line of a pattern.</td>
+        <td>Bxy</td>
+        <td>LOOP SECTION/ BREAK PTN</td>
+        <td>xy = 0 - break pattern immediately and jump to the next position in the sequence. B00 is ignored on the first line of a pattern.<br>
+	    xy > 0 - jump back y rows in the pattern, repeating the section x times.<br>
+	    The Bxy effect should not be nested (ie. don't put a Bxy loop within another Bxy loop), because doing so will lead to an infinite loop. Beware, HT2 does
+	    not do checks against this.</td>
       </tr>
       <tr>
       <td>Cxx</td>
