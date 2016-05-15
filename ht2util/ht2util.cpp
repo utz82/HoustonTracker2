@@ -124,6 +124,7 @@ int main(int argc, char *argv[]){
 		} else {
 			HTFILE.seekg(-6, ios::end);
 			HTFILE.read((&statever), 1);
+			legacyFileEnd = true;
 		}
 	}	
 	if (statever > 1) {
