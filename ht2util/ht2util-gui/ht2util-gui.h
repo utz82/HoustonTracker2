@@ -12,7 +12,7 @@ public:
 
     wxStaticText *htFileInfo;
     wxListCtrl *savestateList;
-    wxStaticText *directoryList;
+    wxListCtrl *directoryList;
     
     wxString CurrentDocPath;
     wxString CurrentFileName;
@@ -30,6 +30,13 @@ public:
 
     wxFileOffset htsize;
     wxUint8 *htdata;
+    
+    wxString *dirList;
+    wxString *fileList;
+    wxInt16 noDirs;
+    wxInt16 noFiles;
+    bool dotdot;
+    wxString currentFBDir;			//current file browser path
 
     unsigned statebeg[8], statelen[8];
     
@@ -57,11 +64,14 @@ private:
     int getLUToffset(char statev, wxFileOffset filesize);
     void readLUT(int fileoffset);
     void populateEmptySList();
+    void populateDirList(wxString currentDir);
     void clearSList();
     unsigned getBaseDiff(int model, int baseOffset);
     void writeChecksum();
     
     void saveHTFile();
+    
+    void OnListItemActivated(wxListEvent& event);
     
 
     
@@ -70,17 +80,15 @@ private:
 
 enum
 {
-    //ID_OpenHT = 1,
-    //ID_SaveHT = 2,
-    //ID_SaveAsHT = 3,
-    //ID_CloseHT = 4,
     ID_ExtractState = 5,
     ID_InsertState = 6,
     ID_DeleteState = 7,
     ID_ExportAsm = 8,
     ID_Retune = 10,
     ID_ChangeSamplePointers = 11,
-    ID_ReplaceKick = 12
+    ID_ReplaceKick = 12,
+    ID_DirList = 13
+
 };
 
 wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
@@ -99,6 +107,9 @@ wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     EVT_MENU(ID_ReplaceKick,	mainFrame::OnReplaceKick)
     
     EVT_MENU(wxID_ABOUT,	mainFrame::OnAbout)
+    
+    EVT_LIST_ITEM_ACTIVATED(ID_DirList, mainFrame::OnListItemActivated)
+    
 wxEND_EVENT_TABLE()
 wxIMPLEMENT_APP(ht2UtilGUI);
 

@@ -9,11 +9,17 @@
     #include <wx/wx.h>
 #endif
 #include <wx/file.h>
+#include <wx/dir.h>
 #include <wx/listctrl.h>
 
 #include "ht2util-gui.h"
 
 #define MAX_SUPPORTED_SAVESTATE_VERSION 1	//latest supported savestate version
+#ifndef __WINDOWS__
+	#define SEPERATOR "/"
+#else
+	#define SEPERATOR "\\"
+#endif
 
 mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
         : wxFrame(NULL, wxID_ANY, title, pos, size)
@@ -56,8 +62,11 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	htFileInfo = new wxStaticText(mainPanel, -1, wxT("model:\nHT2 version:\nsavestate version:"), wxPoint(-1, -1));
 	//savestateList = new wxStaticText(mainPanel, -1, wxT("savestate table"), wxPoint(-1, -1));	//, wxSize(250, 150)
 	savestateList = new wxListCtrl(mainPanel, -1, wxPoint(-1,-1), wxSize(-1,-1), wxLC_REPORT);
-	directoryList = new wxStaticText(mainPanel, -1, wxT("directory list"), wxPoint(-1, -1));	//, wxSize(250, 150)
-	
+	//directoryList = new wxStaticText(mainPanel, -1, wxT("directory list"), wxPoint(-1, -1));	//, wxSize(250, 150)
+	directoryList = new wxListCtrl(mainPanel, ID_DirList, wxPoint(-1,-1), wxSize(-1,-1), wxLC_REPORT|wxLC_NO_HEADER);
+
+
+	//construct savestate list view	
 	wxListItem itemCol;
 	itemCol.SetText(wxT("slot"));
 	savestateList->InsertColumn(0, itemCol);
@@ -78,6 +87,20 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	populateEmptySList();
 	
 	
+	//construct directory listing
+	wxListItem dirListCol;
+	
+	directoryList->InsertColumn(0, dirListCol);
+	savestateList->SetColumnWidth(0, wxLIST_AUTOSIZE );
+	
+	directoryList->InsertColumn(1, dirListCol);
+	savestateList->SetColumnWidth(1, wxLIST_AUTOSIZE );
+	
+	currentFBDir = wxGetCwd();
+	populateDirList(currentFBDir);
+	
+	
+	//construct main layout
 	all->Add(new wxPanel(mainPanel, -1));
 	
 	all->Add(infoBox, 0, wxALIGN_LEFT | wxALL, 10);
@@ -89,7 +112,7 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		leftSide->Add(savestateList,1,wxEXPAND);
 			
 	mainBox->Add(rightSide, 1, wxEXPAND);
-		rightSide->Add(directoryList);
+		rightSide->Add(directoryList,1,wxEXPAND);
 	
 	mainPanel->SetSizer(all);
     
@@ -894,6 +917,114 @@ void mainFrame::populateEmptySList() {
 	return;
 }
 
+//get current directory listing and display it
+void mainFrame::populateDirList(wxString currentDir) {
+
+	wxDir dir(currentDir);
+
+	if (!dir.IsOpened()) {
+
+		wxMessageDialog error(NULL, wxT("Error: Cannot load directory list."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		error.ShowModal();
+		return;
+	}
+	
+	
+	wxString filename;
+	//wxInt16 i = 0;
+	bool cont;
+	
+	//TODO: can't meaningfully use filespec, must write own filter using wxRegEx
+	
+	//get # of directories
+	noDirs = 0;
+	cont = dir.GetFirst(&filename, wxEmptyString, wxDIR_DIRS);
+	while (cont) {
+		noDirs++;
+		cont = dir.GetNext(&filename);
+	}
+	
+	//get # of files
+	noFiles = 0;
+	cont = dir.GetFirst(&filename, "*.ht2s", wxDIR_FILES);
+	while (cont) {
+		noFiles++;
+		cont = dir.GetNext(&filename);
+	}
+	
+	//get double dot
+	dotdot = false;
+	cont = dir.GetFirst(&filename, wxEmptyString, wxDIR_DOTDOT);
+	if (cont) {
+		if (filename == "..") dotdot = true;
+		cont = dir.GetNext(&filename);
+		if (cont) dotdot = true;
+
+	}
+	//if (currentDir == "") dotdot = false;	//TODO: prevent loading beyond root directory
+	
+	if (dirList) delete[] dirList;
+	if (fileList) delete[] fileList;
+	dirList = new wxString[noDirs];
+	fileList = new wxString[noFiles];
+	
+
+	noDirs = 0;
+	cont = dir.GetFirst(&filename, wxEmptyString, wxDIR_DIRS);
+	while (cont) {
+		dirList[noDirs] = filename;
+		noDirs++;
+		cont = dir.GetNext(&filename);
+	}
+	
+	noFiles = 0;
+	cont = dir.GetFirst(&filename, "*.ht2s", wxDIR_FILES);
+	while (cont) {
+		fileList[noFiles] = filename;
+		noFiles++;
+		cont = dir.GetNext(&filename);
+	}
+	
+	wxInt16 noAllItems = noDirs + noFiles;
+	if (dotdot) noAllItems++;
+	
+	wxInt16 j = 0;
+	wxInt16 dd = 0;
+	if (dotdot) {
+		directoryList->InsertItem(0, " ", 0);
+		directoryList->SetItemData(0, 0);
+		directoryList->SetItem(0, 0, " ");
+		directoryList->SetItem(0, 1, "..");
+		j++;
+		dd++;
+	}
+
+// 	wxString debug = "4th: " + dirList[3];
+// 	wxMessageDialog debug1(NULL, debug, wxT("Info"), wxOK_DEFAULT|wxICON_INFORMATION);
+// 	debug1.ShowModal();
+
+	for (; j < noAllItems-noFiles; j++) {
+		directoryList->InsertItem(j, " ", 0);
+		directoryList->SetItemData(j, j);
+		directoryList->SetItem(j, 0, " ");
+		directoryList->SetItem(j, 1, dirList[j-dd]);	
+	}
+	
+	for (; j < noAllItems; j++) {
+		directoryList->InsertItem(j, " ", 0);
+		directoryList->SetItemData(j, j);
+		directoryList->SetItem(j, 0, " ");
+		directoryList->SetItem(j, 1, fileList[j-dd-noDirs]);	
+	}
+	
+	
+
+	directoryList->SetColumnWidth(0,-1);
+	directoryList->SetColumnWidth(1,-1);
+	
+	return;
+}
+
 void mainFrame::clearSList() {
 
 	wxString temp;
@@ -944,4 +1075,30 @@ void mainFrame::saveHTFile() {
 	unsavedChanges = false;
 	wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath);	
 	return;
+}
+
+void mainFrame::OnListItemActivated(wxListEvent& event) {
+// 	wxMessageDialog error1(NULL, wxT("Ey voll geklickt Alter"), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+// 	error1.ShowModal();
+	long itemnr = event.GetIndex();
+	
+	if (dotdot && (!itemnr)) {
+		if (currentFBDir.BeforeLast('/') != "") {
+			currentFBDir = currentFBDir.BeforeLast('/');
+			directoryList->DeleteAllItems();
+			populateDirList(currentFBDir);
+		}
+		return;
+	}
+
+	if ((itemnr >= dotdot) && (itemnr < noDirs + dotdot)) {
+	
+		currentFBDir = currentFBDir + SEPERATOR + dirList[itemnr - dotdot];
+		directoryList->DeleteAllItems();
+		populateDirList(currentFBDir);
+		return;
+	} 
+
+
+	return;	
 }
