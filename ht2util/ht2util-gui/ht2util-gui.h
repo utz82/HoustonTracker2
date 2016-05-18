@@ -63,6 +63,7 @@ private:
     void OnDeleteState(wxCommandEvent& event);
     void OnExportAsm(wxCommandEvent& event);
     void OnExit(wxCommandEvent& event);
+    void XExit(wxCloseEvent& event);
     
     void OnRetune(wxCommandEvent& event);
     void OnChangeSamplePointers(wxCommandEvent& event);
@@ -125,6 +126,8 @@ wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     
     EVT_LIST_ITEM_ACTIVATED(ID_DirList, mainFrame::OnListItemActivated)
     EVT_LIST_BEGIN_DRAG(ID_DirList, mainFrame::OnDirListDrag)
+    
+    EVT_CLOSE(mainFrame::XExit)
     
 wxEND_EVENT_TABLE()
 wxIMPLEMENT_APP(ht2UtilGUI);

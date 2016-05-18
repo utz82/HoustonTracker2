@@ -138,6 +138,11 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 void mainFrame::OnExit(wxCommandEvent& WXUNUSED(event)) {
 
+	Close(true);
+}
+
+void mainFrame::XExit(wxCloseEvent& event) {
+
 	if (unsavedChanges) {
 	
 		wxMessageDialog *unsavedChgMsg = new wxMessageDialog(NULL, wxT("Save changes?"), wxT("Question"), 
@@ -148,7 +153,8 @@ void mainFrame::OnExit(wxCommandEvent& WXUNUSED(event)) {
 		else if (response == wxID_YES) saveHTFile();
 	}
 	
-	Close(true);
+	event.Skip();
+
 }
 
 void mainFrame::OnAbout(wxCommandEvent& WXUNUSED(event)) {
