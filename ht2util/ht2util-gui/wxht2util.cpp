@@ -56,14 +56,14 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	menuTools->Append(ID_ReplaceKick, "&Replace Kick...", "Replace the standard kick sample");
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append( menuFile, "&File" );
-	menuBar->Append( menuTools, "&Tools" );
+//	menuBar->Append( menuTools, "&Tools" );		//TODO disabled for now as functionality is not yet implemented
 	menuBar->Append( menuHelp, "&Help" );
 	SetMenuBar( menuBar ); 
     
 	//main window
 	htFileInfo = new wxStaticText(mainPanel, -1, wxT("model:\nHT2 version:\nsavestate version:"), wxPoint(-1, -1));
 	htSizeInfo = new wxStaticText(mainPanel, -1, wxT("mem free:"), wxPoint(-1, -1));
-	savestateList = new wxListCtrl(mainPanel, -1, wxPoint(-1,-1), wxSize(-1,-1), wxLC_REPORT);
+	savestateList = new wxListCtrl(mainPanel, ID_StateList, wxPoint(-1,-1), wxSize(-1,-1), wxLC_REPORT);
 	directoryList = new wxListCtrl(mainPanel, ID_DirList, wxPoint(-1,-1), wxSize(-1,-1), wxLC_REPORT);
 
 
@@ -112,6 +112,9 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	
 	currentFBDir = wxGetCwd();
 	populateDirList(currentFBDir);
+	
+	exportDropTarget *mdtx = new exportDropTarget(directoryList);
+	directoryList->SetDropTarget(mdtx);
 	
 	
 	//construct main layout
@@ -1229,6 +1232,39 @@ bool mainFrame::insertState(wxString currentStateDoc) {
 
 }
 
+bool mainFrame::exportState(wxString currentStateDoc, wxInt16 i) {
+
+	int fileoffset;
+	wxUint8 *sdata;
+
+	wxFile statefile;
+	if (!statefile.Open(currentStateDoc, wxFile::write)) {
+		wxMessageDialog error1(NULL, wxT("Error: Could not save file."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		error1.ShowModal();
+		return false;
+	}
+	
+	fileoffset = statebeg[i] - baseDiff;
+	
+	sdata = new wxUint8[statelen[i]+1];
+	
+	sdata[0] = static_cast<unsigned char>(statever);
+	
+	for (int j=1; j<int(statelen[i]+1); j++) {
+		sdata[j] = htdata[fileoffset];
+		fileoffset++;
+	}
+	
+	statefile.Write("HT2SAVE", 7);
+	statefile.Write(sdata, (size_t) statelen[i]+1);
+	
+	statefile.Close();
+	delete [] sdata;
+	
+	return true;
+
+}
+
 
 //drag'n'drop handling
 stateDropTarget::stateDropTarget(wxListCtrl *owner) {
@@ -1236,11 +1272,56 @@ stateDropTarget::stateDropTarget(wxListCtrl *owner) {
 	m_owner = owner;
 }
 
+exportDropTarget::exportDropTarget(wxListCtrl *owner) {
+
+	m_owner = owner;
+}
+
 bool stateDropTarget::OnDropText(wxCoord x, wxCoord y, const wxString& data) {
 
-	//if (!isEmptyStateAvailable()) return true;
+	return true;
+}
+
+bool exportDropTarget::OnDropText(wxCoord x, wxCoord y, const wxString& data) {
 
 	return true;
+}
+
+void mainFrame::OnStateListDrag(wxListEvent& event) {
+
+	if (htdata) {			//ignore dnd event if no htfile opened
+	
+		wxString text = "blabla";
+		wxString now;
+		
+		wxTextDataObject tdo(text);
+		wxDropSource tds(tdo, savestateList);
+		if (tds.DoDragDrop(wxDrag_CopyOnly)) {
+		
+			
+			for (long i=0; i<8; i++) {
+
+				if (savestateList->GetItemState(i,wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED) {
+		
+					if (statelen[i] != 0) {
+					
+						now = wxNow();
+		
+						currentStateDoc = currentFBDir + SEPERATOR + CurrentFileName + "-slot" + wxString::Format("%d",i) + "-" + now + ".ht2s";
+						
+						if (!exportState(currentStateDoc, i)) return;
+						
+						directoryList->DeleteAllItems();
+						populateDirList(currentFBDir);
+										
+					}
+				}
+			}
+		}
+	}
+	
+	return;
+
 }
 
 

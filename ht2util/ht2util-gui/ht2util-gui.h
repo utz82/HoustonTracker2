@@ -12,6 +12,14 @@ public:
 	wxListCtrl *m_owner;
 };
 
+class exportDropTarget: public wxTextDropTarget
+{
+public:
+	exportDropTarget(wxListCtrl *owner);
+	virtual bool OnDropText(wxCoord x, wxCoord y, const wxString& data);
+	wxListCtrl *m_owner;
+};
+
 
 class mainFrame: public wxFrame
 {
@@ -86,8 +94,11 @@ private:
     void OnListItemActivated(wxListEvent& event);
     void OnDirListDrag(wxListEvent& event);
     
+    void OnStateListDrag(wxListEvent& event);
+    
     bool isEmptyStateAvailable();
     bool insertState(wxString currentStateDoc);
+    bool exportState(wxString currentStateDoc, wxInt16 i);
     
 
     
@@ -103,7 +114,8 @@ enum
     ID_Retune = 10,
     ID_ChangeSamplePointers = 11,
     ID_ReplaceKick = 12,
-    ID_DirList = 13
+    ID_DirList = 13,
+    ID_StateList = 14
 
 };
 
@@ -126,6 +138,8 @@ wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     
     EVT_LIST_ITEM_ACTIVATED(ID_DirList, mainFrame::OnListItemActivated)
     EVT_LIST_BEGIN_DRAG(ID_DirList, mainFrame::OnDirListDrag)
+    
+    EVT_LIST_BEGIN_DRAG(ID_StateList, mainFrame::OnStateListDrag)
     
     EVT_CLOSE(mainFrame::XExit)
     
