@@ -1,9 +1,17 @@
 
-class ht2UtilGUI: public wxApp
+class ht2UtilGUI: public wxApp { 
+public:
+	virtual bool OnInit(); 
+};
+
+class stateDropTarget: public wxTextDropTarget
 {
 public:
-    virtual bool OnInit();
+	stateDropTarget(wxListCtrl *owner);
+	virtual bool OnDropText(wxCoord x, wxCoord y, const wxString& data);
+	wxListCtrl *m_owner;
 };
+
 
 class mainFrame: public wxFrame
 {
@@ -11,6 +19,7 @@ public:
     mainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 
     wxStaticText *htFileInfo;
+    wxStaticText *htSizeInfo;
     wxListCtrl *savestateList;
     wxListCtrl *directoryList;
     
@@ -33,6 +42,7 @@ public:
     
     wxString *dirList;
     wxString *fileList;
+    wxString *fileSizeList;
     wxInt16 noDirs;
     wxInt16 noFiles;
     bool dotdot;
@@ -61,6 +71,7 @@ private:
     void OnAbout(wxCommandEvent& event);
     
     int getBaseOffset(wxUint8 *htdata);
+    wxInt16 getFreeMem();
     int getLUToffset(char statev, wxFileOffset filesize);
     void readLUT(int fileoffset);
     void populateEmptySList();
@@ -72,6 +83,10 @@ private:
     void saveHTFile();
     
     void OnListItemActivated(wxListEvent& event);
+    void OnDirListDrag(wxListEvent& event);
+    
+    bool isEmptyStateAvailable();
+    bool insertState(wxString currentStateDoc);
     
 
     
@@ -109,6 +124,7 @@ wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     EVT_MENU(wxID_ABOUT,	mainFrame::OnAbout)
     
     EVT_LIST_ITEM_ACTIVATED(ID_DirList, mainFrame::OnListItemActivated)
+    EVT_LIST_BEGIN_DRAG(ID_DirList, mainFrame::OnDirListDrag)
     
 wxEND_EVENT_TABLE()
 wxIMPLEMENT_APP(ht2UtilGUI);

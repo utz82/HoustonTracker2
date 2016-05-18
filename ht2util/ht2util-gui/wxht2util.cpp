@@ -1,7 +1,8 @@
 //ht2util-gui - ht2 savestate manager utility by utz 2015-16
-//version 0.0.1
+//version 0.0.2
 
-//TODO: add checksum recalculations on all ops
+//done: add checksum recalculations on all ops
+//done: add info about free mem / state sizes in files
 
 
 #include <wx/wxprec.h>		//use precompiled wx headers unless compiler does not support precompilation
@@ -11,8 +12,8 @@
 #include <wx/file.h>
 #include <wx/dir.h>
 #include <wx/listctrl.h>
-
-#include "ht2util-gui.h"
+#include <wx/dnd.h>
+#include <algorithm>
 
 #define MAX_SUPPORTED_SAVESTATE_VERSION 1	//latest supported savestate version
 #ifndef __WINDOWS__
@@ -20,6 +21,8 @@
 #else
 	#define SEPERATOR "\\"
 #endif
+
+#include "ht2util-gui.h"
 
 mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
         : wxFrame(NULL, wxID_ANY, title, pos, size)
@@ -58,12 +61,10 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	SetMenuBar( menuBar ); 
     
 	//main window
-	//currentFile = new wxStaticText(mainPanel, -1, wxT("file: "), wxPoint(-1, -1));
 	htFileInfo = new wxStaticText(mainPanel, -1, wxT("model:\nHT2 version:\nsavestate version:"), wxPoint(-1, -1));
-	//savestateList = new wxStaticText(mainPanel, -1, wxT("savestate table"), wxPoint(-1, -1));	//, wxSize(250, 150)
+	htSizeInfo = new wxStaticText(mainPanel, -1, wxT("mem free:"), wxPoint(-1, -1));
 	savestateList = new wxListCtrl(mainPanel, -1, wxPoint(-1,-1), wxSize(-1,-1), wxLC_REPORT);
-	//directoryList = new wxStaticText(mainPanel, -1, wxT("directory list"), wxPoint(-1, -1));	//, wxSize(250, 150)
-	directoryList = new wxListCtrl(mainPanel, ID_DirList, wxPoint(-1,-1), wxSize(-1,-1), wxLC_REPORT|wxLC_NO_HEADER);
+	directoryList = new wxListCtrl(mainPanel, ID_DirList, wxPoint(-1,-1), wxSize(-1,-1), wxLC_REPORT);
 
 
 	//construct savestate list view	
@@ -81,20 +82,33 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	savestateList->SetColumnWidth(2, wxLIST_AUTOSIZE );
 
 	itemCol.SetText(wxT("length"));
+	itemCol.SetAlign(wxLIST_FORMAT_RIGHT);
 	savestateList->InsertColumn(3, itemCol);
 	savestateList->SetColumnWidth(3, wxLIST_AUTOSIZE );
 	
+	stateDropTarget *mdt = new stateDropTarget(savestateList);
+	savestateList->SetDropTarget(mdt);
+	
 	populateEmptySList();
+	
+	//savestateList->SetDropTarget(dndStates(savestateList));
 	
 	
 	//construct directory listing
 	wxListItem dirListCol;
 	
+	dirListCol.SetText(wxT(""));
 	directoryList->InsertColumn(0, dirListCol);
-	savestateList->SetColumnWidth(0, wxLIST_AUTOSIZE );
+	directoryList->SetColumnWidth(0, wxLIST_AUTOSIZE );
 	
+	dirListCol.SetText(wxT("name"));
 	directoryList->InsertColumn(1, dirListCol);
-	savestateList->SetColumnWidth(1, wxLIST_AUTOSIZE );
+	directoryList->SetColumnWidth(1, wxLIST_AUTOSIZE );
+	
+	dirListCol.SetText(wxT("size"));
+	dirListCol.SetAlign(wxLIST_FORMAT_RIGHT);
+	directoryList->InsertColumn(2, dirListCol);
+	directoryList->SetColumnWidth(2, wxLIST_AUTOSIZE );
 	
 	currentFBDir = wxGetCwd();
 	populateDirList(currentFBDir);
@@ -105,6 +119,7 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	
 	all->Add(infoBox, 0, wxALIGN_LEFT | wxALL, 10);
 		infoBox->Add(htFileInfo);
+		infoBox->Add(htSizeInfo);
 		
 	all->Add(mainBox, 1, wxEXPAND | wxALL, 10);
 	
@@ -240,13 +255,12 @@ void mainFrame::OnOpenHT(wxCommandEvent& WXUNUSED(event)) {
 		lutOffset = static_cast<unsigned>(fOffset) + 1;
 		
 		readLUT(lutOffset);
-		
-// 		wxMultiChoiceDialog sl(this, wxT(""), wxT("Savestate List"), stateList);
-// 		sl.ShowModal();
-		
-		//currentFile->SetLabel("file: " + CurrentFileName);
+
+
 		wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath);
 		htFileInfo->SetLabel("model: " + calcversion[tmodel] + "\nHT2 version: 2." + htVerStr + "\nsavestate version: " + stateVerStr);
+		wxString freeMem = wxString::Format("%i", getFreeMem());
+		htSizeInfo->SetLabel("free mem: " + freeMem + " bytes");
 		
 	}
 	unsavedChanges = false;
@@ -266,9 +280,9 @@ void mainFrame::OnCloseHT(wxCommandEvent& WXUNUSED(event)) {
 			else if (response == wxID_YES) saveHTFile();
 		}
 
-		//currentFile->SetLabel("file:");
 		wxTopLevelWindow::SetTitle("ht2util");
 		htFileInfo->SetLabel("model:\nHT2 version:\nsavestate version:");
+		htSizeInfo->SetLabel("mem free:");
 		delete[] htdata;
 		clearSList();
 		unsavedChanges = false;
@@ -294,32 +308,9 @@ void mainFrame::OnSaveAsHT(wxCommandEvent& WXUNUSED(event)) {
 
 	 		CurrentDocPath = SaveDialog->GetPath();
 			CurrentFileName = SaveDialog->GetFilename();
-			
-			//add extension if not added by user... this is more complex than thought, because the wx team believes not auto-adding an extension
-			//is "default behaviour" under gtk lol
-// 			size_t dot = CurrentDocPath.find_last_of(".");			//get file extension
-// 			wxString saveFileExt;
-// 			if (dot != std::string::npos) saveFileExt = CurrentFileName.substr(dot, CurrentFileName.size() - dot);
-// 			if (dot == std::string::npos || saveFileExt != fileExt) {
-// 				CurrentDocPath += fileExt;
-// 				CurrentFileName += fileExt;
-// 			}
-			
-// 			
-// 			wxFile htfile;
-// 			if (!htfile.Open(CurrentDocPath, wxFile::write)) {
-// 				wxMessageDialog error1(NULL, wxT("Error: Could not save file."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-// 				error1.ShowModal();
-// 				return;
-// 			}
-// 			htfile.Write(htdata, (size_t) htsize);
-// 			htfile.Close();
-// 			wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath);
-// 			unsavedChanges = false;
+
 			saveHTFile();
 	 	}
-
-		//currentFile->SetLabel("file: " + CurrentFileName);
 		
 		SaveDialog->Destroy();
 		
@@ -404,16 +395,7 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 	}
 
 	//check if there are empty save slots available
-	bool emptyStateAvailable = false;
-	
-	for (int i=0; i<8; i++) {
-		if (statelen[i] == 0) emptyStateAvailable = true;
-	}
-	if (!emptyStateAvailable) {
-		wxMessageDialog error0(NULL, wxT("Error: No free savestate slots available.\nTry deleting something first."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-		error0.ShowModal();
-		return;
-	}
+	if (!isEmptyStateAvailable()) return;
 
 	//initiate file dialog
 	wxFileDialog *OpenDialog = new wxFileDialog(this, _("Choose a file to open"), wxEmptyString, wxEmptyString,
@@ -481,8 +463,6 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 		unsigned firstFree = lutOffset + baseDiff + 32;
 		for (int i = 0; i < 8; i++) {
 			if (statebeg[i]+ statelen[i] > firstFree) firstFree = statebeg[i] + statelen[i] + 1;
-// 			wxString debug = wxString::Format(("%i"),firstFree);
-// 			wxPuts(debug);
 		}
 
 		
@@ -517,6 +497,9 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 		writeChecksum();
 		
 		readLUT(lutOffset);
+		
+		wxString freeMem = wxString::Format("%i", getFreeMem());
+		htSizeInfo->SetLabel("free mem: " + freeMem + " bytes");		
 // 		wxString statusmsg = "Savestate inserted into slot " + wxString::Format("%d",stateno);
 // 		SetStatusText(statusmsg);
 		unsavedChanges = true;
@@ -608,6 +591,8 @@ void mainFrame::OnDeleteState(wxCommandEvent& WXUNUSED(event)) {
 	}
 	
 	writeChecksum();
+	wxString freeMem = wxString::Format("%i", getFreeMem());
+	htSizeInfo->SetLabel("free mem: " + freeMem + " bytes");
 	unsavedChanges = true;
 	wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath + " [modified]");
 	return;
@@ -658,9 +643,7 @@ void mainFrame::OnExportAsm(wxCommandEvent& WXUNUSED(event)) {
 				
 				fileoffset += 4;
 			
-// 				char readb;
-// 				unsigned char ibyte1, ibyte2;
-//
+			
  				//decrunch pattern sequence
  				wxUint16 l = 0;
 
@@ -718,32 +701,20 @@ void mainFrame::OnExportAsm(wxCommandEvent& WXUNUSED(event)) {
  				//decrunch fx patterns
  				asmFile.Write("fxptn00\n");
 
-// 				HTFILE.seekg(fileoffset, ios::beg);
-// 				HTFILE.read((&readb), 1);
-// 				ibyte2 = static_cast<unsigned char>(readb);
-				//TODO: fx patterns aren't recognized/written
 				wxUint8 ctrlb = htdata[fileoffset];
  				l = 0;
 
  				if (ctrlb < 0xff) {
  					do {
-// 						HTFILE.seekg(fileoffset, ios::beg);
-// 						HTFILE.read((&readb), 1);
-// 						ibyte2 = static_cast<unsigned char>(readb);
+
 						ctrlb = htdata[fileoffset];
  						fileoffset++;
-// 		
-// 						cout << hex << +ibyte2 << endl;
-// 		
+
 						if (ctrlb == l) {
-							//OUTFILE << "fxptn" << +ibyte2 << "\tdb ";
+
 							asmFile.Write("fxptn" + wxString::Format("%x", ctrlb) + "\tdb ");
 							for (j = 0; j < 32; j++) {
-// 								HTFILE.seekg(fileoffset, ios::beg);
-// 								HTFILE.read((&readb), 1);
-// 								ibyte1 = static_cast<unsigned char>(readb);
-// 								fileoffset++;
-// 								OUTFILE << "#" << hex << +ibyte1;
+
 								asmFile.Write("#" + wxString::Format("%x", htdata[fileoffset]));
 								fileoffset++;
 								if (j != 31) asmFile.Write(",");
@@ -752,18 +723,13 @@ void mainFrame::OnExportAsm(wxCommandEvent& WXUNUSED(event)) {
 						}
 						else {
 							for (; (ctrlb & 0x3f) > l; l++) {
-								//cout << l << "\n";
-								//OUTFILE << "fxptn" << l << "\tds 32\n";
+
 								asmFile.Write("fxptn" + wxString::Format("%x", l) + "\tds 32\n");
 							}
 							//OUTFILE << "fxptn" << +(ibyte2 & 0x3f) << "\tdb ";
 							asmFile.Write("fxptn" + wxString::Format("%x", ctrlb & 0x3f) + "\tdb ");
 							for (j = 0; j < 32; j++) {
-// 								HTFILE.seekg(fileoffset, ios::beg);
-// 								HTFILE.read((&readb), 1);
-// 								ibyte1 = static_cast<unsigned char>(readb);
-// 								fileoffset++;
-// 								OUTFILE << "#" << hex << +ibyte1;
+
 								asmFile.Write("#" + wxString::Format("%x", htdata[fileoffset]));
 								fileoffset++;
 								if (j != 31) asmFile.Write(",");
@@ -965,8 +931,10 @@ void mainFrame::populateDirList(wxString currentDir) {
 	
 	if (dirList) delete[] dirList;
 	if (fileList) delete[] fileList;
+	if (fileSizeList) delete[] fileSizeList;
 	dirList = new wxString[noDirs];
 	fileList = new wxString[noFiles];
+	fileSizeList = new wxString[noFiles];
 	
 
 	noDirs = 0;
@@ -976,14 +944,27 @@ void mainFrame::populateDirList(wxString currentDir) {
 		noDirs++;
 		cont = dir.GetNext(&filename);
 	}
+	if (noDirs) std::sort(dirList, dirList + noDirs);
 	
 	noFiles = 0;
+	wxString fPath;
 	cont = dir.GetFirst(&filename, "*.ht2s", wxDIR_FILES);
 	while (cont) {
 		fileList[noFiles] = filename;
+		fPath = currentDir + SEPERATOR + filename;
+		
+		wxFile sFile(fPath);
+		wxInt16 fSize = sFile.Length();
+		if (sFile.IsOpened()) {
+			fileSizeList[noFiles] = wxString::Format("%i", (fSize - 8));
+			sFile.Close();
+		}
+		else fileSizeList[noFiles] = "broken";
+				
 		noFiles++;
 		cont = dir.GetNext(&filename);
 	}
+	if (noFiles) std::sort(fileList, fileList + noFiles);
 	
 	wxInt16 noAllItems = noDirs + noFiles;
 	if (dotdot) noAllItems++;
@@ -995,32 +976,32 @@ void mainFrame::populateDirList(wxString currentDir) {
 		directoryList->SetItemData(0, 0);
 		directoryList->SetItem(0, 0, " ");
 		directoryList->SetItem(0, 1, "..");
+		directoryList->SetItem(j, 2, " ");
 		j++;
 		dd++;
 	}
-
-// 	wxString debug = "4th: " + dirList[3];
-// 	wxMessageDialog debug1(NULL, debug, wxT("Info"), wxOK_DEFAULT|wxICON_INFORMATION);
-// 	debug1.ShowModal();
 
 	for (; j < noAllItems-noFiles; j++) {
 		directoryList->InsertItem(j, " ", 0);
 		directoryList->SetItemData(j, j);
 		directoryList->SetItem(j, 0, " ");
-		directoryList->SetItem(j, 1, dirList[j-dd]);	
+		directoryList->SetItem(j, 1, dirList[j-dd]);
+		directoryList->SetItem(j, 2, " ");	
 	}
 	
 	for (; j < noAllItems; j++) {
 		directoryList->InsertItem(j, " ", 0);
 		directoryList->SetItemData(j, j);
 		directoryList->SetItem(j, 0, " ");
-		directoryList->SetItem(j, 1, fileList[j-dd-noDirs]);	
+		directoryList->SetItem(j, 1, fileList[j-dd-noDirs]);
+		directoryList->SetItem(j, 2, fileSizeList[j-dd-noDirs]);	
 	}
 	
 	
 
 	directoryList->SetColumnWidth(0,-1);
 	directoryList->SetColumnWidth(1,-1);
+	directoryList->SetColumnWidth(2,-1);
 	
 	return;
 }
@@ -1078,8 +1059,7 @@ void mainFrame::saveHTFile() {
 }
 
 void mainFrame::OnListItemActivated(wxListEvent& event) {
-// 	wxMessageDialog error1(NULL, wxT("Ey voll geklickt Alter"), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-// 	error1.ShowModal();
+
 	long itemnr = event.GetIndex();
 	
 	if (dotdot && (!itemnr)) {
@@ -1099,6 +1079,192 @@ void mainFrame::OnListItemActivated(wxListEvent& event) {
 		return;
 	} 
 
-
 	return;	
+}
+
+
+//get available savestate memory
+//TODO: seems calculation is inaccurate, available memory is slightly larger
+wxInt16 mainFrame::getFreeMem() {
+
+	//get first free mem address
+	unsigned firstFree = lutOffset + baseDiff + 32;
+	for (int i = 0; i < 8; i++) {
+		if (statebeg[i]+ statelen[i] > firstFree) firstFree = statebeg[i] + statelen[i] + 1;
+	}
+
+	wxInt16 freeMem = (htsize - 75) - (firstFree - baseDiff);
+	if (legacyFileEnd) freeMem -= 2;
+
+	return freeMem;
+}
+
+//check if there are empty save slots available
+bool mainFrame::isEmptyStateAvailable() {
+
+	bool emptyStateAvailable = false;
+	
+	for (int i=0; i<8; i++) {
+		if (statelen[i] == 0) emptyStateAvailable = true;
+	}
+	
+	if (!emptyStateAvailable) {
+		wxMessageDialog error0(NULL, wxT("Error: No free savestate slots available.\nTry deleting something first."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		error0.ShowModal();
+	}
+	
+	return emptyStateAvailable;
+}
+
+
+bool mainFrame::insertState(wxString currentStateDoc) {
+
+	//open state file and perform validity checks
+	wxFile ht2s(currentStateDoc);
+	if (!ht2s.IsOpened()) {
+		wxMessageDialog error1(NULL, wxT("Error: File could not be opened."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		error1.ShowModal();
+		return false;
+	}
+	
+	stateSize = ht2s.Length();
+	if (stateSize == wxInvalidOffset) {
+		wxMessageDialog error2(NULL, wxT("Error: File is corrupt."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		error2.ShowModal();
+		return false;
+	}
+	
+	//read in data and perform more validity checks
+	stateData = new wxUint8[stateSize];
+	
+	if (ht2s.Read(stateData, (size_t) stateSize) != stateSize) {
+		wxMessageDialog error3(NULL, wxT("Error: File could not be read."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		error3.ShowModal();
+	
+		delete[] stateData;
+		return false;
+	}
+
+	ht2s.Close();
+	
+	//check if we've got an actual ht2s file
+	wxString sHeader = "";
+	for (int i=0; i<7; i++) {
+		sHeader += stateData[i];
+	}
+	if (sHeader != "HT2SAVE") {
+		wxMessageDialog error4(NULL, wxT("Error: Not a valid HT2 savestate."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		error4.ShowModal();
+	
+		delete[] stateData;
+		return false;		
+	}
+	
+	//check version of the ht2s file against savestate version of the ht2 executable
+	if (stateData[7] < statever) {
+		wxMessageDialog warn1(NULL, wxT("Warning: The savestate you are trying to insert is outdated for this version of HT2.\nConsider upgrading the savestate."), wxT("Warning"), wxOK_DEFAULT|wxICON_ERROR);
+		warn1.ShowModal();
+	}
+	if (stateData[7] > statever) {
+		wxMessageDialog warn2(NULL, wxT("Error: The savestate you are trying to insert is not supported by this version of HT2."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		warn2.ShowModal();
+		delete[] stateData;
+		return false;	
+	}
+	
+	//get first free mem address
+	unsigned firstFree = lutOffset + baseDiff + 32;
+	for (int i = 0; i < 8; i++) {
+		if (statebeg[i]+ statelen[i] > firstFree) firstFree = statebeg[i] + statelen[i] + 1;
+	}
+
+	
+	if ((firstFree - baseDiff + stateSize - 8) > (htsize - 77)) {		//-checksum -padding -versionbyte -header (should be 75 on htver>1)
+		wxMessageDialog error5(NULL, wxT("Error: Not enough space to insert savestate.\nTry deleting something first."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
+		error5.ShowModal();
+		delete[] stateData;
+		return false;
+	}
+	
+	//get first available slot
+	int stateno = 0;
+	while (statelen[stateno] != 0) {
+		stateno++;
+	}
+	
+	//insert savestate
+	int writeOffset = firstFree - baseDiff;
+	for (int i=8; i<stateSize; i++) {
+		htdata[writeOffset] = stateData[i];
+		writeOffset++;
+	}
+	
+	//rewrite savestate LUT
+	writeOffset = lutOffset + (stateno * 4);
+	htdata[writeOffset] = (unsigned char)(firstFree & 0xff);
+	htdata[writeOffset+1] = (unsigned char)((firstFree/256) & 0xff);
+	htdata[writeOffset+2] = (unsigned char)((firstFree+stateSize-8) & 0xff);
+	htdata[writeOffset+3] = (unsigned char)(((firstFree+stateSize-8)/256) & 0xff);
+	
+	//recalculate checksum
+	writeChecksum();
+	
+	readLUT(lutOffset);
+	
+	wxString freeMem = wxString::Format("%i", getFreeMem());
+	htSizeInfo->SetLabel("free mem: " + freeMem + " bytes");		
+// 		wxString statusmsg = "Savestate inserted into slot " + wxString::Format("%d",stateno);
+// 		SetStatusText(statusmsg);
+	unsavedChanges = true;
+	wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath + " [modified]");
+	
+	delete[] stateData;
+	return true;
+
+}
+
+
+//drag'n'drop handling
+stateDropTarget::stateDropTarget(wxListCtrl *owner) {
+
+	m_owner = owner;
+}
+
+bool stateDropTarget::OnDropText(wxCoord x, wxCoord y, const wxString& data) {
+
+	//if (!isEmptyStateAvailable()) return true;
+
+	return true;
+}
+
+
+void mainFrame::OnDirListDrag(wxListEvent& event) {
+
+	if (htdata) {			//ignore dnd event if no htfile opened
+		long itemnr = event.GetIndex();
+	
+		if (itemnr >= dotdot + noDirs) {
+
+			wxString text = "blabla";
+  
+			wxTextDataObject tdo(text);
+			wxDropSource tds(tdo, directoryList);
+			if (tds.DoDragDrop(wxDrag_CopyOnly)) {
+				
+				for (long i = itemnr; i < (dotdot + noDirs + noFiles); i++) {
+
+					if (directoryList->GetItemState(i,wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED) {
+				
+						if (!isEmptyStateAvailable()) return;
+						
+						currentStateDoc = currentFBDir + SEPERATOR + fileList[itemnr - dotdot - noDirs];
+						
+						if (!insertState(currentStateDoc)) return;
+						
+					}	
+				}
+			}	
+		}
+	}
+	return;
 }
