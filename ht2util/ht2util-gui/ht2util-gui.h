@@ -57,6 +57,7 @@ public:
     wxInt16 noFiles;
     bool dotdot;
     wxString currentFBDir;			//current file browser path
+    wxImageList *fbIcons;
 
     unsigned statebeg[8], statelen[8];
     

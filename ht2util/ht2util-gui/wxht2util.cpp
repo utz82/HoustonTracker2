@@ -13,6 +13,8 @@
 #include <wx/dir.h>
 #include <wx/listctrl.h>
 #include <wx/dnd.h>
+#include <wx/artprov.h>
+#include <wx/imaglist.h>
 #include <algorithm>
 
 #define MAX_SUPPORTED_SAVESTATE_VERSION 1	//latest supported savestate version
@@ -97,15 +99,22 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	stateDropTarget *mdt = new stateDropTarget(savestateList);
 	savestateList->SetDropTarget(mdt);
 	
-	populateEmptySList();
+	populateEmptySList();	
 	
-	//savestateList->SetDropTarget(dndStates(savestateList));
-	
+	//construct image list
+	const wxSize iconSize = wxSize(24,24);
+	const wxIcon folderIcon = wxArtProvider::GetIcon(wxART_FOLDER, wxART_OTHER, iconSize);
+	const wxIcon fileIcon = wxArtProvider::GetIcon(wxART_NORMAL_FILE, wxART_OTHER, iconSize);
+	fbIcons = new wxImageList(24, 24, false, 0);
+	fbIcons->Add(folderIcon);
+	fbIcons->Add(fileIcon);
 	
 	//construct directory listing
-	wxListItem dirListCol;
+	wxListItem dirListCol;	
+	directoryList->AssignImageList(fbIcons, wxIMAGE_LIST_SMALL);
 	
 	dirListCol.SetText(wxT(""));
+	itemCol.SetImage(-1);
 	directoryList->InsertColumn(0, dirListCol);
 	directoryList->SetColumnWidth(0, wxLIST_AUTOSIZE );
 	
@@ -141,7 +150,8 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 		rightSide->Add(directoryList,1,wxEXPAND);
 	
 	mainPanel->SetSizer(all);
-    
+	
+	
 	//status bar
 	CreateStatusBar();
 	SetStatusText( "" );
@@ -1018,10 +1028,11 @@ void mainFrame::populateDirList(wxString currentDir) {
 	
 	wxInt16 j = 0;
 	wxInt16 dd = 0;
+
 	if (dotdot) {
-		directoryList->InsertItem(0, " ", 0);
+		directoryList->InsertItem(0, "  ", -1);
 		directoryList->SetItemData(0, 0);
-		directoryList->SetItem(0, 0, " ");
+		//directoryList->SetItem(0, 0, " ");
 		directoryList->SetItem(0, 1, "..");
 		directoryList->SetItem(j, 2, " ");
 		j++;
@@ -1029,17 +1040,17 @@ void mainFrame::populateDirList(wxString currentDir) {
 	}
 
 	for (; j < noAllItems-noFiles; j++) {
-		directoryList->InsertItem(j, " ", 0);
+		directoryList->InsertItem(j, "", 0);
 		directoryList->SetItemData(j, j);
-		directoryList->SetItem(j, 0, " ");
+		//directoryList->SetItem(j, 0, "");
 		directoryList->SetItem(j, 1, dirList[j-dd]);
 		directoryList->SetItem(j, 2, " ");	
 	}
 	
 	for (; j < noAllItems; j++) {
-		directoryList->InsertItem(j, " ", 0);
+		directoryList->InsertItem(j, "", 1);
 		directoryList->SetItemData(j, j);
-		directoryList->SetItem(j, 0, " ");
+		//directoryList->SetItem(j, 0, "");
 		directoryList->SetItem(j, 1, fileList[j-dd-noDirs]);
 		directoryList->SetItem(j, 2, fileSizeList[j-dd-noDirs]);	
 	}
