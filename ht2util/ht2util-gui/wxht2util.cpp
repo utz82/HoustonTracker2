@@ -365,15 +365,18 @@ void mainFrame::OnExtractState(wxCommandEvent& WXUNUSED(event)) {
 	int fileoffset;
 	wxUint8 *sdata;
 	sdata = NULL;
+	wxDateTime dt;
 	wxString now;
 
 	for (long i=0; i<8; i++) {
 
 		if (savestateList->GetItemState(i,wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED) {		//woooo... using & instead of == to check flags
 		
-			now = wxNow();
+			//now = wxNow();
+			dt = wxDateTime::Now();
+			now = dt.Format(wxT("-%y-%b-%d_%H-%M-%S"));
 		
-			suggestedFileName = CurrentFileName + "-slot" + wxString::Format("%d",i) + "-" + now + ".ht2s";
+			suggestedFileName = CurrentFileName + "-slot" + wxString::Format("%d",static_cast<wxInt16>(i)) + "-" + now + ".ht2s";
 			
 			wxFileDialog *SaveDialog = new wxFileDialog(this, _("Save state as?"), wxEmptyString, suggestedFileName,
 				_("HT2 savestate (*.ht2s)|*.ht2s"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
@@ -651,13 +654,16 @@ void mainFrame::OnExportAsm(wxCommandEvent& WXUNUSED(event)) {
 	}
 	
 	wxString now,suggestedFileName;
+	wxDateTime dt;
 	
 	
 	for (long i=0; i<8; i++) {
 
 		if (savestateList->GetItemState(i,wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED) {
 		
-			now = wxNow();
+			//now = wxNow();
+			dt = wxDateTime::Now();
+			now = dt.Format(wxT("-%y-%b-%d_%H-%M-%S"));
 		
 			suggestedFileName = CurrentFileName + "-slot" + wxString::Format("%d",i) + "-" + now + ".asm";
 			
@@ -941,8 +947,7 @@ void mainFrame::populateDirList(wxString currentDir) {
 	wxString filename;
 	//wxInt16 i = 0;
 	bool cont;
-	
-	//TODO: can't meaningfully use filespec, must write own filter using wxRegEx
+
 	
 	//get # of directories
 	noDirs = 0;
@@ -1351,6 +1356,7 @@ void mainFrame::OnStateListDrag(wxListEvent& event) {
 	
 		wxString text = "blabla";
 		wxString now;
+		wxDateTime dt;
 		
 		wxTextDataObject tdo(text);
 		wxDropSource tds(tdo, savestateList);
@@ -1363,7 +1369,9 @@ void mainFrame::OnStateListDrag(wxListEvent& event) {
 		
 					if (statelen[i] != 0) {
 					
-						now = wxNow();
+						//now = wxNow();
+						dt = wxDateTime::Now();
+						now = dt.Format(wxT("-%y-%b-%d_%H-%M-%S"));
 		
 						currentStateDoc = currentFBDir + SEPERATOR + CurrentFileName + "-slot" + wxString::Format("%d",i) + "-" + now + ".ht2s";
 						
