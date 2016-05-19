@@ -36,15 +36,15 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	wxBoxSizer *rightSide = new wxBoxSizer(wxVERTICAL);
 
 	//main menu
-	wxMenu *menuFile = new wxMenu;
+	menuFile = new wxMenu;
 	menuFile->Append(wxID_OPEN, "&Open HT2 file...", "Open HT2 executable to be modified");
 	menuFile->Append(wxID_SAVE, "&Save HT2 file", "Save the current HT2 executable");
 	menuFile->Append(wxID_SAVEAS, "&Save HT2 file as...", "Save HT2 executable with a new name");
 	menuFile->Append(wxID_CLOSE, "&Close HT2 file", "Close the current HT2 executable");
 	menuFile->AppendSeparator();
-	menuFile->Append(ID_InsertState, "&Insert savestate...\tIns", "Insert a savestate into the current HT2 executable");
+	menuFile->Append(wxID_ADD, "&Insert savestate...\tIns", "Insert a savestate into the current HT2 executable");
+	menuFile->Append(wxID_REMOVE, "&Delete savestate\tDel", "Delete a savestate from the current HT2 executable");
 	menuFile->Append(ID_ExtractState, "&Extract savestate...\tCtrl-E", "Extract a savestate and save to file");
-	menuFile->Append(ID_DeleteState, "&Delete savestate\tDel", "Delete a savestate from the current HT2 executable");
 	menuFile->Append(ID_ExportAsm, "&Export .asm...", "Decompress and disassemble a savestate, and export as .asm");
 	menuFile->AppendSeparator();
 	menuFile->Append(wxID_EXIT);
@@ -59,6 +59,7 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 //	menuBar->Append( menuTools, "&Tools" );		//TODO disabled for now as functionality is not yet implemented
 	menuBar->Append( menuHelp, "&Help" );
 	SetMenuBar( menuBar ); 
+	disableMenuItems();
     
 	//main window
 	htFileInfo = new wxStaticText(mainPanel, -1, wxT("model:\nHT2 version:\nsavestate version:"), wxPoint(-1, -1));
@@ -273,6 +274,7 @@ void mainFrame::OnOpenHT(wxCommandEvent& WXUNUSED(event)) {
 		
 	}
 	unsavedChanges = false;
+	enableMenuItems();
 	return;
 }
 
@@ -296,6 +298,7 @@ void mainFrame::OnCloseHT(wxCommandEvent& WXUNUSED(event)) {
 		clearSList();
 		unsavedChanges = false;
 	}
+	disableMenuItems();
 	return;
 }
 
@@ -1262,6 +1265,30 @@ bool mainFrame::exportState(wxString currentStateDoc, wxInt16 i) {
 	delete [] sdata;
 	
 	return true;
+
+}
+
+void mainFrame::disableMenuItems() {
+
+	menuFile->Enable(wxID_SAVE, false);
+	menuFile->Enable(wxID_SAVEAS, false);
+	menuFile->Enable(wxID_CLOSE, false);
+	menuFile->Enable(wxID_ADD, false);
+	menuFile->Enable(wxID_REMOVE, false);
+	menuFile->Enable(ID_ExtractState, false);
+	menuFile->Enable(ID_ExportAsm, false);
+
+}
+
+void mainFrame::enableMenuItems() {
+
+	menuFile->Enable(wxID_SAVE, true);
+	menuFile->Enable(wxID_SAVEAS, true);
+	menuFile->Enable(wxID_CLOSE, true);
+	menuFile->Enable(wxID_ADD, true);
+	menuFile->Enable(wxID_REMOVE, true);
+	menuFile->Enable(ID_ExtractState, true);
+	menuFile->Enable(ID_ExportAsm, true);
 
 }
 

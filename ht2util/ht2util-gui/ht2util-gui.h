@@ -25,6 +25,8 @@ class mainFrame: public wxFrame
 {
 public:
     mainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+    
+    wxMenu *menuFile;
 
     wxStaticText *htFileInfo;
     wxStaticText *htSizeInfo;
@@ -79,6 +81,9 @@ private:
     
     void OnAbout(wxCommandEvent& event);
     
+    void disableMenuItems();
+    void enableMenuItems();
+    
     int getBaseOffset(wxUint8 *htdata);
     wxInt16 getFreeMem();
     int getLUToffset(char statev, wxFileOffset filesize);
@@ -125,8 +130,8 @@ wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     EVT_MENU(wxID_SAVEAS,	mainFrame::OnSaveAsHT)
     EVT_MENU(wxID_CLOSE,	mainFrame::OnCloseHT)
     EVT_MENU(ID_ExtractState,	mainFrame::OnExtractState)
-    EVT_MENU(ID_InsertState,	mainFrame::OnInsertState)
-    EVT_MENU(ID_DeleteState,	mainFrame::OnDeleteState)
+    EVT_MENU(wxID_ADD,		mainFrame::OnInsertState)
+    EVT_MENU(wxID_REMOVE,	mainFrame::OnDeleteState)
     EVT_MENU(ID_ExportAsm,	mainFrame::OnExportAsm)
     EVT_MENU(wxID_EXIT,		mainFrame::OnExit)
     
