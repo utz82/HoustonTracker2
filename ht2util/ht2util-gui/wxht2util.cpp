@@ -675,7 +675,7 @@ void mainFrame::OnExportAsm(wxCommandEvent& WXUNUSED(event)) {
 			dt = wxDateTime::Now();
 			now = dt.Format(wxT("-%y-%b-%d_%H-%M-%S"));
 		
-			suggestedFileName = CurrentFileName + "-slot" + wxString::Format("%d",i) + "-" + now + ".asm";
+			suggestedFileName = CurrentFileName + "-slot" + wxString::Format("%d",static_cast<wxInt16>(i)) + "-" + now + ".asm";
 			
 			wxFileDialog *SaveDialog = new wxFileDialog(this, _("Save state as?"), wxEmptyString, suggestedFileName,
 				_("assembler source (*.asm)|*.asm"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
@@ -1384,7 +1384,7 @@ void mainFrame::OnStateListDrag(wxListEvent& event) {
 						dt = wxDateTime::Now();
 						now = dt.Format(wxT("-%y-%b-%d_%H-%M-%S"));
 		
-						currentStateDoc = currentFBDir + SEPERATOR + CurrentFileName + "-slot" + wxString::Format("%d",i) + "-" + now + ".ht2s";
+						currentStateDoc = currentFBDir + SEPERATOR + CurrentFileName + "-slot" + wxString::Format("%d",static_cast<wxInt16>(i)) + "-" + now + ".ht2s";
 						
 						if (!exportState(currentStateDoc, i)) return;
 						
