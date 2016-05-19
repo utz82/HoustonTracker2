@@ -27,6 +27,13 @@
 mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
         : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
+	htdata = NULL;
+	stateData = NULL;
+	dirList = NULL;
+	fileList = NULL;
+	fileSizeList = NULL;
+	unsavedChanges = false;
+
 	wxPanel *mainPanel = new wxPanel(this, -1);
 
 	wxBoxSizer *all = new wxBoxSizer(wxVERTICAL);
@@ -168,7 +175,18 @@ void mainFrame::OnAbout(wxCommandEvent& WXUNUSED(event)) {
 
 void mainFrame::OnOpenHT(wxCommandEvent& WXUNUSED(event)) {
 
-	//TODO: check if a file is currently opened and has unsaved changes
+	//check if a file is currently opened and has unsaved changes
+	if (unsavedChanges) {
+
+		wxMessageDialog *unsavedChgMsg = new wxMessageDialog(NULL, wxT("Save changes?"), wxT("Question"), 
+			wxCANCEL | wxYES_NO | wxCANCEL_DEFAULT | wxICON_QUESTION);
+
+		wxInt16 response = unsavedChgMsg->ShowModal();
+		if (response == wxID_CANCEL) return;
+		else if (response == wxID_YES) saveHTFile();			
+	}
+	
+
 
 	wxFileDialog *OpenDialog = new wxFileDialog(
 		this, _("Choose a file to open"), wxEmptyString, wxEmptyString,
@@ -193,6 +211,7 @@ void mainFrame::OnOpenHT(wxCommandEvent& WXUNUSED(event)) {
 			return;
 		}
 		
+		delete[] htdata;
 		htdata = new wxUint8[htsize];
 		
 		if (htfile.Read(htdata, (size_t) htsize) != htsize) {
@@ -200,6 +219,7 @@ void mainFrame::OnOpenHT(wxCommandEvent& WXUNUSED(event)) {
 			error3.ShowModal();
 		
 			delete[] htdata;
+			htdata = NULL;
 			return;
 		}
 
@@ -221,12 +241,10 @@ void mainFrame::OnOpenHT(wxCommandEvent& WXUNUSED(event)) {
 		
 		//read savestate version
 		if (tmodel == 0 || htdata[htsize-3] != 0) {
-			statever = htdata[htsize-4];	//detect legacy HT2 version: if val at offset -3 is 0, it's a legacy binary
-			//wxPuts(wxT("using regular file end"));			
+			statever = htdata[htsize-4];	//detect legacy HT2 version: if val at offset -3 is 0, it's a legacy binary			
 		} else {
 			statever = htdata[htsize-6];
 			legacyFileEnd = true;
-			//wxPuts(wxT("using legacy file end"));
 		}
 		if (statever > MAX_SUPPORTED_SAVESTATE_VERSION) {
 			wxMessageDialog error4(NULL, wxT("Warning: File is of a newer version than supported by this version of ht2util.\nSome functionality may not perform as expected."),
@@ -241,6 +259,7 @@ void mainFrame::OnOpenHT(wxCommandEvent& WXUNUSED(event)) {
 			error5.ShowModal();
 		
 			delete[] htdata;
+			htdata = NULL;
 			return;
 		}
 		
@@ -260,6 +279,7 @@ void mainFrame::OnOpenHT(wxCommandEvent& WXUNUSED(event)) {
 			error6.ShowModal();
 		
 			delete[] htdata;
+			htdata = NULL;
 			return;
 		}
 		lutOffset = static_cast<unsigned>(fOffset) + 1;
@@ -295,10 +315,11 @@ void mainFrame::OnCloseHT(wxCommandEvent& WXUNUSED(event)) {
 		htFileInfo->SetLabel("model:\nHT2 version:\nsavestate version:");
 		htSizeInfo->SetLabel("mem free:");
 		delete[] htdata;
+		htdata = NULL;
 		clearSList();
 		unsavedChanges = false;
+		disableMenuItems();
 	}
-	disableMenuItems();
 	return;
 }
 
@@ -343,6 +364,7 @@ void mainFrame::OnExtractState(wxCommandEvent& WXUNUSED(event)) {
 	wxString suggestedFileName;
 	int fileoffset;
 	wxUint8 *sdata;
+	sdata = NULL;
 	wxString now;
 
 	for (long i=0; i<8; i++) {
@@ -385,6 +407,7 @@ void mainFrame::OnExtractState(wxCommandEvent& WXUNUSED(event)) {
 					
 					statefile.Close();
 					delete [] sdata;
+					sdata = NULL;
 					
 				}
 			}
@@ -441,6 +464,7 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 			error3.ShowModal();
 		
 			delete[] stateData;
+			stateData = NULL;
 			return;
 		}
 
@@ -456,6 +480,7 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 			error4.ShowModal();
 		
 			delete[] stateData;
+			stateData = NULL;
 			return;		
 		}
 		
@@ -468,6 +493,7 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 			wxMessageDialog warn2(NULL, wxT("Error: The savestate you are trying to insert is not supported by this version of HT2."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
 			warn2.ShowModal();
 			delete[] stateData;
+			stateData = NULL;
 			return;	
 		}
 		
@@ -482,6 +508,7 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 			wxMessageDialog error5(NULL, wxT("Error: Not enough space to insert savestate.\nTry deleting something first."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
 			error5.ShowModal();
 			delete[] stateData;
+			stateData = NULL;
 			return;
 		}
 		
@@ -515,7 +542,10 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 // 		wxString statusmsg = "Savestate inserted into slot " + wxString::Format("%d",stateno);
 // 		SetStatusText(statusmsg);
 		unsavedChanges = true;
-		wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath + " [modified]");			
+		wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath + " [modified]");
+		
+		delete[] stateData;
+		stateData = NULL;			
 	}
 	
 	return;
@@ -941,9 +971,9 @@ void mainFrame::populateDirList(wxString currentDir) {
 	}
 	//if (currentDir == "") dotdot = false;	//TODO: prevent loading beyond root directory
 	
-	if (dirList) delete[] dirList;
-	if (fileList) delete[] fileList;
-	if (fileSizeList) delete[] fileSizeList;
+	delete[] dirList;
+	delete[] fileList;
+	delete[] fileSizeList;
 	dirList = new wxString[noDirs];
 	fileList = new wxString[noFiles];
 	fileSizeList = new wxString[noFiles];
@@ -1263,6 +1293,7 @@ bool mainFrame::exportState(wxString currentStateDoc, wxInt16 i) {
 	
 	statefile.Close();
 	delete [] sdata;
+	sdata = NULL;
 	
 	return true;
 
