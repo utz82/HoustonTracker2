@@ -1035,10 +1035,11 @@ lpInvalidErr				;handle error caused by invalid loop point created by deleting r
 	jp errorHand
 	
 ;*************************************************************************************
-IF ((HIGH($))<(HIGH($+32)))
+IF ((HIGH($+5))<(HIGH($+37)))
 	org 256*(1+(HIGH($)))		;align to next page if necessary
 .WARNING sample table crosses page boundary
 ENDIF
+	db 'XDRUM'
 
 	ds 2				;needed for sample LUT offset calculation
 	
