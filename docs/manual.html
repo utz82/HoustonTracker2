@@ -45,7 +45,8 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#fxreference">4.3.4.2. Effects Reference</a><br>
     &nbsp;&nbsp; <a href="#ldsav">4.4. Loading, Saving, and Backing Up</a><br>
     &nbsp;&nbsp; <a href="#error">4.5. Error Codes</a><br><br>
-    <a href="#thanks"><b>5. Thanks, Credits, and Greetings</b></a><br><br>
+    <a href="#ht2util"><b>5. Using ht2util</b></a><br><br>
+    <a href="#thanks"><b>6. Thanks, Credits, and Greetings</b></a><br><br>
     <a href="#source"><b>Appendix A: Building from Source</b></a><br>
     <a href="#dataformat"><b>Appendix B: Data Format Specification</b></a><br>
     <a href="#technotes"><b>Appendix C: Synthesis Techniques</b></a><br><br>
@@ -1210,7 +1211,7 @@
   <div class="main">
     Creating a backup of your HT2 songs is trivial: Simply send the HT2 PRGM file to your computer or another calc of the same model.
     The program file contains all the save slots as well as the currently loaded song. <br><br>
-    <img src="data/underconstr.jpg">&nbsp;In the future, there will be a PC utility for manipuling backup files.
+    <img src="data/idea.jpg">&nbsp;You can use the <a href="#ht2util">ht2util</a> savestate manager to extract/insert save slots into your HT2 PRGM file.
     <br><br><br><br>
   </div>
   <a name="error"></a>
@@ -1278,9 +1279,40 @@
     <br><br><br><br><br>
   </div> 
   
+  <a name="ht2util"></a>
+  <div class="header">
+    5. Using ht2util<br><br>
+  </div>
+  <div class="main">
+    <b>ht2util</b> is a PC-based savestate manager application for HoustonTracker 2. It allows you to export and import songs from/to the savestate block of your
+    HT2 binary, among other things.<br><br><br>
+  </div>
+  <div class="minor">
+    Installation<br><br>
+  </div>
+  <div class="main">
+    ht2util works as a stand-alone application, no installation is required.<br><br>
+    Linux users can compile the program from source by running "make" in the /src directory. ht2util depends on wxWidgets 2.8 or higher, so install that first if
+    necessary. Most Linux distros provide a native wxWidgets implementation in their repositories.<br><br><br>
+  </div>
+  <div class="minor">
+    Usage<br><br>
+  </div>
+  <div class="main">
+    Always start by loading a HT2 program file. This can be a blank ht2.8*p, or one you've backed up from your calculator. Once the file has loaded successfully, 
+    the contents of its savestate table will be displayed in the left panel.<br><br>
+    To <b>import</b> a savestate, use "File->Insert savestate...", or drag one or more files from the right-hand (filebrowser) panel to the left-hand 
+    (savestate) panel.<br><br>
+    To <b>delete</b> one or more savestates, mark the desired state(s) in the savestate panel, then use "File->Delete savestate" or simply press "Delete".<br><br>
+    To <b>extract</b> one or more savestates, mark the desired state(s) in the savestate panel and then use "File->Extract savestate..." to save it with a ".ht2s" extension. 
+    You can also simply drag the desired savestate(s) from the savestate panel to the filebrowser panel; this will save the state(s) with a generic filename.<br><br>
+    Furthermore, you can decompress and export savestates to .asm, however this is not particularly useful yet unless you're working with the HT2 source.<br>
+    <br><br><br><br><br>
+  </div>
+  
   <a name="thanks"></a>
   <div class="header">
-    5. Thanks, Credits, and Greetings<br><br>
+    6. Thanks, Credits, and Greetings<br><br>
   </div>
   <div class="main">
     Thanks to...<br><br>
