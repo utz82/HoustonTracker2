@@ -3,6 +3,7 @@
 
 //done: add checksum recalculations on all ops
 //done: add info about free mem / state sizes in files
+//TODO: add ht version to savestate format, so we can check for necessary upgrade and incompatibility!!!
 
 
 #include <wx/wxprec.h>		//use precompiled wx headers unless compiler does not support precompilation
@@ -406,17 +407,18 @@ void mainFrame::OnExtractState(wxCommandEvent& WXUNUSED(event)) {
 					
 					fileoffset = statebeg[i] - baseDiff;
 					
-					sdata = new wxUint8[statelen[i]+1];
+					sdata = new wxUint8[statelen[i]+2];
 					
 					sdata[0] = static_cast<unsigned char>(statever);
+					sdata[1] = static_cast<unsigned char>(htver);
 					
-					for (int j=1; j<int(statelen[i]+1); j++) {
+					for (int j=2; j<int(statelen[i]+2); j++) {
 						sdata[j] = htdata[fileoffset];
 						fileoffset++;
 					}
 					
 					statefile.Write("HT2SAVE", 7);
-					statefile.Write(sdata, (size_t) statelen[i]+1);
+					statefile.Write(sdata, (size_t) statelen[i]+2);
 					
 					statefile.Close();
 					delete [] sdata;
@@ -497,11 +499,8 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 			return;		
 		}
 		
+		
 		//check version of the ht2s file against savestate version of the ht2 executable
-		if (stateData[7] < statever) {
-			wxMessageDialog warn1(NULL, wxT("Warning: The savestate you are trying to insert is outdated for this version of HT2.\nConsider upgrading the savestate."), wxT("Warning"), wxOK_DEFAULT|wxICON_ERROR);
-			warn1.ShowModal();
-		}
 		if (stateData[7] > statever) {
 			wxMessageDialog warn2(NULL, wxT("Error: The savestate you are trying to insert is not supported by this version of HT2."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
 			warn2.ShowModal();
@@ -510,6 +509,23 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 			return;	
 		}
 		
+		
+		//check version of the ht2s file again HT2 version
+		if (stateData[8] < htver) {
+		
+			wxMessageDialog warn1(NULL, wxT("Warning: The savestate was extracted from an older version of HT2 than the one you're currently using.\nYou will need to manually adjust some effect commands."), wxT("Warning"), wxOK_DEFAULT|wxICON_WARNING);
+ 			warn1.ShowModal();
+		
+		}
+		
+		if (stateData[8] > htver) {
+		
+			wxMessageDialog warn1(NULL, wxT("Warning: This savestate was extracted from a newer version of HT2 than the one you're currently using.\nSome settings and effect commands may not work as intended."), wxT("Warning"), wxOK_DEFAULT|wxICON_WARNING);
+ 			warn1.ShowModal();
+		
+		}
+		
+		
 		//get first free mem address
 		unsigned firstFree = lutOffset + baseDiff + 32;
 		for (int i = 0; i < 8; i++) {
@@ -517,7 +533,7 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 		}
 
 		
-		if ((firstFree - baseDiff + stateSize - 8) > (htsize - 77)) {		//-checksum -padding -versionbyte -header (should be 75 on htver>1)
+		if ((firstFree - baseDiff + stateSize - 9) > (htsize - 77)) {		//-checksum -padding -versionbyte -header (should be 75 on htver>1)
 			wxMessageDialog error5(NULL, wxT("Error: Not enough space to insert savestate.\nTry deleting something first."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
 			error5.ShowModal();
 			delete[] stateData;
@@ -533,7 +549,7 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 		
 		//insert savestate
 		int writeOffset = firstFree - baseDiff;
-		for (int i=8; i<stateSize; i++) {
+		for (int i=9; i<stateSize; i++) {
 			htdata[writeOffset] = stateData[i];
 			writeOffset++;
 		}
@@ -542,8 +558,8 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 		writeOffset = lutOffset + (stateno * 4);
 		htdata[writeOffset] = (unsigned char)(firstFree & 0xff);
 		htdata[writeOffset+1] = (unsigned char)((firstFree/256) & 0xff);
-		htdata[writeOffset+2] = (unsigned char)((firstFree+stateSize-8) & 0xff);
-		htdata[writeOffset+3] = (unsigned char)(((firstFree+stateSize-8)/256) & 0xff);
+		htdata[writeOffset+2] = (unsigned char)((firstFree+stateSize-9) & 0xff);
+		htdata[writeOffset+3] = (unsigned char)(((firstFree+stateSize-9)/256) & 0xff);
 		
 		//recalculate checksum
 		writeChecksum();
@@ -1013,7 +1029,7 @@ void mainFrame::populateDirList(wxString currentDir) {
 		wxFile sFile(fPath);
 		wxInt16 fSize = sFile.Length();
 		if (sFile.IsOpened()) {
-			fileSizeList[noFiles] = wxString::Format("%i", (fSize - 8));
+			fileSizeList[noFiles] = wxString::Format("%i", (fSize - 9));
 			sFile.Close();
 		}
 		else fileSizeList[noFiles] = "broken";
@@ -1064,6 +1080,7 @@ void mainFrame::populateDirList(wxString currentDir) {
 	return;
 }
 
+//clear savestate list
 void mainFrame::clearSList() {
 
 	wxString temp;
@@ -1219,15 +1236,28 @@ bool mainFrame::insertState(wxString currentStateDoc) {
 	}
 	
 	//check version of the ht2s file against savestate version of the ht2 executable
-	if (stateData[7] < statever) {
-		wxMessageDialog warn1(NULL, wxT("Warning: The savestate you are trying to insert is outdated for this version of HT2.\nConsider upgrading the savestate."), wxT("Warning"), wxOK_DEFAULT|wxICON_ERROR);
-		warn1.ShowModal();
-	}
 	if (stateData[7] > statever) {
 		wxMessageDialog warn2(NULL, wxT("Error: The savestate you are trying to insert is not supported by this version of HT2."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
 		warn2.ShowModal();
 		delete[] stateData;
+		stateData = NULL;
 		return false;	
+	}
+	
+	
+	//check version of the ht2s file again HT2 version
+	if (stateData[8] < htver) {
+	
+		wxMessageDialog warn1(NULL, wxT("Warning: The savestate was extracted from an older version of HT2 than the one you're currently using.\nYou will need to manually adjust some effect commands."), wxT("Warning"), wxOK_DEFAULT|wxICON_WARNING);
+ 		warn1.ShowModal();
+	
+	}
+	
+	if (stateData[8] > htver) {
+	
+		wxMessageDialog warn1(NULL, wxT("Warning: This savestate was extracted from a newer version of HT2 than the one you're currently using.\nSome settings and effect commands may not work as intended."), wxT("Warning"), wxOK_DEFAULT|wxICON_WARNING);
+ 		warn1.ShowModal();
+	
 	}
 	
 	//get first free mem address
@@ -1237,7 +1267,7 @@ bool mainFrame::insertState(wxString currentStateDoc) {
 	}
 
 	
-	if ((firstFree - baseDiff + stateSize - 8) > (htsize - 77)) {		//-checksum -padding -versionbyte -header (should be 75 on htver>1)
+	if ((firstFree - baseDiff + stateSize - 9) > (htsize - 77)) {		//-checksum -padding -versionbyte -header (should be 75 on htver>1)
 		wxMessageDialog error5(NULL, wxT("Error: Not enough space to insert savestate.\nTry deleting something first."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
 		error5.ShowModal();
 		delete[] stateData;
@@ -1252,7 +1282,7 @@ bool mainFrame::insertState(wxString currentStateDoc) {
 	
 	//insert savestate
 	int writeOffset = firstFree - baseDiff;
-	for (int i=8; i<stateSize; i++) {
+	for (int i=9; i<stateSize; i++) {
 		htdata[writeOffset] = stateData[i];
 		writeOffset++;
 	}
@@ -1261,8 +1291,8 @@ bool mainFrame::insertState(wxString currentStateDoc) {
 	writeOffset = lutOffset + (stateno * 4);
 	htdata[writeOffset] = (unsigned char)(firstFree & 0xff);
 	htdata[writeOffset+1] = (unsigned char)((firstFree/256) & 0xff);
-	htdata[writeOffset+2] = (unsigned char)((firstFree+stateSize-8) & 0xff);
-	htdata[writeOffset+3] = (unsigned char)(((firstFree+stateSize-8)/256) & 0xff);
+	htdata[writeOffset+2] = (unsigned char)((firstFree+stateSize-9) & 0xff);
+	htdata[writeOffset+3] = (unsigned char)(((firstFree+stateSize-9)/256) & 0xff);
 	
 	//recalculate checksum
 	writeChecksum();
@@ -1295,17 +1325,18 @@ bool mainFrame::exportState(wxString currentStateDoc, wxInt16 i) {
 	
 	fileoffset = statebeg[i] - baseDiff;
 	
-	sdata = new wxUint8[statelen[i]+1];
+	sdata = new wxUint8[statelen[i]+2];
 	
 	sdata[0] = static_cast<unsigned char>(statever);
+	sdata[1] = static_cast<unsigned char>(htver);
 	
-	for (int j=1; j<int(statelen[i]+1); j++) {
+	for (int j=2; j<int(statelen[i]+2); j++) {
 		sdata[j] = htdata[fileoffset];
 		fileoffset++;
 	}
 	
 	statefile.Write("HT2SAVE", 7);
-	statefile.Write(sdata, (size_t) statelen[i]+1);
+	statefile.Write(sdata, (size_t) statelen[i]+2);
 	
 	statefile.Close();
 	delete [] sdata;

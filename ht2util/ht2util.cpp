@@ -25,7 +25,7 @@ unsigned getBaseDiff(int model, int baseOffset);
 
 unsigned statebeg[8], statelen[8];
 const string calcversion[3] = { "82", "83", "83+/84+" };
-unsigned basediff;
+unsigned basediff, htver;
 
 fstream HTFILE;
 
@@ -81,7 +81,6 @@ int main(int argc, char *argv[]){
 	}
 		
 	//get HT2 version number
-	unsigned htver;
 	htver = getHTVersionNo(baseOffset);
 
 	//determine calc type by file extension
@@ -341,9 +340,9 @@ int insertState(unsigned int lutOffset, char statev) {
 	}
 	
 	//check header to verify that is is an actual HT2 savestate file
-	char buffer[8];
+	char buffer[9];
 	STATEFILE.seekg(0, ios::beg);
-	STATEFILE.read(buffer, 8);
+	STATEFILE.read(buffer, 9);
 	
 	if (buffer[0] != 'H' || buffer[1] != 'T' || buffer[2] != '2' || buffer[3] != 'S' || buffer[4] != 'A' || buffer[5] != 'V' || buffer[6] != 'E') {
 		cout << "Error: " << statefilename << " is either corrupt or not a valid HT2 savestate file.\n";
@@ -354,19 +353,26 @@ int insertState(unsigned int lutOffset, char statev) {
 	bool doUpgrade = false;
 	
 	if (buffer[7] > statev) {
-		cout << "Error: " << statefilename << " is of a newer version than the HT2 file you're trying to insert into. Try upgrading your HT2 file first.\n";
+		cout << "Error: This savestate version is not supported by this version of HT2. Consider using a newer version of HT2.\n";
 		STATEFILE.close();
 		return -1;
 	}
-	if (buffer[7] < statev) {
-		cout << "Warning: " << statefilename << " is of an older version than the HT2 file you're trying to insert into, and will be automatically upgraded.\n";
+// 	if (buffer[7] < statev) {
+// 		cout << "Warning: " << statefilename << " is of an older version than the HT2 file you're trying to insert into. You will need to manually adjust the FX commands.\n";
+// 		doUpgrade = true;
+// 	}
+	if (static_cast<unsigned>(buffer[8]) < htver) {
+		cout << "Warning: " << statefilename << " was extracted from an older HT2 version than the one you're currently using. You will need to manually adjust the FX commands.\n";
 		doUpgrade = true;
+	}
+	if (static_cast<unsigned>(buffer[8]) > htver) {
+		cout << "Warning: " << statefilename << " was extracted from a newer HT2 version than the one you're currently using. Some settings and FX commands will not work as expected.\n";
 	}
 	
 	//get state file size
 	STATEFILE.seekg(0, ios::end);
 	int statesize = STATEFILE.tellg();
-	statesize = statesize - 8;		//don't count header
+	statesize = statesize - 9;		//don't count header
 	
 	//get first available slot
 	int stateno = 0;
@@ -392,13 +398,13 @@ int insertState(unsigned int lutOffset, char statev) {
 	
 	//read state into buffer
 	char fbuf[statesize];
-	STATEFILE.seekg(8, ios::beg);
+	STATEFILE.seekg(9, ios::beg);
 	STATEFILE.read(fbuf, statesize);
 	
 	
 	//upgrade if necessary
 	if (doUpgrade) {
-		cout << "We should really upgrade this savestate.\n";
+		cout << "We should really upgrade this savestate, but this isn't implemented yet.\n";
 	}
 	
 	//write buffer into HT2 file
@@ -710,7 +716,7 @@ int extractState(char statev) {
 	ofstream OUTFILE;
 	OUTFILE.open (outfilename.c_str(), ios::out | ios::binary);
 	
-	OUTFILE << "HT2SAVE" << statev;				//header
+	OUTFILE << "HT2SAVE" << statev << static_cast<unsigned char>(htver);				//header
 	
 	HTFILE.seekg(fileoffset, ios::beg);
 	HTFILE.read(buffer, statelen[stateno]);
