@@ -322,7 +322,7 @@ void readLUT(int fileoffset, int htv, char statev) {
 int insertState(unsigned int lutOffset, char statev) {
 
 	//check if there are free save slots available
-	if (statelen[0] != 0 && statelen[1] != 0 && statelen[2] != 0 && statelen[3] != 0 && statelen[4] != 0 && statelen[5] != 0 && statelen[6] != 0) {
+	if (statelen[0] != 0 && statelen[1] != 0 && statelen[2] != 0 && statelen[3] != 0 && statelen[4] != 0 && statelen[5] != 0 && statelen[6] != 0 && statelen[7] != 0) {
 		cout << "Error: No free savestates available. Try deleting something first.\n";
 		return -1;
 	}
@@ -385,7 +385,7 @@ int insertState(unsigned int lutOffset, char statev) {
 //	unsigned int firstfree = 0;
 	unsigned firstfree = lutOffset + basediff + 32;
 	for (i = 0; i < 8; i++) {
-		if (statebeg[i] > firstfree) firstfree = statebeg[i] + statelen[i] + 1;
+		if (statebeg[i] + statelen[i] > firstfree) firstfree = statebeg[i] + statelen[i] + 1;
 	}
 	
 	//check if there is sufficient space to insert the state
