@@ -373,9 +373,6 @@ void mainFrame::OnExtractState(wxCommandEvent& WXUNUSED(event)) {
 	}
 	
 	wxString suggestedFileName;
-	int fileoffset;
-	wxUint8 *sdata;
-	sdata = NULL;
 	wxDateTime dt;
 	wxString now;
 
@@ -398,31 +395,10 @@ void mainFrame::OnExtractState(wxCommandEvent& WXUNUSED(event)) {
 			
 					currentStateDoc = SaveDialog->GetPath();
 				
-					wxFile statefile;
-					if (!statefile.Open(currentStateDoc, wxFile::write)) {
-						wxMessageDialog error1(NULL, wxT("Error: Could not save file."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-						error1.ShowModal();
-						return;
-					}
+					exportState(currentStateDoc, i);
 					
-					fileoffset = statebeg[i] - baseDiff;
-					
-					sdata = new wxUint8[statelen[i]+2];
-					
-					sdata[0] = static_cast<unsigned char>(statever);
-					sdata[1] = static_cast<unsigned char>(htver);
-					
-					for (int j=2; j<int(statelen[i]+2); j++) {
-						sdata[j] = htdata[fileoffset];
-						fileoffset++;
-					}
-					
-					statefile.Write("HT2SAVE", 7);
-					statefile.Write(sdata, (size_t) statelen[i]+2);
-					
-					statefile.Close();
-					delete [] sdata;
-					sdata = NULL;
+					directoryList->DeleteAllItems();
+					populateDirList(currentFBDir);
 					
 				}
 			}
@@ -456,125 +432,8 @@ void mainFrame::OnInsertState(wxCommandEvent& WXUNUSED(event)) {
 	
 		currentStateDoc = OpenDialog->GetPath();
 		
-		//open state file and perform validity checks
-		wxFile ht2s(currentStateDoc);
-		if (!ht2s.IsOpened()) {
-			wxMessageDialog error1(NULL, wxT("Error: File could not be opened."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-			error1.ShowModal();
-			return;
-		}
+		if (!insertState(currentStateDoc)) return;
 		
-		stateSize = ht2s.Length();
-		if (stateSize == wxInvalidOffset) {
-			wxMessageDialog error2(NULL, wxT("Error: File is corrupt."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-			error2.ShowModal();
-			return;
-		}
-		
-		//read in data and perform more validity checks
-		stateData = new wxUint8[stateSize];
-		
-		if (ht2s.Read(stateData, (size_t) stateSize) != stateSize) {
-			wxMessageDialog error3(NULL, wxT("Error: File could not be read."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-			error3.ShowModal();
-		
-			delete[] stateData;
-			stateData = NULL;
-			return;
-		}
-
-		ht2s.Close();
-		
-		//check if we've got an actual ht2s file
-		wxString sHeader = "";
-		for (int i=0; i<7; i++) {
-			sHeader += stateData[i];
-		}
-		if (sHeader != "HT2SAVE") {
-			wxMessageDialog error4(NULL, wxT("Error: Not a valid HT2 savestate."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-			error4.ShowModal();
-		
-			delete[] stateData;
-			stateData = NULL;
-			return;		
-		}
-		
-		
-		//check version of the ht2s file against savestate version of the ht2 executable
-		if (stateData[7] > statever) {
-			wxMessageDialog warn2(NULL, wxT("Error: The savestate you are trying to insert is not supported by this version of HT2."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-			warn2.ShowModal();
-			delete[] stateData;
-			stateData = NULL;
-			return;	
-		}
-		
-		
-		//check version of the ht2s file again HT2 version
-		if (stateData[8] < htver) {
-		
-			wxMessageDialog warn1(NULL, wxT("Warning: The savestate was extracted from an older version of HT2 than the one you're currently using.\nYou will need to manually adjust some effect commands."), wxT("Warning"), wxOK_DEFAULT|wxICON_WARNING);
- 			warn1.ShowModal();
-		
-		}
-		
-		if (stateData[8] > htver) {
-		
-			wxMessageDialog warn1(NULL, wxT("Warning: This savestate was extracted from a newer version of HT2 than the one you're currently using.\nSome settings and effect commands may not work as intended."), wxT("Warning"), wxOK_DEFAULT|wxICON_WARNING);
- 			warn1.ShowModal();
-		
-		}
-		
-		
-		//get first free mem address
-		unsigned firstFree = lutOffset + baseDiff + 32;
-		for (int i = 0; i < 8; i++) {
-			if (statebeg[i]+ statelen[i] > firstFree) firstFree = statebeg[i] + statelen[i] + 1;
-		}
-
-		
-		if ((firstFree - baseDiff + stateSize - 9) > (htsize - 77)) {		//-checksum -padding -versionbyte -header (should be 75 on htver>1)
-			wxMessageDialog error5(NULL, wxT("Error: Not enough space to insert savestate.\nTry deleting something first."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
-			error5.ShowModal();
-			delete[] stateData;
-			stateData = NULL;
-			return;
-		}
-		
-		//get first available slot
-		int stateno = 0;
-		while (statelen[stateno] != 0) {
-			stateno++;
-		}
-		
-		//insert savestate
-		int writeOffset = firstFree - baseDiff;
-		for (int i=9; i<stateSize; i++) {
-			htdata[writeOffset] = stateData[i];
-			writeOffset++;
-		}
-		
-		//rewrite savestate LUT
-		writeOffset = lutOffset + (stateno * 4);
-		htdata[writeOffset] = (unsigned char)(firstFree & 0xff);
-		htdata[writeOffset+1] = (unsigned char)((firstFree/256) & 0xff);
-		htdata[writeOffset+2] = (unsigned char)((firstFree+stateSize-9) & 0xff);
-		htdata[writeOffset+3] = (unsigned char)(((firstFree+stateSize-9)/256) & 0xff);
-		
-		//recalculate checksum
-		writeChecksum();
-		
-		readLUT(lutOffset);
-		
-		wxString freeMem = wxString::Format("%i", getFreeMem());
-		htSizeInfo->SetLabel("free mem: " + freeMem + " bytes");		
-// 		wxString statusmsg = "Savestate inserted into slot " + wxString::Format("%d",stateno);
-// 		SetStatusText(statusmsg);
-		unsavedChanges = true;
-		wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath + " [modified]");
-		
-		delete[] stateData;
-		stateData = NULL;			
 	}
 	
 	return;
@@ -1217,6 +1076,7 @@ bool mainFrame::insertState(wxString currentStateDoc) {
 		error3.ShowModal();
 	
 		delete[] stateData;
+		stateData = NULL;
 		return false;
 	}
 
@@ -1271,6 +1131,7 @@ bool mainFrame::insertState(wxString currentStateDoc) {
 		wxMessageDialog error5(NULL, wxT("Error: Not enough space to insert savestate.\nTry deleting something first."), wxT("Error"), wxOK_DEFAULT|wxICON_ERROR);
 		error5.ShowModal();
 		delete[] stateData;
+		stateData = NULL;
 		return false;
 	}
 	
@@ -1307,6 +1168,7 @@ bool mainFrame::insertState(wxString currentStateDoc) {
 	wxTopLevelWindow::SetTitle("ht2util - " + CurrentDocPath + " [modified]");
 	
 	delete[] stateData;
+	stateData = NULL;
 	return true;
 
 }
@@ -1315,6 +1177,7 @@ bool mainFrame::exportState(wxString currentStateDoc, wxInt16 i) {
 
 	int fileoffset;
 	wxUint8 *sdata;
+	sdata = NULL;
 
 	wxFile statefile;
 	if (!statefile.Open(currentStateDoc, wxFile::write)) {
