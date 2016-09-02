@@ -8,8 +8,7 @@ looprow
 	db 0		;loop point (row#)
 
 ptns					;the pattern matrix
-	ds 256*4,#ff			;1024+1 #ff bytes
-	;db 1,#ff			;shouldn't this be just #ff?
+	ds 256*4,#ff			;1024+1 #ff bytes			
 	db #ff
 	
 ptn00					;the note patterns
