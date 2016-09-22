@@ -164,10 +164,10 @@ wordSwitch equ $+1
 	xor a
 	ld (wordSwitch),a
 
+	call waitForKeyRelease
 	ld hl,usrDrum
 	ld de,#2ba6
 	call setXY
-	call waitForKeyRelease
 	jp kSetBFull	
 	
 
@@ -1113,11 +1113,11 @@ setUsrDrumHi
 	jp kSetBFull+2
 	;jp kSetBFull
 	
-setUsrDrumLo
-	ld hl,usrDrum
-	ld de,#2ba6
-	call setXY
-	jp kSetBFull
+; setUsrDrumLo					;TODO: dead code?
+; 	ld hl,usrDrum
+; 	ld de,#2ba6
+; 	call setXY
+; 	jp kSetBFull
 
 kzoom
 	ret
