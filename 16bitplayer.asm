@@ -279,11 +279,12 @@ mute1					;mute switch for ch1
 pan1 equ $+1
 	and lp_on		;7
 
+	exx			;4	;back to the normal register set
 out1
 	out (link),a		;11	;output state ch1
-					;----- DRUMS: 71/71t
+					;----- DRUMS: 75/75t
 					
-	exx			;4	;back to the normal register set
+	
 	add iy,de		;15	;update counter ch3
 phaseshift3 equ $+1			;switch for phase shift/set duty cycle
 	ld a,#80		;7	
@@ -298,21 +299,19 @@ pitchslide equ $+1
 	add hl,de		;11
 slideswitch
 	ex de,hl		;4	;#eb = ex de,hl || nop (when initial DE = 0)
-out3
-	out (link),a		;11
-					;---- CH1: 88t
 	
 ch3 equ $+1				;misnomer, this is ch2
 	ld hl,#0000		;10	;and now, same as above but for ch2
+out3
+	out (link),a		;11
+					;---- CH1: 94t
+	
+
 	add hl,bc		;11
 	ld b,h			;4
 	ld c,l			;4	
-; phaseshift2 equ $+1
-; 	ld a,#80		;7
-; pwmswitch				;ch2 PWM effect switch
-; fastpwmswitch equ $+1			;ch2 fastPWM/auto chord switch
-; 	add a,#0		;7	;add a,n = #c6; adc a,n = #ce	TODO: synced duty manip
 
+					;Duty Modulation FX
 					;and 0, xor/add = regular mode
 					;and n, xor = synced pwm mod  --> 7xx: xx=0 off, xx < #7f fast pwm, xx > #7f synced pwm
 					;and n, add = SID/PWM   --> 5xx w/ xx > #80 -> n = xx&#7f (so 581 would be regular SID)
@@ -344,7 +343,7 @@ pan2 equ $+1
 	and lp_on		;7
 out2
 	out (link),a		;11
-					;---- CH3: 93t
+					;---- CH3: 83t
 readkeys				;check if a key has been pressed
 	in a,(kbd)		;11
 	cpl			;4	;COULD IN THEORY OPTIMIZE THIS AWAY
@@ -356,6 +355,7 @@ reentry
 
 	dec e			;4	;update timer - slightly inefficient, but faster on average than dec de\ld a,d\or e, and gives better sound
 	jp nz,playnote		;10
+				;100+75+94+83 = 352t
 
 	dec d				;update timer hi-byte
 xFX equ $+1

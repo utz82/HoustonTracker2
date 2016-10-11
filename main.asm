@@ -1318,7 +1318,8 @@ baseCounterLUT			;counter values for octave 6, all other counter values are deri
 
 	;dw #4000, #43CE, #47D6, #4C1C, #50A3, #556E, #5A83, #5FE4, #6598, #6BA3, #7209, #78D1
 	;dw #2000, #21E7, #23EB, #260E, #2851, #2AB7, #2D41, #2FF2, #32CC, #35D1, #3905, #3C68
-	dw #14b8, #15f3, #1741, #18a3, #1a1a, #1ba8, #1d4d, #1f0b, #20e3, #22d8, #24ea, #271c
+	;dw #14b8, #15f3, #1741, #18a3, #1a1a, #1ba8, #1d4d, #1f0b, #20e3, #22d8, #24ea, #271c
+	dw #1f6f, #214e, #2349, #2562, #279b, #29f6, #2c74, #2f19, #31e6, #34de, #3802, #3b57
 
 font
 	include "font3.asm"
