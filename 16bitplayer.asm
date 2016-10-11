@@ -307,11 +307,34 @@ ch3 equ $+1				;misnomer, this is ch2
 	add hl,bc		;11
 	ld b,h			;4
 	ld c,l			;4	
+; phaseshift2 equ $+1
+; 	ld a,#80		;7
+; pwmswitch				;ch2 PWM effect switch
+; fastpwmswitch equ $+1			;ch2 fastPWM/auto chord switch
+; 	add a,#0		;7	;add a,n = #c6; adc a,n = #ce	TODO: synced duty manip
+
+					;and 0, xor/add = regular mode
+					;and n, xor = synced pwm mod  --> 7xx: xx=0 off, xx < #7f fast pwm, xx > #7f synced pwm
+					;and n, add = SID/PWM   --> 5xx w/ xx > #80 -> n = xx&#7f (so 581 would be regular SID)
+					;add n, add = fastPWM/auto chord	
+					
+					;<=580: dutyModSwitch1 = [AND N, dutyModSwitch2 = XOR/ADD N,] dutyMod = 0, phaseShift = xx
+					;>580: dutyModSwitch1 = [AND N, dutyModSwitch2 = ADD N,] dutyMod = xx&#7f
+					
+					;=700: dutyModSwitch1 = AND N, dutyModSwitch2 = ADD N, dutyMod = 0, sync on [, phaseShift = #80]
+					;<780: dutyModSwitch1 = ADD N, dutyModSwitch2 = ADD N, dutyMod = xx, sync off
+					;>=780: dutyModSwitch1 = AND N, dutyModSwitch2 = XOR N, dutyMod = xx - #7f, sync on
+					
+					;add n, xor = also valid, but for what?
+syncSwitch					
+	sbc a,a			;4	;supply sync with main osc for duty modulation fx (sub a,a = #97; sbc a,a = #9f)
+dutyModSwitch1
+dutyMod equ $+1
+	and #0			;7	;and n = #e6; add a,n = #c6
+dutyModSwitch2
 phaseshift2 equ $+1
-	ld a,#80		;7
-pwmswitch				;ch2 PWM effect switch
-fastpwmswitch equ $+1			;ch2 fastPWM/auto chord switch
-	add a,#0		;7	;add a,n = #c6; adc a,n = #ce
+	add a,#80		;7	;add a,n = #c6; xor n = #ee
+	
 	ld (phaseshift2),a	;13	
 	cp b			;4
 mute2
@@ -321,7 +344,7 @@ pan2 equ $+1
 	and lp_on		;7
 out2
 	out (link),a		;11
-					;---- CH3: 89t
+					;---- CH3: 93t
 readkeys				;check if a key has been pressed
 	in a,(kbd)		;11
 	cpl			;4	;COULD IN THEORY OPTIMIZE THIS AWAY
@@ -620,6 +643,29 @@ fx4					;duty cycle ch1
 	jr c,Askip
 	ld a,4				;else, activate noise mode (A01)
 	jr Afast
+	
+fxA					;ch1 "glitch" effect
+	ld a,(de)
+	or a
+	jr z,Askip
+	dec a
+	ld a,5
+	jr nz,Afast
+
+	dec a
+Afast
+	ld (fxswap2),a
+	ld a,#cb
+	ld (fxswap1),a
+	jp fxcont
+Askip
+	;xor a
+	;ld (fxswap1),a
+	;ld (fxswap2),a
+	ld hl,0
+	ld (fxswap1),hl
+	jp fxcont
+	
 
 fx5					;duty cycle ch2
 	ld a,(de)
@@ -627,13 +673,17 @@ fx5					;duty cycle ch2
 	jr nc,_activatePWM
 	
 	ld (phaseshift2),a		;set duty
-	ld a,#c6			;deactivate pwm sweep
-	ld (pwmswitch),a	
+	xor a
+	ld (dutyMod),a			;reset duty modulator
+	;ld a,#c6			;deactivate pwm sweep
+	;ld (pwmswitch),a	
 	jp fxcont
 	
 _activatePWM
-	ld a,#ce
-	ld (pwmswitch),a
+	;ld a,#ce
+	;ld (pwmswitch),a
+	and #7f
+	ld (dutyMod),a
 	jp fxcont
 	
 fx6					;duty cycle ch3
@@ -643,8 +693,45 @@ fx6					;duty cycle ch3
 	
 fx7
 	ld a,(de)
-	ld (fastpwmswitch),a
-	jp fxcont	
+	or a
+	jr nz,_activate
+	
+	ld (dutyMod),a
+	ld a,#e6
+	ld (dutyModSwitch1),a
+	ld a,#c6
+	ld (dutyModSwitch2),a
+	ld a,#9f
+	ld (syncSwitch),a
+	jp fxcont
+	
+_activate
+	cp #80
+	jr c,_autochord
+	
+	sub #7f
+	ld (dutyMod),a
+	ld a,#e6
+	ld (dutyModSwitch1),a
+	ld a,#ee
+	ld (dutyModSwitch2),a
+	ld a,#9f
+	ld (syncSwitch),a
+	jp fxcont
+	
+	
+_autochord
+	ld (dutyMod),a
+	ld a,#c6
+	ld (dutyModSwitch1),a
+	ld (dutyModSwitch2),a
+	ld a,#97
+	ld (syncSwitch),a
+	jp fxcont
+	
+; 	ld a,(de)
+; 	ld (fastpwmswitch),a
+; 	jp fxcont	
 	
 fx8					;execute note table ch2
 	ld a,(de)
@@ -669,27 +756,7 @@ fx9					;ch3 "glitch" effect
 	ld (pitchslide+1),a
 	jp fxcont
 
-fxA					;ch1 "glitch" effect
-	ld a,(de)
-	or a
-	jr z,Askip
-	dec a
-	ld a,5
-	jr nz,Afast
 
-	dec a
-Afast
-	ld (fxswap2),a
-	ld a,#cb
-	ld (fxswap1),a
-	jp fxcont
-Askip
-	;xor a
-	;ld (fxswap1),a
-	;ld (fxswap2),a
-	ld hl,0
-	ld (fxswap1),hl
-	jp fxcont
 
 fxC					;note cut ch1
 	ld a,(de)
@@ -1009,9 +1076,16 @@ resetFX2
 	ld a,lp_off
 	ld (maskD),a
 
-resetFX3	
-	ld a,#c6			;reset pwm sweep	
-	ld (pwmswitch),a		
+resetFX3
+	ld a,#9f
+	ld (syncSwitch),a
+	
+	ld a,#e6			;reset ch2 duty modulation setting 1
+	ld (dutyModSwitch1),a
+	
+	ld a,#c6			;reset ch2 duty modulation setting 2	
+	;ld (pwmswitch),a
+	ld (dutyModSwitch2),a		
 	
 	ld a,#03			;reset drum counter mode
 	ld (drumswap),a
@@ -1022,7 +1096,8 @@ resetFX3
 	ld (pitchslide),a
 	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
-	ld (fastpwmswitch),a		;reset fastpwm
+	;ld (fastpwmswitch),a		;reset fastpwm
+	ld (dutyMod),a			;reset ch2 duty modulator
 				
 	ld hl,noXFX			;reset extended FX
 	ld (xFX),hl

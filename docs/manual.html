@@ -1079,8 +1079,9 @@
       <td>5xx</td>
         <td>DUTY CYCLE/ SWEEP CH2</td>
         <td>Set the duty cycle for channel 2, or enable duty cycle sweep.<br>
-	    xx <= 0x80 - set duty cycle and disable duty cycle sweep. A value of 0x80 produces the default 50:50 wave. Very low/high values will cause glitches.<br>
-	    xx > 0x80 - enable SID-style duty cycle sweep.<br>
+	    xx <= 0x80 - set duty cycle and disable duty cycle sweep. A value of 0x80 produces the default 50:50 wave. Very low values will cause glitches.<br>
+	    xx > 0x80 - enable SID-style duty cycle sweep. Sweep speed = (xx & 0x7F), 581 will produce the classic sweep effect known from HT versions &lt;= 2.20.<br>
+	    Some parameters are shared with effect 7xx, hence these two effects impact each other.
 	</td>
       </tr>
       <tr>
@@ -1094,8 +1095,11 @@
       <td>7xx</td>
         <td>AUTO CHORD CH2</td>
         <td>Add a chord effect to channel 2.<br>
-	    The chord created varies depending on the note used, and is not necessarily harmonic.<br>
-	    xx can be any value, 700 turns off the effect. HINT: Try 780 with channel 2 duty cycle sweep enabled.<br>
+	    xx &lt; 0x80 - enable unsynced auto chord. The chord created varies depending on the note used, and is not necessarily harmonic.<br>
+	    xx &gt;= 0x80 - enable synced auto chord. This will produce an octave chord, depending to some extend on the current duty setting.
+	    A higher value for xx will generally produce stronger harmonics.<br>
+	    700 switches off the effect.<br>
+	    Some parameters are shared with effect 5xx, hence these two effects impact each other. See the description of effect 5xx for details.<br>
 	</td>
       </tr>
       <tr>

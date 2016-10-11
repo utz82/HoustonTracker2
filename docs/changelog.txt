@@ -1,4 +1,19 @@
 
+version 2.21.00
+===============
+
+NEW/CHANGES
+
+- note table tuned to 440 Hz (and many notes produce more useful noise fx as a result)
+- ch2 duty sweep (5xx, xx > 0x80) now has a configurable parameter (xx & 0x7f)
+- effect 7xx (auto-chord) now has two modes: unsynced (regular) and synced (octave chord)
+
+BUGFIXES
+
+- fixed user drum input glitch
+
+
+
 version 2.20
 ==================
 

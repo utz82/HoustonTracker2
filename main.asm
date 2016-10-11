@@ -1,5 +1,5 @@
 ;************************************************************************************
-;HOUSTONTRACKER 2.20.00
+;HOUSTONTRACKER 2.21.00
 ;by utz * irrlichtproject.de/houston
 ;************************************************************************************
 
@@ -33,7 +33,7 @@ IF MODEL = TI8XS
 include "_include/ti8xs.inc"
 ENDIF
 
-	db "HT 2.20", 0
+	db "HT 2.21", 0
 
 ;************************************************************************************
 ;APD_BUF scratch pad and other equates
@@ -1317,7 +1317,8 @@ hex2FF					;replace hex digit with - (dash)
 baseCounterLUT			;counter values for octave 6, all other counter values are derived from this
 
 	;dw #4000, #43CE, #47D6, #4C1C, #50A3, #556E, #5A83, #5FE4, #6598, #6BA3, #7209, #78D1
-	dw #2000, #21E7, #23EB, #260E, #2851, #2AB7, #2D41, #2FF2, #32CC, #35D1, #3905, #3C68
+	;dw #2000, #21E7, #23EB, #260E, #2851, #2AB7, #2D41, #2FF2, #32CC, #35D1, #3905, #3C68
+	dw #14b8, #15f3, #1741, #18a3, #1a1a, #1ba8, #1d4d, #1f0b, #20e3, #22d8, #24ea, #271c
 
 font
 	include "font3.asm"
