@@ -187,10 +187,6 @@ rdnotesRP				;entry point for RowPlay
 		
 	or h			;4	;deactivate pitch slide and table execution on rest notes, else activate	
 	ld i,a			;9	;(de)activate table execution
-	jr z,_skip		;12/7
-	ld a,#eb		;7	;activate slide (#eb = ex de,hl)
-_skip
-	ld (slideswitch),a	;13
 	
 	pop de			;10	;fx ptn pointer to de
 	ld a,(de)		;7	;read drum/fx cmd
@@ -213,12 +209,14 @@ fxreturn
 	push de			;11	;stack 2			
 	push bc			;11	;stack 3
 
-	ld bc,0			;10	;BC' is add value for ch2, zero it
+ch3 equ $+1				;misnomer, this is ch2
+	ld bc,0			;10	;BC' is base divider value for ch2
+	ld hl,0			;10	;reset ch3 accu
 
 xtab equ $+2
 	ld ix,ptn00		;14	;pattern pointer for "execute note table" effect
 
-ch2 equ $+1
+ch2 equ $+1				;misnomer, this is ch3
 	ld de,0			;10	;DE' holds the base counter for ch3
 
 	ld iy,0			;14	;IY is the add value for ch3, zero it
@@ -269,6 +267,7 @@ panD equ $+1
 
 outdr	
 	ex af,af'		;4
+	
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
 phaseshift1 equ $+1
 	ld a,#80		;7	;set duty
@@ -282,10 +281,25 @@ pan1 equ $+1
 	exx			;4	;back to the normal register set
 out1
 	out (link),a		;11	;output state ch1
-					;----- DRUMS: 75/75t
+					;----- DRUMS: 77/77t
 					
 	
 	add iy,de		;15	;update counter ch3
+	jr nc,noSlideShift	;7
+	
+	ld a,e			;4
+slideDirectionA
+pitchslide equ $+1
+	add a,0			;7	;add a,n = #ce, sub n = #d6
+	ld e,a			;4
+	
+slideDirectionB
+	adc a,d			;4	;sbc a,a	;adc a,d; sub e = #938a | sbc a,a; add a,d = #829f
+	sub e			;4	;add a,d
+	ld d,a			;4
+					;34		;+34 -25 = +9t	but 18t saved because HL' is now single-use!!!
+
+noShiftRet
 phaseshift3 equ $+1			;switch for phase shift/set duty cycle
 	ld a,#80		;7	
 	cp iyh			;8
@@ -294,24 +308,15 @@ mute3
 	or lp_off		;7
 pan3 equ $+1
 	and lp_on		;7	;and thus we derive the output state
-pitchslide equ $+1
-	ld hl,0			;10	;switch for pitch slide
-	add hl,de		;11
-slideswitch
-	ex de,hl		;4	;#eb = ex de,hl || nop (when initial DE = 0)
-	
-ch3 equ $+1				;misnomer, this is ch2
-	ld hl,#0000		;10	;and now, same as above but for ch2
 out3
 	out (link),a		;11
-					;---- CH1: 94t
-	
+					;---- CH1: 93t
 
-	add hl,bc		;11
-	ld b,h			;4
-	ld c,l			;4	
+	add hl,bc		;11	;add counters ch2
 
-					;Duty Modulation FX
+syncSwitch				;ch2 Duty Modulation FX	
+	sbc a,a			;4	;supply sync with main osc for duty modulation fx (sub a,a = #97; sbc a,a = #9f)
+					
 					;and 0, xor/add = regular mode
 					;and n, xor = synced pwm mod  --> 7xx: xx=0 off, xx < #7f fast pwm, xx > #7f synced pwm
 					;and n, add = SID/PWM   --> 5xx w/ xx > #80 -> n = xx&#7f (so 581 would be regular SID)
@@ -325,8 +330,6 @@ out3
 					;>=780: dutyModSwitch1 = AND N, dutyModSwitch2 = XOR N, dutyMod = xx - #7f, sync on
 					
 					;add n, xor = also valid, but for what?
-syncSwitch					
-	sbc a,a			;4	;supply sync with main osc for duty modulation fx (sub a,a = #97; sbc a,a = #9f)
 dutyModSwitch1
 dutyMod equ $+1
 	and #0			;7	;and n = #e6; add a,n = #c6
@@ -335,15 +338,15 @@ phaseshift2 equ $+1
 	add a,#80		;7	;add a,n = #c6; xor n = #ee
 	
 	ld (phaseshift2),a	;13	
-	cp b			;4
+	cp h			;4
 mute2
 	sbc a,a			;4
 	or lp_off		;7
 pan2 equ $+1
 	and lp_on		;7
 out2
-	out (link),a		;11
-					;---- CH3: 83t
+	out (link),a		;11*
+					;---- CH3: 75t
 readkeys				;check if a key has been pressed
 	in a,(kbd)		;11
 	cpl			;4	;COULD IN THEORY OPTIMIZE THIS AWAY
@@ -355,16 +358,21 @@ reentry
 
 	dec e			;4	;update timer - slightly inefficient, but faster on average than dec de\ld a,d\or e, and gives better sound
 	jp nz,playnote		;10
-				;100+75+94+83 = 352t
+				;345
 
 	dec d				;update timer hi-byte
 xFX equ $+1
-	jp nz,noXFX
-
+	jp nz,noXFX			;execute extended fx if present, and jump @playnote -> should become jp nz,playnote for all cases that don't change HL'
+					;TODO: preserve HL' under all costs
 oldSP equ $+1
 	ld sp,0				;retrieve SP
 rowplaySwap equ $+1			;switch for jumping to exitRowplay instead
 	jp rdnotes
+
+;*************************************************************************************
+noSlideShift
+	jr _aa			;12
+_aa	jp noShiftRet		;10+12=34
 
 ;*************************************************************************************
 noteCut					;note cut effect for ch1
@@ -382,10 +390,12 @@ nLengthBackup equ $+1
 	
 ;*************************************************************************************
 execTable				;execute note table effect ch3
+					;TODO: preserve HL'?
 
 	ld a,i				;skip table execution on rests
 	jr z,playnote
-	exx		
+	exx
+	ld (_HLrestore),hl		
 	ld h,HIGH(NoteTab)		;point to frequency table
 	ld a,(ix+0)			;read note byte
 	inc ix				;inc pattern pointer
@@ -394,6 +404,8 @@ execTable				;execute note table effect ch3
 	ld e,(hl)
 	inc l
 	ld d,(hl)
+_HLrestore equ $+1
+	ld hl,0
 	exx
 
 	jp playnote			;resume playback
@@ -404,7 +416,8 @@ keyPressed
 	ld sp,(oldSP)
 	
 	push de				;preserve all counters
-	push bc
+	push bc				;TODO: push HL'/pop HL'
+	push hl
 	exx
 	push de
 	push hl
@@ -421,6 +434,7 @@ keyPressed
 	pop hl
 	pop de
 	exx
+	pop hl
 	pop bc
 	pop de
 
@@ -624,16 +638,19 @@ pchD
 fx2					;pitch slide up
 	ld a,(de)
 	ld (pitchslide),a
+	ld a,#ce
+	ld (slideDirectionA),a
+	ld hl,#938a
+	ld (slideDirectionB),hl
 	jp fxcont
 	
 fx3					;pitch slide down
 	ld a,(de)
 	ld (pitchslide),a
-	or a
-	jr z,_skip
-	ld a,#ff
-_skip
-	ld (pitchslide+1),a
+	ld a,#d6
+	ld (slideDirectionA),a
+	ld hl,#829f
+	ld (slideDirectionB),hl
 	jp fxcont	
 
 fx4					;duty cycle ch1
@@ -729,9 +746,6 @@ _autochord
 	ld (syncSwitch),a
 	jp fxcont
 	
-; 	ld a,(de)
-; 	ld (fastpwmswitch),a
-; 	jp fxcont	
 	
 fx8					;execute note table ch2
 	ld a,(de)
@@ -753,7 +767,7 @@ fx8					;execute note table ch2
 	
 fx9					;ch3 "glitch" effect
 	ld a,(de)
-	ld (pitchslide+1),a
+	;ld (pitchslide+1),a		;TODO: this doesn't work anymore!
 	jp fxcont
 
 
@@ -777,7 +791,7 @@ disableExt				;disable extended effects (8xx, Cxx)
 	;exx
 	jp fxcont	
 	
-fxD					;set drum mode.
+fxD					;set drum mode.  TODO: instead of awkward jump, point HL to table, get offset, store
 	ld a,(de)
 	and #0f				;calculate jump
 	add a,a
@@ -1084,7 +1098,6 @@ resetFX3
 	ld (dutyModSwitch1),a
 	
 	ld a,#c6			;reset ch2 duty modulation setting 2	
-	;ld (pwmswitch),a
 	ld (dutyModSwitch2),a		
 	
 	ld a,#03			;reset drum counter mode
@@ -1094,9 +1107,7 @@ resetFX3
 	ld (fxswap1),a			;reset A0x fx
 	ld (fxswap2),a
 	ld (pitchslide),a
-	ld (pitchslide+1),a
 	ld (drumswap2),a		;reset drum value mode
-	;ld (fastpwmswitch),a		;reset fastpwm
 	ld (dutyMod),a			;reset ch2 duty modulator
 				
 	ld hl,noXFX			;reset extended FX
