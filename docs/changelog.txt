@@ -1,5 +1,5 @@
 
-version 2.21.10
+version 2.22.00
 ===============
 
 NEW/CHANGES
@@ -7,9 +7,12 @@ NEW/CHANGES
 - note table tuned to 440 Hz (and some notes produce more useful noise fx as a result)
 - ch2 duty sweep (5xx, xx > 0x80) now has a configurable parameter (xx & 0x7f)
 - effect 7xx (auto-chord) now has two modes: unsynced (regular) and synced (octave chord)
-- volume rebalance: ch1 and drums have slightly increased volume, ch3 is a little quieter
+- channel volumes rebalanced
 - slowed down ch3 slides, 3xx now works like 2xx (xx is no longer inverse)
-- 9xx temporarily disabled
+- 9xx no longer disables 2xx/3xx pitch slides
+- new effect: ch3 grind (enabled with 6xx, xx>0x80)
+- old Axx has been ditched
+- new Axx effect: set phase offset ch3
 
 BUGFIXES
 

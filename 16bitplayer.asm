@@ -188,6 +188,13 @@ rdnotesRP				;entry point for RowPlay
 	or h			;4	;deactivate pitch slide and table execution on rest notes, else activate	
 	ld i,a			;9	;(de)activate table execution
 	
+	or a
+	jr z,_disable9xx		;disable 9xx glitch effect on rests
+	ld a,#57			
+	
+_disable9xx
+	ld (ch3GlitchEnable),a
+	
 	pop de			;10	;fx ptn pointer to de
 	ld a,(de)		;7	;read drum/fx cmd
 	
@@ -211,15 +218,15 @@ fxreturn
 
 ch3 equ $+1				;misnomer, this is ch2
 	ld bc,0			;10	;BC' is base divider value for ch2
-	ld hl,0			;10	;reset ch3 accu
+	ld iy,0			;14	;reset ch2 accu
 
 xtab equ $+2
 	ld ix,ptn00		;14	;pattern pointer for "execute note table" effect
 
 ch2 equ $+1				;misnomer, this is ch3
 	ld de,0			;10	;DE' holds the base counter for ch3
-
-	ld iy,0			;14	;IY is the add value for ch3, zero it
+ch3Phase equ $+2
+	ld hl,0			;10	;reset ch3 accu
 	
 	exx			;4
 	push de			;11	;stack 4
@@ -257,7 +264,7 @@ muteD					;mute switch for drums
 	
 	ex af,af'		;4	;load output mask for drum channel
 	out (link),a		;11	;output drum channel state
-					;---- CH2: 100t	
+					;---- CH2: 96t	
 
 drumswap				;switch for drum mode. inc bc = #03, dec bc = #0b, inc c = #0c, dec c = #0d, nop	
 	inc bc			;6	;increment sample data pointer
@@ -279,13 +286,15 @@ pan1 equ $+1
 	and lp_on		;7
 
 	exx			;4	;back to the normal register set
+	add hl,de		;11	;update counter ch3
 out1
 	out (link),a		;11	;output state ch1
-					;----- DRUMS: 77/77t
+					;----- DRUMS: 88/88t
 					
-	
-	add iy,de		;15	;update counter ch3
-	jr nc,noSlideShift	;7
+	jr nc,noSlideShift	;12/7	
+					;TODO: put 8 cycles here, then there is time for a 20t effect in the wait subroutine
+ch3grind equ $+1
+	rlc a			;8	;#cb 07, swap with rlc d (#cb 02) for ???effect
 	
 	ld a,e			;4
 slideDirectionA
@@ -302,7 +311,7 @@ slideDirectionB
 noShiftRet
 phaseshift3 equ $+1			;switch for phase shift/set duty cycle
 	ld a,#80		;7	
-	cp iyh			;8
+	cp h			;8
 mute3
 	sbc a,a			;4	;result of this will be either #00 or #ff. for mute, swap #9f (sbc a,a) with #97 (sub a,a)
 	or lp_off		;7
@@ -310,9 +319,9 @@ pan3 equ $+1
 	and lp_on		;7	;and thus we derive the output state
 out3
 	out (link),a		;11
-					;---- CH1: 93t
+					;---- CH1: 82t
 
-	add hl,bc		;11	;add counters ch2
+	add iy,bc		;15	;add counters ch2
 
 syncSwitch				;ch2 Duty Modulation FX	
 	sbc a,a			;4	;supply sync with main osc for duty modulation fx (sub a,a = #97; sbc a,a = #9f)
@@ -336,17 +345,19 @@ dutyMod equ $+1
 dutyModSwitch2
 phaseshift2 equ $+1
 	add a,#80		;7	;add a,n = #c6; xor n = #ee
-	
-	ld (phaseshift2),a	;13	
-	cp h			;4
+	ld (phaseshift2),a	;13
+					;keycheck here wouldn't work, would need to reload A
+	cp iyh			;8
 mute2
 	sbc a,a			;4
 	or lp_off		;7
 pan2 equ $+1
 	and lp_on		;7
 out2
-	out (link),a		;11*
-					;---- CH3: 75t
+	exx			;4
+	
+	out (link),a		;11
+					;---- CH3: 87t
 readkeys				;check if a key has been pressed
 	in a,(kbd)		;11
 	cpl			;4	;COULD IN THEORY OPTIMIZE THIS AWAY
@@ -354,16 +365,16 @@ readkeys				;check if a key has been pressed
 	jr nz,keyPressed	;12/7	;and exit if necessary
 
 reentry	
-	exx			;4
+	
 
 	dec e			;4	;update timer - slightly inefficient, but faster on average than dec de\ld a,d\or e, and gives better sound
 	jp nz,playnote		;10
-				;345
+				;353
 
 	dec d				;update timer hi-byte
 xFX equ $+1
-	jp nz,noXFX			;execute extended fx if present, and jump @playnote -> should become jp nz,playnote for all cases that don't change HL'
-					;TODO: preserve HL' under all costs
+	jp nz,noXFX			;execute extended fx if present, and jump @playnote
+	
 oldSP equ $+1
 	ld sp,0				;retrieve SP
 rowplaySwap equ $+1			;switch for jumping to exitRowplay instead
@@ -371,8 +382,14 @@ rowplaySwap equ $+1			;switch for jumping to exitRowplay instead
 
 ;*************************************************************************************
 noSlideShift
-	jr _aa			;12
-_aa	jp noShiftRet		;10+12=34
+
+	ret c			;5	;timing, ret never taken
+ch3GlitchAdd equ $+1	
+	ld a,#0			;7	;disable = 0
+	add a,d			;4
+ch3GlitchEnable
+	ld d,a			;4	;#57, temporarily disable with nop
+	jp noShiftRet		;10+12=34
 
 ;*************************************************************************************
 noteCut					;note cut effect for ch1
@@ -659,28 +676,30 @@ fx4					;duty cycle ch1
 	cp #81				;if duty < #80, deactivate Axx
 	jr c,Askip
 	ld a,4				;else, activate noise mode (A01)
-	jr Afast
+;	jr Afast
 	
-fxA					;ch1 "glitch" effect
-	ld a,(de)
-	or a
-	jr z,Askip
-	dec a
-	ld a,5
-	jr nz,Afast
-
-	dec a
+;fxA					;ch1 "glitch" effect -> TODO: will become phase offset ch3
+; 	ld a,(de)
+; 	or a
+; 	jr z,Askip
+; 	dec a
+; 	ld a,5
+; 	jr nz,Afast
+;
+; 	dec a
 Afast
 	ld (fxswap2),a
 	ld a,#cb
 	ld (fxswap1),a
 	jp fxcont
 Askip
-	;xor a
-	;ld (fxswap1),a
-	;ld (fxswap2),a
 	ld hl,0
 	ld (fxswap1),hl
+	jp fxcont
+
+fxA
+	ld a,(de)			;set ch3 phase. Can be modified as follows: if bit 7 is set, interpret bits 0..6 as bitmask toggeling various fx
+	ld (ch3Phase),a
 	jp fxcont
 	
 
@@ -705,7 +724,19 @@ _activatePWM
 	
 fx6					;duty cycle ch3
 	ld a,(de)
+	cp #81
+	jr nc,_activateGrind
+
 	ld (phaseshift3),a
+	ld a,7
+	ld (ch3grind),a
+	jp fxcont
+
+_activateGrind
+	add a,a
+	ld (phaseshift3),a
+	ld a,2
+	ld (ch3grind),a
 	jp fxcont
 	
 fx7
@@ -767,10 +798,8 @@ fx8					;execute note table ch2
 	
 fx9					;ch3 "glitch" effect
 	ld a,(de)
-	;ld (pitchslide+1),a		;TODO: this doesn't work anymore!
+	ld (ch3GlitchAdd),a
 	jp fxcont
-
-
 
 fxC					;note cut ch1
 	ld a,(de)
@@ -1103,12 +1132,17 @@ resetFX3
 	ld a,#03			;reset drum counter mode
 	ld (drumswap),a
 	
+	ld a,#07			;reset ch3 grind fx
+	ld (ch3grind),a
+	
 	xor a
 	ld (fxswap1),a			;reset A0x fx
 	ld (fxswap2),a
 	ld (pitchslide),a
 	ld (drumswap2),a		;reset drum value mode
 	ld (dutyMod),a			;reset ch2 duty modulator
+	ld (ch3Phase),a			;reset ch3 phase offset
+	ld (ch3GlitchAdd),a		;reset ch3 fx 9xx
 				
 	ld hl,noXFX			;reset extended FX
 	ld (xFX),hl

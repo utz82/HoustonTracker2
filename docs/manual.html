@@ -1072,8 +1072,8 @@
       <td>4xx</td>
         <td>DUTY CYCLE/ NOISE CH1</td>
         <td>Set the duty cycle for channel 2, and toggle noise mode.<br>
-	   xx <= 0x80 - set duty cycle and disable noise mode (equivalent to additionally setting A00 command)<br>
-	   xx > 0x80 - set duty cycle and enable noise mode (equivalent to additionally setting A01 command).<br>
+	   xx <= 0x80 - set duty cycle and disable noise mode<br>
+	   xx > 0x80 - set duty cycle and enable noise mode<br>
 	</td>
       </tr>
       <tr>
@@ -1087,9 +1087,10 @@
       </tr>
       <tr>
       <td>6xx</td>
-        <td>DUTY CYCLE CH3</td>
-        <td>Set the duty cycle for channel 3.<br>
-	    xx can be any value, but very low/high values will cause glitches. A value of 0x80 produces the default 50:50 wave.<br>
+        <td>DUTY CYCLE/ GRIND CH3</td>
+        <td>Set the duty cycle for channel 3, and toggle grind mode.<br>
+	    xx <= 0x80 - set duty cycle and disable grind mode<br>
+	    xx > 0x80 - set duty cycle to (xx*2)&0xff and enable grind mode<br>
 	</td>
       </tr>
       <tr>
@@ -1116,22 +1117,29 @@
        <tr>
       <td>9xx</td>
         <td>GLITCH CH3</td>
-        <td>Add a nasty glitch effect to channel 3. Using this will disable effect 3xx.<br>
+        <td>Add a nasty glitch effect to channel 3.<br>
 	    xx can be any value, 900 turns off the effect.<br>
-	    NOTE: This effect has been disabled in the current beta.<br>
 	</td>
       </tr>
       <tr>
-        <td>A0x</td>
-        <td>ADD SFX CH1</td>
-        <td>Add a sound effect to channel 1.<br>
+        <td>Axx</td>
+        <td>CH3 PHASE</td>
+        <td>
+	  Set the phase offset for channel 3.<br>
+	  This has little effect on itself, but will cause interference when used together with another channel that plays the same note as ch3. In this case,
+	  it can be used as a primitive form of volume control.<br>
+	  xx can be any value, values around 0x80 will work best. A00 turns off the effect.
+	</td>
+<!--        <td>Add a sound effect to channel 1.<br>
 	   A00 deactivates the effect. Additionally, setting 4xx to a value &lt;= 0x80 will deactivate the A01 effect.<br>
 	   A01 adds noise or glitchy sounds to channel 1. The actual outcome depends on the current pitch of ch1. To some extend, it's also influenced by the
 	   currently active drum sound. It works best with high notes, especially A-5 and A-6.<br>
 	   A02 adds slight random inaccuracies to the pitch of channel 1. It has little effect by itself, but can be used to produce a phasing effect in 
 	   conjunction with other channels
 	   set to the same note as ch1. The effect does not work equally well on all pitches, namely it won't do anything on C notes.</td>
+-->
       </tr>
+
       <tr>
         <td>Bxy</td>
         <td>LOOP SECTION/ BREAK PTN</td>
