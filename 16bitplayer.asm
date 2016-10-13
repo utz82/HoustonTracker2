@@ -821,96 +821,45 @@ disableExt				;disable extended effects (8xx, Cxx)
 	jp fxcont	
 	
 fxD					;set drum mode.  TODO: instead of awkward jump, point HL to table, get offset, store
+	ld hl,drumModeTable1
 	ld a,(de)
-	and #0f				;calculate jump
-	add a,a
-	add a,a
-	ld (_jumpx),a
-_jumpx equ $+1
-	jr $
-
-_fxDx0
-	ld a,0				;nop (default)
-	jr _fxDxx
-_fxDx1
-	ld a,#27			;daa
-	jr _fxDxx
-_fxDx2
-	ld a,#8f			;add a,a
-	jr _fxDxx
-_fxDx3
-	ld a,#1f			;rra
-	jr _fxDxx
-_fxDx4
-	ld a,#2f			;cpl
-	jr _fxDxx
-_fxDx5
-	ld a,#79			;ld a,c
-	jr _fxDxx
-_fxDx6
-	ld a,#89			;add a,c
-	jr _fxDxx
-_fxDx7
-	ld a,#88			;add a,b
-	jr _fxDxx
-_fxDx8
-	ld a,#90			;sub b
-	jr _fxDxx
-_fxDx9
-	ld a,#91			;sub c
-	jr _fxDxx
-_fxDxa
-	ld a,#a0			;and b
-	jr _fxDxx
-_fxDxb
-	ld a,#a1			;and c
-	jr _fxDxx
-_fxDxc
-	ld a,#b0			;or b
-	jr _fxDxx
-_fxDxd
-	ld a,#b1			;or c
-	jr _fxDxx
-_fxDxe
-	ld a,#a8			;xor b
-	jr _fxDxx
-_fxDxf
-	ld a,#a9			;xor c
-
-_fxDxx
+	and #0f				;calculate offset
+	add a,l
+	ld l,a
+	ld a,(hl)
 	ld (drumswap2),a
+	
+	ld hl,drumModeTable2
 	ld a,(de)
+	cp #50
+	jr nc,_ignore
+	
 	and #70
-	cp #41				;if high nibble > 4, ignore
-	jp nc,fxcont
-	
-	ccf				;calculate jump
 	rra
 	rra
-	ld (_jump),a
-	
-_jump equ $+1
-	jr $
-
-_fxD0x
-	ld a,#03			;inc bc
-	jr _fxDyy	
-_fxD1x
-	ld a,#0b			;dec bc
-	jr _fxDyy	
-_fxD2x
-	ld a,#0c			;inc c
-	jr _fxDyy	
-_fxD3x
-	ld a,#0d			;dec c
-	jr _fxDyy
-_fxD4x
-	xor a				;nop
-
-_fxDyy
-	ld (drumswap),a					
+	rra
+	rra
+	add a,l
+	ld l,a
+	ld a,(hl)
+	ld (drumswap),a
+_ignore
 	jp fxcont
+	
+	
+IF ((HIGH($))<(HIGH($+15)))
+.ERROR drumModeTable1 crosses page
+ENDIF
+drumModeTable1
+	db #00, #27, #8f,     #1f, #2f, #79,    #89,     #88,     #90,   #91,   #a0,   #a1,  #b0,  #b1,  #a8,   #a9
+	;  nop  daa  add a,a  rra  cpl  ld c,a  add a,c  add a,b  sub b  sub c  and b  or b  or b  or c  xor b  xor c
 
+IF ((HIGH($))<(HIGH($+4)))
+.ERROR drumModeTable2 crosses page
+ENDIF	
+drumModeTable2
+	db #03,    #0b,    #0c,   #0d,   #00
+	;  inc bc  dec bc  inc c  dec c  nop	
 
 
 fxE					;reset all fx
