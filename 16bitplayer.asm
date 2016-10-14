@@ -272,8 +272,9 @@ panD equ $+1
 	xor lp_sw		;7	;toggle output mask	
 	ret c			;5	;43t, ret never taken
 
-outdr	
 	ex af,af'		;4
+outdr	
+	;ex af,af'		;4
 	
 	add hl,sp		;11	;add current counter to base freq.counter val. ch1 and save result in HL
 phaseshift1 equ $+1
@@ -292,9 +293,9 @@ out1
 					;----- DRUMS: 88/88t
 					
 	jr nc,noSlideShift	;12/7	
-					;TODO: put 8 cycles here, then there is time for a 20t effect in the wait subroutine
+
 ch3grind equ $+1
-	rlc a			;8	;#cb 07, swap with rlc d (#cb 02) for ???effect
+	rlc a			;8	;#cb 07, swap with rlc d (#cb 02) for "grind" effect
 	
 	ld a,e			;4
 slideDirectionA
@@ -467,10 +468,14 @@ counterSP equ $+1
 waitD
  	ex af,af'		;4	;load output mask for drum channel
  	out (link),a		;11	;output drum channel state
- 					;---- CH2: 100t	
-fxswap1
-fxswap2 equ $+1
-	dw 0			;8	;swap with rlc h (cb 04) for noise/glitch effect, with rlc l (cb 05) for phase effect
+ 					;---- CH2: 96t	
+	ex af,af'
+; fxswap1
+; fxswap2 equ $+1
+; 	dw 0			;8	;swap with rlc h (cb 04) for noise/glitch effect, with rlc l (cb 05) for phase effect
+; 					;TODO: could be optimized, rlc a to deactivate
+noiseEnable equ $+1
+	rlc a			;8	;switch for enabling ch1 noise effect. rlc a (cb 07) = off, rlc h (cb 04) = on, rlc l (cb 05) = pitch inacc. (usused)
 	jp outdr		;10
 				;15+18+10=43
 
@@ -673,9 +678,15 @@ fx3					;pitch slide down
 fx4					;duty cycle ch1
 	ld a,(de)
 	ld (phaseshift1),a
-	cp #81				;if duty < #80, deactivate Axx
-	jr c,Askip
-	ld a,4				;else, activate noise mode (A01)
+	cp #81				;if duty < #80, deactivate noise effect
+	ld a,7
+	;jr c,Askip
+	jr c,_disableNoise
+	ld a,4				;else, activate noise mode (formerly A01)
+	
+_disableNoise
+	ld (noiseEnable),a
+	jp fxcont
 ;	jr Afast
 	
 ;fxA					;ch1 "glitch" effect -> TODO: will become phase offset ch3
@@ -687,15 +698,16 @@ fx4					;duty cycle ch1
 ; 	jr nz,Afast
 ;
 ; 	dec a
-Afast
-	ld (fxswap2),a
-	ld a,#cb
-	ld (fxswap1),a
-	jp fxcont
-Askip
-	ld hl,0
-	ld (fxswap1),hl
-	jp fxcont
+
+; Afast
+; 	ld (fxswap2),a
+; 	ld a,#cb
+; 	ld (fxswap1),a
+; 	jp fxcont
+; Askip
+; 	ld hl,0
+; 	ld (fxswap1),hl
+; 	jp fxcont
 
 fxA
 	ld a,(de)			;set ch3 phase. Can be modified as follows: if bit 7 is set, interpret bits 0..6 as bitmask toggeling various fx
@@ -1083,10 +1095,11 @@ resetFX3
 	
 	ld a,#07			;reset ch3 grind fx
 	ld (ch3grind),a
+	ld (noiseEnable),a
 	
 	xor a
-	ld (fxswap1),a			;reset A0x fx
-	ld (fxswap2),a
+; 	ld (fxswap1),a			;reset A0x fx
+; 	ld (fxswap2),a
 	ld (pitchslide),a
 	ld (drumswap2),a		;reset drum value mode
 	ld (dutyMod),a			;reset ch2 duty modulator
