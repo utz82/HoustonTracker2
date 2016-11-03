@@ -21,12 +21,15 @@
 \usepackage{bm}
 \usepackage[toc,page]{appendix}
 \usepackage{alltt}
-
+\usepackage{marvosym}
+\newcommand*{\TakeFourierOrnament}[1]{{%
+\fontencoding{U}\fontfamily{futs}\selectfont\char#1}}
+\newcommand*{\danger}{\TakeFourierOrnament{66}}
 
 
 \begin{document}
 \title{HoustonTracker 2 Manual}
-\author{utz/irrlicht project}
+%\author{utz/irrlicht project}
 \date{\today}
 \maketitle
 \tableofcontents
@@ -94,9 +97,9 @@ Models marked as "not supported" have differences in architecture that would req
 
 
 \section{License}
-HoustonTracker 2 is free, open source software. It is released under a "revised" BSD-License. This means you're basically free to use, modify, and redistribute this software both in binary as well as source form, as long as you don't pretend that I endorse what you're doing, or try to hold me responsible for any damage done.
+HoustonTracker 2 is free, open source software. It is released under a "Revised" BSD-License. This means you're basically free to use, modify, and redistribute this software both in binary as well as source form, as long as you don't pretend that I endorse what you're doing, or try to hold me responsible for any damage done.
 
-The full license terms are as follows:
+The full license terms are as follows: \newline
 
 {\scriptsize
 \begin{verbatim}
@@ -183,9 +186,9 @@ All numbers in the HoustonTracker 2 user interface itself are hexadecimal, there
 & a suitable PC\textless-\textgreater Calc link cable, e.g. \href{https://education.ti.com/en/us/products/computer_software/connectivity-software/silver-usb-cable-for-windows-mac/features/features-summary}{TI SilverLink} (recommended), \href{http://guide.alibaba.com/shop/texas-instruments-instruments-ti-graphlink-serial-cable-for-windows_10284857.html}{TI GraphLink}, homemade \href{http://www.ticalc.org/hardware/cables/parallel.html}{parallel} or \href{http://www.ticalc.org/hardware/cables/serial.html}{serial} cable for data transfers
 & a 2.5mm (micro-)jack adapter/cable for sound
 \end{easylist}
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-.6\height}{\includegraphics{idea}} & You can use a cheap calc-to-calc link cable to make your own 2.5mm adapter. \\
-\raisebox{-.9\height}{\includegraphics{warn.jpg}} & The plastic base of many adapters is too thick to fit into TI's extra narrow socket. If that's the case, you need to carefully scrape off some plastic from the base of the jack until it fits. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\textcolor{black}{\newline\Huge\PointingHand} & You can use a cheap calc-to-calc link cable to make your own 2.5mm adapter. \\
+\Huge{\textcolor{red}{\newline\danger}} & The plastic base of many adapters is too thick to fit into TI's extra narrow socket. If that's the case, you need to carefully scrape off some plastic from the base of the jack until it fits. \\
 \end{tabularx}
 
 \subparagraph{Software} ~\\
@@ -202,21 +205,21 @@ TI-82 & \href{http://www.ticalc.org/pub/82/asm/shells/crashsdk.zip}{CrASH 1.6} \
 TI-82 Parcus & \href{http://www.ticalc.org/pub/82/asm/shells/crash19006.zip}{CrASH\_19.006} \\
 TI-83, TI-82Stats & \href{http://www.ticalc.org/pub/83/asm/shells/ion16u.zip}{Ion 1.6U} \\
 TI-83 Plus, TI-84 Plus & \href{http://dcs.cemetech.net/}{Doors CS 7} \\
-\end{tabularx}
+\end{tabularx} ~\\
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-.5\height}{\includegraphics{warn.jpg}} & HT2 is not compatible with MirageOS. \\
-\raisebox{-1\height}{\includegraphics{idea}} & If you don't own a TI calc, you can run HT2 on an emulator. The beta version of tilem2 is recommended. A Win32 installer can be found \href{http://tilem.sourceforge.net/beta/tilem-2.1-beta-20161022.exe}{here}, *nix users can obtain the development version via \emph{svn checkout https://tilem.svn.sourceforge.net/svnroot/tilem/trunk tilem}. You need to have TiLP installed in any case. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\Huge{\textcolor{red}{\danger}} & HT2 is not compatible with MirageOS. \\
+\Huge{\textcolor{black}{\newline\PointingHand}} & If you don't own a TI calc, you can run HT2 on an emulator. The beta version of tilem2 is recommended. A Win32 installer can be found \href{http://tilem.sourceforge.net/beta/tilem-2.1-beta-20161022.exe}{here}, *nix users can obtain the development version via \emph{svn checkout https://tilem.svn.sourceforge.net/svnroot/tilem/trunk tilem}. You need to have TiLP installed in any case. \\
 \end{tabularx}
-
 
 \section{Installation}
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-1\height}{\includegraphics{warn.jpg}} & \textbf{\textcolor{red}{After installing HoustonTracker 2, your calculator will not be able to perform most of its regular tasks until HT2 is removed. Do not install HT2 if you need to use your calculator for regular work, such as in school or university.}} \\
-\end{tabularx}
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\Huge{\textcolor{red}{\newline\danger}} & \textbf{\textcolor{red}{After installing HoustonTracker 2, your calculator will not be able to perform most of its regular tasks until HT2 is removed. Do not install HT2 if you need to use your calculator for regular work, such as in school or university.}} \\
+\end{tabularx} ~\\
 
 The following instructions assume that you have TiLP installed on your computer. If you are using another linking program, then you probably know what to do...
 
+\newpage
 \subparagraph{Installing on TI82/82 Parcus} ~\\
 
 \begin{easylist}
@@ -230,8 +233,8 @@ The following instructions assume that you have TiLP installed on your computer.
 & Assuming all went good, you can now put your calc in transmission mode again, and send ("File"-\textgreater"Send Files") ht2.82p (regular) resp. ht2p.82p (Parcus).
 \end{easylist} ~\\
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-1\height}{\includegraphics{warn.jpg}} & \textbf{\textcolor{red}{If you intend to use a SilverLink cable in conjunction with a TI-82, do not install the official TI connectivity software on your computer. If you currently have TI Connect installed, or had it installed in the past, make sure you fully remove all of its components, especially the USB driver that came with it.}} \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\Huge{\textcolor{red}{\newline\danger}} & \textbf{\textcolor{red}{If you intend to use a SilverLink cable in conjunction with a TI-82, do not install the official TI connectivity software on your computer. If you currently have TI Connect installed, or had it installed in the past, make sure you fully remove all of its components, especially the USB driver that came with it.}} \\
 \end{tabularx} ~\\
 
 
@@ -259,12 +262,9 @@ The following instructions assume that you have TiLP installed on your computer.
 & Assuming all went good, you can now send ("File"-\textgreater"Send Files") ht2.8xp.
 \end{easylist} ~\\
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.6\height}{\includegraphics{idea}} & If you don't have enough free memory because you have a large number of archived apps, you can install ht2s.8xp instead. \\
-\end{tabularx} ~\\
-
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-1\height}{\includegraphics{idea}} & For faster access, you can use TiLP in GUI-less mode. To do so, open a command prompt (cmd.exe on Win or any shell on *nix), and enter the following command: \newline
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\textcolor{black}{\newline\Huge\PointingHand} & If you don't have enough free memory because you have a large number of archived apps, you can install ht2s.8xp instead. \\
+\Huge\textcolor{black}{\newline\PointingHand} & For faster access, you can use TiLP in GUI-less mode. To do so, open a command prompt (cmd.exe on Win or any shell on *nix), and enter the following command: \newline
 
 \verb+tilp [calc-model] [cable-model] [filename]+ \newline
 
@@ -272,6 +272,8 @@ So, to send HT2 to your TI83 Plus via a SilverLink cable, you would type \newlin
 
 \verb-tilp ti83+ SilverLink ht2.8xp-  \\
 \end{tabularx} ~\\
+
+
 
 
 \section{Running HT2}
@@ -284,13 +286,10 @@ Once you've successfully installed HT2, running it is very simple.
 & Make sure HoustonTracker 2 is highlighted, and press \textbf{[ENTER]} again. Unless an error occured, HT2 is now running.
 \end{easylist} ~\\
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-1\height}{\includegraphics{warn.jpg}} & Always plug in headphones after you have started HT2, and remove them before you quit the editor. Having headphones plugged in while HT2 is not running will massively slow down the calculator. (In case you accidentally plugged in headphones at the wrong time, don't panic - the calculator hasn't crashed, it's just very slow.) \\
-\end{tabularx} ~\\
-
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.6\height}{\includegraphics{warn.jpg}} & On TI83/8x Plus, booting and shutting down HT2 may take up to 10 seconds. \\
-\end{tabularx} ~\\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\Huge{\textcolor{red}{\newline\danger}} & Always plug in headphones after you have started HT2, and remove them before you quit the editor. Having headphones plugged in while HT2 is not running will massively slow down the calculator. (In case you accidentally plugged in headphones at the wrong time, don't panic - the calculator hasn't crashed, it's just very slow.) \\
+\textcolor{red}{\newline\Huge\danger} & On TI83/8x Plus, booting and shutting down HT2 may take up to 10 seconds. \\
+\end{tabularx}
 
 
 
@@ -300,16 +299,16 @@ The following section will explain how to get started with HoustonTracker 2 in 1
 
 \paragraph{Step 1} Start Houston Tracker, and plug in your audio/headphone cable. Check \autoref{sec:running} if you can't figure out how to do that.
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.6\height}{\includegraphics{warn.jpg}} & Always plug in headphones \emph{after} you've started HT2, and unplug them before you quit. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\textcolor{red}{\newline\Huge\danger} & Always plug in headphones \emph{after} you've started HT2, and unplug them before you quit. \\
 \end{tabularx} ~\\
 
 \paragraph{Step 2} Activate AutoInc mode by pressing \textbf{[MODE]}. Now, let's enter some patterns into the song sequence. To do so, press the following keys: \textbf{[0], [0], [0], [1], [0], [2], [0], [0]}. Your main screen should now look like this:
 
 {\includegraphics{tut1}} \newline
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.6\height}{\includegraphics{warn.jpg}} & Always fill all four positions of a sequence row to avoid glitches and unwanted effects. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\textcolor{red}{\newline\Huge\danger} & Always fill all four positions of a sequence row to avoid glitches and unwanted effects. \\
 \end{tabularx} ~\\
 
 \paragraph{Step 3} Move the cursor up to the first position in the sequence again. Now press \textbf{[2nd]}. This will bring up the pattern screen. \newline
@@ -337,7 +336,9 @@ The following section will explain how to get started with HoustonTracker 2 in 1
 \section{Keys}
 \label{sec:keys}
 
+\begin{center}
 {\includegraphics[width=0.75\textwidth]{keymap.jpg}} \newline
+\end{center}
 
 \newpage
 \begin{longtable}{p{0.35\textwidth} p{0.6\textwidth} }
@@ -417,6 +418,7 @@ The following section will explain how to get started with HoustonTracker 2 in 1
 \textbf{[ALPHA][\(\bm{-}\)]} & \textbf{DELete} the current \textbf{ROW}. \\
 \textbf{[\(\bm{+}\)]} & \textbf{PUT} the \textbf{NEXT} unused \textbf{FREE} pattern in sequence at the current position. \\
 \textbf{[ALPHA][\(\bm{+}\)]} & \textbf{CLoNe} the current \textbf{PaTterN} and insert the clone at the current cursor position. \\
+\hline
 \end{longtable}
 
 
@@ -434,8 +436,8 @@ The playback indicators are located directly below the HT2 logo. The first posit
 
 The AutoInc/RowPlay indicators tell you whether the auto-incrementing and RowPlay functions are currently activated. They are located in the lower third of the right screen side, just below the the global variables. The AutoInc indicator displays "A0" when auto-incrementing is deactivated (default), and A1 when activated. Auto-incrementing means that after you enter a value or note in HT2, the cursor will automatically advance to the next position. You can toggle AutoInc with key \textbf{[MODE]}. The RowPlay indicator tells you whether RowPlay mode is currently active. If so, it will display the capital letter P. When entering a note, HT2 will automatically play the current pattern position (including all channels that are not muted). You can toggle RowPlay by pressing \textbf{[ALPHA], [MODE]}. \newline
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-1\height}{\includegraphics{warn.jpg}} & RowPlay mode can't reliably detect all effect settings that apply to the current position, so depending on the circumstances, it may not reflect how the position will actually sound when the whole song is played back. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\Huge{\textcolor{red}{\newline\danger}} & RowPlay mode can't reliably detect all effect settings that apply to the current position, so depending on the circumstances, it may not reflect how the position will actually sound when the whole song is played back. \\
 \end{tabularx} ~\\
 
 Below the AutoInc/RowPlay indicators, there is the general purpose message area. Here, various important messages will be displayed, such as occuring errors, or requests for the user to confirm an action. Confirming is done with key \textbf{[.]}, cancelling is done with key \textbf{[0]}. 
@@ -450,8 +452,8 @@ Any number in the range of 0x01 - 0x3F will set the number of ticks directly. Ad
 
 To set the user drum pointer, press \textbf{[ALPHA], [TRACE]}, followed by a 4-digit hex number. See the section on \nameref{sec:drums} for details about the user drum pointer. \newline
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.6\height}{\includegraphics{warn.jpg}} & Changes to the global variables are not effective until you restart the player. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+{\textcolor{red}{\newline\Huge\danger}} & Changes to the global variables are not effective until you restart the player. \\
 \end{tabularx} ~\\
 
 
@@ -465,18 +467,18 @@ The first 3 columns represent the 3 tone channels, ie. they contain \hyperref[se
 
 \paragraph{Moving around on the sequence screen} Keys \textbf{[\(\medblacktriangleup\)], [\(\medblacktriangledown\)], [\(\medblacktriangleleft\)]}, and \textbf{[\(\medblacktriangleright\)]} move the cursor around on the sequence screen. Pressing \textbf{[ALPHA], [\(\medblacktriangleleft\)]} resp. \textbf{[ALPHA], [\(\medblacktriangleright\)]} will move the cursor up/down by 10 rows. Pressing \textbf{[ALPHA], [\(\medblacktriangleup\)]} will move the cursor to the start of the sequence. Likewise, pressing \textbf{[ALPHA], [\(\medblacktriangleup\)]} mode will move the cursor to the end of the sequence.
 
-\paragraph{Editing the sequence} Use keys \textbf{[0]..[9]} and A..F (\textbf{[MATH], [MATRX]} resp. \textbf{[APPS], [PRGM], [$\bm{x^{-1}}$], [SIN]}, and \textbf{[COS]}) to enter pattern numbers. You can have a maximum of 128 note patterns, and 64 fx patterns, so the highest pattern numbers are 0x7F and 0x3F respectively. Note patterns are shared across all 3 tone channels, so you can use any note pattern on any channel. If you try to enter an invalid pattern number, HT2 will automatically replace it with an arbitrary valid one. \newline
+\paragraph{Editing the sequence} Use keys \textbf{[0]..[9]} and A..F (\textbf{[MATH], [MATRX]} resp. \textbf{[APPS], [PRGM], [$\bm{x^{-1}}$], [SIN]}, and \textbf{[COS]}) to enter pattern numbers. You can have a maximum of 128 note patterns, and 64 fx patterns, so the highest pattern numbers are 0x7F and 0x3F respectively. Note patterns are shared across all 3 tone channels, so you can use any note pattern on any channel. If you try to enter an invalid pattern number, HT2 will automatically replace it with an arbitrary valid one.
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.6\height}{\includegraphics{warn.jpg}} & Note patterns and fx patterns use a different numbering, e.g. note pattern 01 is different from fx pattern 01. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+{\textcolor{red}{\newline\Huge\danger}} & Note patterns and fx patterns use a different numbering, e.g. note pattern 01 is different from fx pattern 01. \\
 \end{tabularx} ~\\
 
 To automatically put the first unused pattern at the current sequence position, press \textbf{[$\bm{+}$]}. To clone the pattern at the current position (copy it's contents to a new, unused pattern), press \textbf{[ALPHA], [$\bm{+}$]}. To delete the pattern number at the current position, press \textbf{[ALPHA], [0]}.
 
-You can press \textbf{[$\bm{-}$]} to copy the current row. This will insert the copy at the current position. Press \textbf{[$\bm{-}$]} to delete the current row. \newline
+You can press \textbf{[$\bm{-}$]} to copy the current row. This will insert the copy at the current position. Press \textbf{[$\bm{-}$]} to delete the current row.
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.6\height}{\includegraphics{warn.jpg}} & Always fill all four sequence positions in a given row. Pressing play on a sequence row that has empty positions will have undesired side effects. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\Huge{\textcolor{red}{\newline\danger}} & Always fill all four sequence positions in a given row. Pressing play on a sequence row that has empty positions will have undesired side effects. \\
 \end{tabularx} ~\\
 
 \paragraph{Block Operations} HT2 uses two block markers, block start (BS) and block end (BE) to select a section of sequence data for copying, pasting, and cutting. Block operations work only on the whole sequence, not on individual channels.
@@ -501,9 +503,9 @@ In order to hear notes while you're entering them, you can toggle RowPlay by pre
 
 To change the current octave, press \textbf{[GRAPH]}, then enter a number between 0 and 6. You can also edit octaves manually in the pattern.
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.6\height}{\includegraphics{idea}} & You can cycle through note patterns with \textbf{[ALPHA], [\(\medblacktriangleleft\)]} and \textbf{[ALPHA], [\(\medblacktriangleright\)]}. \\
-\raisebox{-0.6\height}{\includegraphics{idea}} & In order to use a different pattern length, use the \hyperref[sec:fx]{B00 effect command}. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+{\textcolor{black}{\newline\Huge\PointingHand}} & You can cycle through note patterns with \textbf{[ALPHA], [\(\medblacktriangleleft\)]} and \textbf{[ALPHA], [\(\medblacktriangleright\)]}. \\
+{\textcolor{black}{\newline\Huge\PointingHand}} & In order to use a different pattern length, use the \hyperref[sec:fx]{B00 effect command}. \\
 \end{tabularx} ~\\
 
 
@@ -558,9 +560,9 @@ This will give you a waveform looking like this: \newline
 
 {\includegraphics[width=\textwidth]{drumwave}} \newline
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.5\height}{\includegraphics{warn.jpg}} & The last byte of the sample must be 0. \\
-\raisebox{-1\height}{\includegraphics{idea}} & You can even define a second drum sample, which you can then trigger in drum mode C1x/C3x. This sample also starts at FX pattern 0x20, but needs to be written backwards, so the second byte of the sample is on the last position (FX parameter of the last row) of FX pattern 0x1F, third byte is just before that (drum/FX command of the last row), and so forth. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+{\textcolor{red}{\newline\Huge\danger}} & The last byte of the sample must be 0. \\
+\Huge{\textcolor{black}{\newline\PointingHand}} & You can even define a second drum sample, which you can then trigger in drum mode C1x/C3x. This sample also starts at FX pattern 0x20, but needs to be written backwards, so the second byte of the sample is on the last position (FX parameter of the last row) of FX pattern 0x1F, third byte is just before that (drum/FX command of the last row), and so forth. \\
 \end{tabularx} ~\\
 
 \newpage
@@ -674,7 +676,7 @@ xx can be any value, values around 0x80 will work best. A00 turns off the effect
 \hline
 Bxy & BREAK PTN/LOOP SECTION & xy = 0 - break pattern immediately and jump to the next position in the sequence. B00 is ignored on the first line of a pattern.
 
-xy > 0 - jump back y rows in the pattern, repeating the section x times.
+xy \textgreater\space0 - jump back y rows in the pattern, repeating the section x times.
 
 The Bxy effect should not be nested (ie. don't put a Bxy loop within another Bxy loop), because doing so will lead to an infinite loop. Beware, HT2 does not check this. \\
 \hline
@@ -701,6 +703,7 @@ E83 - as above, but does not reset speed, duty cycles, and panning settings. \\
 Fxx & SET SPEED & Set the current speed. This command temporarily overrides the global speed setting, but does not permanently change it. For details on how the speed setting works, refer to the section on \hyperref[sec:globalvars]{global variables}.
 
 TIP: When entering this effect while the player is running, make sure to enter the parameter first, and then the F command. \\
+\hline
 \end{longtable} ~\\
 
 
@@ -709,8 +712,8 @@ TIP: When entering this effect while the player is running, make sure to enter t
 
 If the save was successful, error code E0 will be displayed in the message area. If the save was unsuccessful due to insufficient memory, error code E2 will be displayed instead. Note that you may run out of memory rather quickly. You will always be able to maintain at least two save slots, however. \newline
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.5\height}{\includegraphics{warn.jpg}} & Any data after the first unfilled position (--) in the sequence is \emph{not} saved. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+{\textcolor{red}{\newline\Huge\danger}} & Any data after the first unfilled position (- -) in the sequence is \emph{not} saved. \\
 \end{tabularx} ~\\
 
 \paragraph{Loading} To load a previously saved tune, simply press \textbf{[Y$\bm{=}$]}. The letters "LD" will appear in the message area.
@@ -722,8 +725,8 @@ And that's all you need to know about deleting save slots!
 
 \paragraph{Backups} Creating a backup of your HT2 songs is trivial: Simply send the HT2 PRGM file to your computer or another calc of the same model. The program file contains all the save slots as well as the currently loaded song. \newline
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-0.5\height}{\includegraphics{idea}} & You can use the \hyperref[sec:ht2util]{ht2util savestate manager} to extract/insert save slots into your HT2 PRGM file. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+{\textcolor{black}{\newline\Huge\PointingHand}} & You can use the \hyperref[sec:ht2util]{ht2util savestate manager} to extract/insert save slots into your HT2 PRGM file. \\
 \end{tabularx} ~\\
 
 
@@ -767,8 +770,8 @@ To \emph{extract} one or more savestates, mark the desired state(s) in the saves
 
 Furthermore, you can decompress and export savestates to .asm, however this is not particularly useful yet unless you're working with the HT2 source. \newline
 
-\begin{tabularx}{\textwidth}{l X}
-\raisebox{-1\height}{\includegraphics{warn.jpg}} & ht2util does not automatically update effect commands yet. If you've imported a savestate from an older version of HT2, you will need to adjust those manually. Refer to the changelog to see which commands need to be updated. \\
+\begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
+\Huge{\textcolor{red}{\newline\danger}} & ht2util does not automatically update effect commands yet. If you've imported a savestate from an older version of HT2, you will need to adjust those manually. Refer to the changelog to see which commands need to be updated. \\
 \end{tabularx} ~\\
 
 
