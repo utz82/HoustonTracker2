@@ -1098,6 +1098,32 @@ printBuf
 	ld hl,PrintBuf			;print a pair of characters
 	ld b,6
 	jp drawlp2
+	
+;*******************************************************************************	
+printPlayModeIndicator
+	ld de,#2988
+	call setXY
+	
+	ld a,(PlayerFlag)
+	or a
+	ld d,#19				;"P"
+	jr z,_playerStopped
+	
+	ld d,#12
+	
+_playerStopped	
+	
+	ld a,(SynthMode)
+	or a
+	jr z,_noSynthMode
+	
+	ld e,#13
+	jp printDE
+	
+_noSynthMode
+	call clearPrintBuf
+	ld a,d
+	jp printCharLNC
 
 ;************************************************************************************
 clearPrintBuf				;clear the print buffer in (ops)

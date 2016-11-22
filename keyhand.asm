@@ -1379,12 +1379,7 @@ kneg					;play from current row
 	inc a				;set player flag, A=1
 	ld (PlayerFlag),a
 	
-	ld de,#2988			;update screen pointer
-	call setXY
-	call clearPrintBuf
-	ld a,#12			;print P for PLAY
-	call printCharLNC
-		
+	call printPlayModeIndicator	
 	call waitForKeyRelease
 	
 	xor a
@@ -1773,30 +1768,21 @@ kdiv						;deleting blocks
 kpot
 	ret
 	
-kclear							;toggle synth (hold) mode
-	ld de,#2bac
-	call setXY
-	call clearPrintBuf
-	
+kclear						;toggle synth (hold) mode
 	ld a,(SynthMode)
 	cpl
 	ld (SynthMode),a
 	or a
-	jr z,_disable
+	ld a,#1d				;disable
+	jr z,_set
 	
-	ld a,#13				;"S"
-	call printCharLNC
-	
-	ld a,#3c
-	jr _set
-	
-_disable
-	call printBuf
-	ld a,#1d
+	ld a,#3c				;enable
 _set
-	ld (timerHold),a	
+	ld (timerHold),a
+	call printPlayModeIndicator	
 	jp waitForKeyRelease
-
+	
+	
 
 kenter
 	ld a,(PlayerFlag)		;check if player is running
@@ -1804,16 +1790,10 @@ kenter
 	jr nz,exitplayer
 
 	ld (exitPlayerSP),sp		;store SP for exiting player
-	;ld a,1				;set player flag
 	inc a				;set player flag, A=1
 	ld (PlayerFlag),a
 	
-	ld de,#2988			;update screen pointer
-	call setXY
-	call clearPrintBuf
-	ld a,#12			;print P for PLAY
-	call printCharLNC
-	
+	call printPlayModeIndicator
 	call mplay			;call the music player
 
 exitplayer
@@ -1824,11 +1804,6 @@ exitPlayerSP equ $+1
 	ld a,lp_off			;turn off sound
 	out (link),a
 	
-	ld de,#2988			;update screen pointer
-	call setXY
-	call clearPrintBuf
-	ld a,#19			;print STOP char
-	call printCharLNC
-		
+	call printPlayModeIndicator	
 	jp waitForKeyRelease
 	;ret				;return to keyhandler

@@ -346,16 +346,10 @@ printVarNames				;create global var names on the right side
 	call clearPrintBuf		;clear print buffer
 	call printBuf
 
-	ld de,#2988			;update screen pointer
-	call setXY
+	call printPlayModeIndicator	;print STOP char
 	
-	;call clearPrintBuf
-	ld a,#19			;print STOP char
-	call printCharLNC
-	
-	ld hl,varmsgs			;load chars
-	;ld b,5				;4 messages to print
-	ld b,4
+	ld hl,varmsgs			;load chars			
+	ld b,4				;4 messages to print
 
 _rdlp	
 	ld d,(hl)
