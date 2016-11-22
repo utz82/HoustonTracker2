@@ -367,8 +367,10 @@ readkeys				;check if a key has been pressed
 
 reentry	
 	
-
-	dec e			;4	;update timer - slightly inefficient, but faster on average than dec de\ld a,d\or e, and gives better sound
+timerHold
+	dec e			;4	;update timer lo byte
+					;swap with inc a for synth mode (hold row) - a is always 0 at this point so inc a reliably returns nz
+					;dec e = #1d, inc a = #3c
 	jp nz,playnote		;10
 				;353
 

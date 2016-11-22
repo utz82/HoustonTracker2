@@ -1769,9 +1769,33 @@ kdiv						;deleting blocks
 	jp nz,insertBlk
 	jp waitForKeyRelease			;do nothing if Alpha not active
 
+
 kpot
-kclear
 	ret
+	
+kclear							;toggle synth (hold) mode
+	ld de,#2bac
+	call setXY
+	call clearPrintBuf
+	
+	ld a,(SynthMode)
+	cpl
+	ld (SynthMode),a
+	or a
+	jr z,_disable
+	
+	ld a,#13				;"S"
+	call printCharLNC
+	
+	ld a,#3c
+	jr _set
+	
+_disable
+	call printBuf
+	ld a,#1d
+_set
+	ld (timerHold),a	
+	jp waitForKeyRelease
 
 
 kenter

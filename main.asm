@@ -33,7 +33,7 @@ IF MODEL = TI8XS
 include "_include/ti8xs.inc"
 ENDIF
 
-	db "HT 2.22", 0
+	db "HT 2.23", 0
 
 ;************************************************************************************
 ;APD_BUF scratch pad and other equates
@@ -80,6 +80,8 @@ RowPlay		equ apd_buf+#17		;1	RowPlay mode (0 = off, #ff = on)
 LastKey		equ apd_buf+#18		;1	#a0 if last key set ALPHA mode on, else 0
 
 reptpos		equ apd_buf+#19		;1	number of remaining rows in pattern during playback
+
+SynthMode	equ apd_buf+#20		;1	Synth mode (0 = off, #ff = on).
 
 ;ReInit		equ apd_buf+#1a		;1	flag for reinitialization  
 

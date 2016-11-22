@@ -1,5 +1,5 @@
 
-version 2.22.00
+version 2.23.00
 ===============
 
 NEW/CHANGES
@@ -9,10 +9,11 @@ NEW/CHANGES
 - effect 7xx (auto-chord) now has two modes: unsynced (regular) and synced (octave chord)
 - channel volumes rebalanced
 - slowed down ch3 slides, 3xx now works like 2xx (xx is no longer inverse)
-- 9xx no longer disables 2xx/3xx pitch slides
+- 9xx no longer disables 3xx
 - new effect: ch3 grind (enabled with 6xx, xx>0x80)
 - old Axx has been ditched
 - new Axx effect: set phase offset ch3
+- Synth Mode: hold current row
 
 BUGFIXES
 
