@@ -477,6 +477,12 @@ isFxPtnFree					;check if a pattern is free
 	jr chklp-1
 
 ;************************************************************************************
+errorHand0				;clear StateSelect (when entering from LOAD/SAVE)
+	ex af,af'
+	ld a,#16
+	ld (StateSelect),a
+	ex af,af'
+
 errorHand				;error handler
 					;IN: A - error code
 	ld d,#0e
@@ -1124,7 +1130,18 @@ _noSynthMode
 	call clearPrintBuf
 	ld a,d
 	jp printCharLNC
-
+	
+;*******************************************************************************	
+printSaveSlotIndicator			;enter with A = slot number
+	ex af,af'
+	ld de,#2bac
+	call setXY
+	
+	ex af,af'
+	ld d,#13			;"S"
+	ld e,a
+	jp printDE
+	
 ;************************************************************************************
 clearPrintBuf				;clear the print buffer in (ops)
 	xor a

@@ -431,6 +431,10 @@ _success
 	;ld a,(StateSelect)
 LUTpointer equ $+2	
 	ld (savestateLUT+2),de		;write end address to savestate LUT
+	
+	ld a,(StateSelect)
+	call printSaveSlotIndicator
+	
 	xor a
 	jp errorHand	
 ;************************************************************************************
@@ -482,7 +486,7 @@ saveError				;handling out of memory errors
 	ld (hl),a
 	
 	ld a,2				;set error code
-	jp errorHand
+	jp errorHand0
 
 ;************************************************************************************
 load					;load a song from a backup savestate.
@@ -494,7 +498,7 @@ load					;load a song from a backup savestate.
 	dec a
 	jr z,_ldstart
 	ld a,6				;if version != 0, abort loading and generate error
-	jp errorHand
+	jp errorHand0
 	
 _ldstart
 ; 	ld hl,ptns			;initialize sequence with #ff bytes			;this is all unnecessary since we zap before
@@ -521,7 +525,7 @@ _ldstart
 	ld a,(hl)
 	or a				;trap empty savestates
 	ld a,5
-	jp z,errorHand			;abort and ouput error if empty savestate encountered
+	jp z,errorHand0			;abort and ouput error if empty savestate encountered
 	ld d,(hl)
 	ex de,hl			;move it to HL
 	ld de,musicData			;set destination address

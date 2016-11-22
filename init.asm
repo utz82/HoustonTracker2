@@ -50,6 +50,9 @@ usbdeact					;TI84+/SE detected, deactivating USB to save power
 	out (#54),a
 ENDIF
 
+reinit0
+	ld a,#16
+	ex af,af'
 reinit
 	ld hl,apd_buf				;clear APD_BUF
 	ld de,apd_buf+1
@@ -57,6 +60,9 @@ reinit
 	xor a
 	ld (hl),a
 	ldir
+	
+	ex af,af'
+	ld (StateSelect),a
 
 ;************************************************************************************
 ; genDrum					;generate kick drum sample in text_mem
@@ -345,6 +351,9 @@ printVarNames				;create global var names on the right side
 	call setXY
 	call clearPrintBuf		;clear print buffer
 	call printBuf
+
+	ld a,(StateSelect)
+	call printSaveSlotIndicator
 
 	call printPlayModeIndicator	;print STOP char
 	

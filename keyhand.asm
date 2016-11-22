@@ -1131,6 +1131,7 @@ kwindow						;delete save slot / clear current tune
 	or a
 	jr z,_zap
 	call delSlot
+	
 	jp waitForKeyRelease
 	;jp nz,delSlot				;if Alpha mode is active, delete save slot
 						;else, clear current tune
@@ -1142,7 +1143,8 @@ _zap
 
 	pop hl
 	call zap
-	jp reinit	
+	
+	jp reinit0	
 
 kyeq						;load
 	ld a,(PlayerFlag)			;check if player is running - actually unnecessary, should be save to save while player is running
@@ -1167,7 +1169,10 @@ _skip
 	
 	pop hl					;pop return address from stack
 	call load				;load song
-	jp reinit				;reinit HT2		
+
+	ld a,(StateSelect)
+	ex af,af'
+	jp reinit				;reinit HT2
 
 k2nd
 	ld a,(CScrType)				;check if we're on a pattern screen
