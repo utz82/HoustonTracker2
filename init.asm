@@ -29,7 +29,7 @@ IF MODEL = TI8X || MODEL = TI8XS
 	in a,(2)				;detect hardware
 	ld b,a
 	and #80					;if bit 7 is set, we have TI83+ BASIC
-	jr z,reinit
+	jr z,reinit0
 	
 	xor a					
 	out (#20),a				;set 6 MHz mode
@@ -39,7 +39,7 @@ IF MODEL = TI8X || MODEL = TI8XS
 	and 3
 	jr z,usbdeact				;TI84+ SE
 	bit 5,b
-	jr z,reinit				;TI83+ SE
+	jr z,reinit0				;TI83+ SE
 
 usbdeact					;TI84+/SE detected, deactivating USB to save power
 	xor a
