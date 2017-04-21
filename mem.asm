@@ -140,7 +140,7 @@ zap					;delete song currently loaded in work area
 	ld bc,4095
 	ldir
 	
-	ret
+	jp resetFX0
 
 ;************************************************************************************
 addressCompare				;compare two 16-bit values
