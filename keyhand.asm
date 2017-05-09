@@ -98,10 +98,7 @@ reprint
 	xor a
 	ld (InputType),a		;reset input type
 	
-	call printCsr			;print cursor
-	
-	;ret
-	jp waitForKeyRelease
+	jp kdirskip2			;print cursor & wait for key release
 	
 inputDouble				;input a double digit hex value
 					;IN: set iPrintPos and iUpdatePos				
@@ -257,7 +254,8 @@ _skip
 		
 	;jp z,kright			
 	jp z,kRnoalpha			;if AutoInc mode is on, update cursor as if RIGHT key had been pressed
-	jp printCsr			;else, simply reprint the cursor at the current position
+	;jp printCsr			;else, simply reprint the cursor at the current position
+	jp kdirskip2
 
 
 updateSeqScr				;update an entry on the sequence screen
@@ -390,14 +388,15 @@ _reprint
 	
 	ld a,(RowPlay)
 	or a
-	jr z,_skipRP
-	call rowPlay
+	call nz,rowPlay
 
 _skipRP
 	ld a,(AutoInc)
 	or a	
 	jp z,kpdown			;and update cursor as if DOWN key has been pressed
-	jp printCsr
+;	call printCsr
+;	jp waitForKeyRelease
+	jp kdirskip2
 
 
 _reprintDash				;print dashes if new note byte = 0
@@ -513,7 +512,9 @@ _set
 	ld a,(AutoInc)
 	or a
 	jp z,kfdown
-	jp printCsr2			;TODO: this bugs
+
+	call printCsr2
+	jp waitForKeyRelease
 
 ignoreKeypress
 	pop hl				;clear stack
@@ -1592,7 +1593,7 @@ _chklp
 	jr nz,_chklp
 	
 
-kmult						;copy/paste block
+kmult						;copy/del block
 	ld a,(CScrType)				;detect current screen type
 	or a
 	jp nz,waitForKeyRelease			;and exit if not on sequence screen
