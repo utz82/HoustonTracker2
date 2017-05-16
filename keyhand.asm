@@ -304,14 +304,15 @@ kHexPtn
 	ld h,0
 	ld a,(CsrPos)			;get cursor position
 	ld c,a				;preserve it in C
-	sub #50
-	and %11110111			;mask out bit 3
-	cp #f				;if cursor pos is in 2nd column
-	jr c,_skip
-	;rra				;divide it by 2 to get values 8..F
-	sub 8
-_skip	
+	cpl				;convert it to ptn data offset
+	and #10
+	rrca
 	ld l,a
+	ld a,c
+	and #7
+	add a,l
+	ld l,a
+
 	add hl,de			;position to edit now referenced by HL
 	push hl				;a08a
 
@@ -462,23 +463,20 @@ kHexFX					;handle hex input on fx ptn scr
 	call findCurrFxPtn		;ptn pointer now in DE
 	
 	ld hl,0
-	ld a,(CsrPos)			;read cursor position and convert it to ptn data offset
+	ld a,(CsrPos)			;read cursor position
 	ld c,a				;backup in C
-	and %011110111			;mask out bit 3 and 7 since they're irrelevant
-	add a,a				;in fx ptns, each row takes 2 bytes
-	cp #20
-	jr c,_skip3
-	ld l,#1f
-	
-	cp #40
-	jr c,_skip3
-	ld l,#30
-	
-	cp #60
-	jr c,_skip3
-	ld l,#4f
-_skip3	
-	sub l
+	bit 4,a				;convert cursor position into ptn data offset
+	jr z,_skip3
+	inc l
+_skip3
+	and #20
+	rrca
+	add a,l
+	ld l,a
+	ld a,c
+	and #7
+	rlca
+	add a,l
 	ld l,a
 	
 	add hl,de			;byte to edit now referenced by HL
