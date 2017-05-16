@@ -2,7 +2,7 @@
 A music editor for TI graphing calculators
 
 
-###About
+### About
 
 HoustonTracker 2 is a software sequencer that enables you to create music on Texas Instruments graphing calculators. It uses the machines' communication port to output multi-channel 1-bit music. Its interface is inspired by popular trackers such as LSDJ, Famitracker, and Milkytracker.
 
@@ -15,7 +15,7 @@ http://irrlichtproject.de/houston
 Note that the online documentation applies to the stable version of HT2, for the beta version refer to the manual in the /docs folder in source.
 
 
-###Features
+### Features
 
 * 3 tone channels
 * 1 non-interrupting drum channel
