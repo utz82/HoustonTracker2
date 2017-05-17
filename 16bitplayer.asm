@@ -56,6 +56,17 @@ rdnotes1
 	jr ptnselect
 
 ;*************************************************************************************
+ptnselect_playPtnLoop
+	pop hl				;clean stack - PROBABLY BETTER TO USE LD SP,nnnn
+	pop hl
+	pop hl
+	pop hl
+	pop de
+	dec de
+	dec de
+	dec de
+	dec de
+	jr ptnselect_mod
 ptnselect0
 	pop hl				;clean stack - PROBABLY BETTER TO USE LD SP,nnnn
 	pop hl
@@ -65,11 +76,10 @@ ptnselect0
 ptnselect				;FIRST, set up ptn sequence pointers and push them (preserve song seq pointer in mem?)
 					;SECOND, check if row counter has reached 0
 					;THIRD, pop back ptn sequence pointers and read in data
-	
+	pop de			;10	;restore song data pointer
+ptnselect_mod	
 	ld a,#11		;7	;initialize ptn position counter - all patterns are 16 rows long
 	ld (reptpos),a		;13
-
-	pop de			;10	;restore song data pointer
 	
 	ld a,(de)		;7	;load ptn# ch1
 	cp #ff			;7	;check for end marker
@@ -142,6 +152,7 @@ rdnotes				;read in next step from song data
 	
 	ld hl,reptpos		;10	;update pattern row counter
 	dec (hl)		;11
+ptnLoopSwitch equ $+1
 	jr z,ptnselect0		;12/7
 
 rdnotesRP				;entry point for RowPlay	
@@ -547,14 +558,27 @@ fxF					;#0f = set speed
 	ld (cspeed-1),a
 	jp fxcont
 
-fxB					;#0b = break/ptn loop cmd
-	ld a,(de)			;if param=0
-	or a
-	jr nz,_ptnloop
+ptnBreak_pm_loop
+	ld a,(reptpos)			;break ptn (pattern loop playmode)
+	cp #10
+	jp z,fxreturn			;ignore cmd if triggered on the first pattern row
+	pop de
+	dec de
+	dec de
+	dec de
+	dec de
+	jp ptnselect_mod	
+ptnBreak
 	ld a,(reptpos)			;break ptn
 	cp #10				;ignore cmd if triggered on the first pattern row
 	jp nz,ptnselect			;select next ptn if found  ATTN: leaves register set swapped!
 	jp fxreturn
+
+fxB					;#0b = break/ptn loop cmd
+	ld a,(de)			;if param=0
+	or a
+fxb_pm_loop_switch equ $+1
+	jr z,ptnBreak			;break ptn
 
 _ptnloop
 ptnreptpos equ $+1
@@ -689,27 +713,6 @@ fx4					;duty cycle ch1
 _disableNoise
 	ld (noiseEnable),a
 	jp fxcont
-;	jr Afast
-	
-;fxA					;ch1 "glitch" effect -> TODO: will become phase offset ch3
-; 	ld a,(de)
-; 	or a
-; 	jr z,Askip
-; 	dec a
-; 	ld a,5
-; 	jr nz,Afast
-;
-; 	dec a
-
-; Afast
-; 	ld (fxswap2),a
-; 	ld a,#cb
-; 	ld (fxswap1),a
-; 	jp fxcont
-; Askip
-; 	ld hl,0
-; 	ld (fxswap1),hl
-; 	jp fxcont
 
 fxA
 	ld a,(de)			;set ch3 phase. Can be modified as follows: if bit 7 is set, interpret bits 0..6 as bitmask toggeling various fx

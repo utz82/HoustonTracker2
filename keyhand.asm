@@ -1379,6 +1379,14 @@ kneg					;play from current row
 	or a
 	jp nz,waitForKeyRelease
 	
+	ld a,(AlphaFlag)		;check AlphaFlag
+	or a
+	jr z,_skip0
+	ld a,#af			;if set, enable pattern looping
+	ld (ptnLoopSwitch),a
+	ld a,#e1
+	ld (fxb_pm_loop_switch),a
+_skip0	
 	ld (exitPlayerSP),sp		;store SP for exiting player
 	inc a				;set player flag, A=1
 	ld (PlayerFlag),a
@@ -1493,7 +1501,7 @@ _lp
 	ld (hl),a
 	inc hl
 	djnz _lp		
-	
+jumpReprintX	
 	jp reprintX
 
 	
@@ -1536,9 +1544,8 @@ freeFound
 	jr z,_return
 	
 	ld a,(SourcePtn)			;if in Alpha mode, copy source pattern to new pattern
-	cp #ff					;unless source pattern was empty (#ff)
-	;jr z,_return
-	jp z,reprintX
+	inc a			
+	jr z,jumpReprintX			;don't copy if source pattern was #ff
 	
 	ld a,(CsrPos)
 	and %00000110
@@ -1559,7 +1566,7 @@ _copy
 	ldir
 	
 _return
-	jp reprintX
+	jr jumpReprintX
 
 
 _copyfx
@@ -1807,6 +1814,10 @@ exitPlayerSP equ $+1
 	ld (PlayerFlag),a
 	ld a,lp_off			;turn off sound
 	out (link),a
+	ld a,#ba			;disable pattern looping
+	ld (ptnLoopSwitch),a
+	ld a,#f1
+	ld (fxb_pm_loop_switch),a
 	
 	call printPlayModeIndicator	
 	jp waitForKeyRelease

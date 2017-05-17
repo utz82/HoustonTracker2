@@ -1,5 +1,5 @@
 ;************************************************************************************
-;HOUSTONTRACKER 2.22.00
+;HOUSTONTRACKER 2.24.00
 ;by utz * irrlichtproject.de/houston
 ;************************************************************************************
 
@@ -33,7 +33,7 @@ IF MODEL = TI8XS
 include "_include/ti8xs.inc"
 ENDIF
 
-	db "HT 2.23", 0
+	db "HT 2.24", 0
 
 ;************************************************************************************
 ;APD_BUF scratch pad and other equates
@@ -1112,12 +1112,12 @@ printPlayModeIndicator
 	
 	ld a,(PlayerFlag)
 	or a
-	ld d,#19				;"P"
+	ld d,#19			;"P"
 	jr z,_playerStopped
 	
 	ld d,#12
 	
-_playerStopped	
+_playerStopped
 	
 	ld a,(SynthMode)
 	or a

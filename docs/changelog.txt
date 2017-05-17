@@ -1,10 +1,10 @@
 
-version 2.23.00
+version 2.24.00
 ===============
 
 NEW/CHANGES
 
-- note table tuned to 440 Hz (and some notes produce more useful noise fx as a result)
+- note table tuned to ~440 Hz (and some notes produce more useful noise fx as a result)
 - ch2 duty sweep (5xx, xx > 0x80) now has a configurable parameter (xx & 0x7f)
 - effect 7xx (auto-chord) now has two modes: unsynced (regular) and synced (octave chord)
 - channel volumes rebalanced
@@ -14,10 +14,14 @@ NEW/CHANGES
 - old Axx has been ditched
 - new Axx effect: set phase offset ch3
 - Synth Mode: hold current row
+- add display of last used savestate
+- add pattern loop playback mode
 
 BUGFIXES
 
 - fixed user drum input glitch
+- fixed major bug in keyhandler
+- reset player when clearing worktune
 
 
 
