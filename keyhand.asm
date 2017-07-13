@@ -360,7 +360,7 @@ _exitlp					;note val now in A
 	pop hl
 	ld (hl),a			;update note byte
 	or a
-	jr z,_reprintDash
+	jr z,reprintDash
 	
 _reprint
 	call setPrintPos
@@ -391,16 +391,14 @@ _reprint
 	or a
 	call nz,rowPlay
 
-_skipRP
-	ld a,(AutoInc)
+skipRP
+	ld a,(AutoInc)			;move cursor down if AutoInc is enabled
 	or a	
-	jp z,kpdown			;and update cursor as if DOWN key has been pressed
-;	call printCsr
-;	jp waitForKeyRelease
-	jp kdirskip2
+	jp z,kpdown			
+	jp kdirskip2			;else return normally
 
 
-_reprintDash				;print dashes if new note byte = 0
+reprintDash				;print dashes if new note byte = 0
 	call setPrintPos
 	push de
 	
@@ -415,8 +413,7 @@ _reprintDash				;print dashes if new note byte = 0
 	ld a,#16
 	call printCharLNC
 	
-	;jp kpdown
-	jr _skipRP
+	jr skipRP
 
 	
 inputOct
@@ -450,8 +447,7 @@ _skip
 	ld a,c				;retrieve input digit (new oct)
 	
 	call printCharL			;print it
-	
-	jp kpdown			;and update cursor as if DOWN key has been pressed
+	jr skipRP			;and update cursor
 
 
 ;************************************************************************************	
