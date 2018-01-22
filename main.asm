@@ -1368,7 +1368,7 @@ baseCounterLUT			;counter values for octave 6, all other counter values are deri
 	dw #1f86, #2166, #2362, #257d, #27b8, #2a14, #2c95, #2f3b, #320a, #3504, #382b, #3b82
 
 font
-	include "font3.asm"
+	include "font.asm"
 	
 htlogo					;the HT2 logo
 	db %11110101
@@ -1449,7 +1449,7 @@ ttest equ $-1
 ;music player, work area, savestates
 
 mplay
-	include "16bitplayer.asm"
+	include "player.asm"
 
 	db 'XSAVE'
 savestateLUT				;32 byte save state lookup table
