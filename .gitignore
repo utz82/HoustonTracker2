@@ -1,0 +1,11 @@
+_BACKUP/
+_build/
+_bin/
+_scripts/
+*.sym
+*.aux
+*.log
+*.out
+*.toc
+manual.pdf
+test.sh

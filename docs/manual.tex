@@ -807,33 +807,42 @@ HoustonTracker 2 is developed under Linux. If you're running Linux or another *n
 \paragraph{Building Requirements} ~\\
 \begin{easylist}[itemize]
 & The \href{http://pasmo.speccy.org/}{Pasmo assembler} must be installed and present in your search path (unless you want to adapt the sources for another assembler).
+& For building documentation, pdflatex must be installed and present in your search path.
 & Optionally, you may want to install an TI calculator emulator. For *nix systems, using the development version of tilem2 is recommended.
 \end{easylist}
 
 \paragraph{Building with the Build Script (*nix only)} It's as simple as opening a terminal, navigating to the folder containing HT2, and typing
 
 \begin{alltt}
-./compile.sh \emph{-[model]}
+./build.sh \emph{[-model] [-docs] [-test]}
 \end{alltt}
 
-where \emph{[model]} is one of
+where \emph{[-model]} is one of
 
 \begin{tabularx}{\textwidth}{p{0.1\textwidth} X}
-82 & build for TI-82 \\
-8p & build for TI-82 Parcus \\
-83 & build for TI-83, TI-82 Stats \\
-8x & build for TI-83 Plus, TI-84 Plus etc. \\
-8xs & build "small" version for TI-83 Plus, TI-84 Plus etc. \\
-all & build all targets. \\
+-82 & build for TI-82 \\
+-8p & build for TI-82 Parcus \\
+-83 & build for TI-83, TI-82 Stats \\
+-8x & build for TI-83 Plus, TI-84 Plus etc. \\
+-8xs & build "small" version for TI-83 Plus, TI-84 Plus etc. \\
+-all & build all targets. \\
 \end{tabularx} ~\\
 
-Optionally, you can rebuild the note table before running the build script. In order to do so, run the tablegen.sh shell script. This will allow you to change HT2's base tuning.
+Not specifying a model has the same effect as passing "-all". You can additionally build documentation by passing the "-docs" flag.
 
-In order to have the build script automatically run your builds in tilem2, uncomment the lines in compile.sh that look like this:
+You can test the build by passing the "-test" flag. This requires that you have a test script set up as \_scripts/test.sh. The -model argument is passed to test.sh. A simple test script might look like this:
 
 \begin{alltt}
-tilem2 -a -r "\emph{/path/to/your/rom/xyz.rom}" -m \emph{[model] [buildfile]}
-\end{alltt} ~\\
+#!/bin/sh
+
+tilem2 -a -r "\emph{/path/to/rom/xyz.rom}" -m \emph{[model] [build]}
+\end{alltt}
+
+where \emph{[model]} is one of ti82, ti83, or ti83p, and \emph{[build]} is the path to the ht2*.8*p file that should be tested. Optionally you can pass -p\emph{ [macro]} to trigger suitable keypress macro recording from tilem2.
+
+\iffalse
+Optionally, you can rebuild the note table before running the build script. In order to do so, run the tablegen.sh shell script. This will allow you to change HT2's base tuning.
+\fi
 
 \paragraph{Building by Hand} The following steps are required to build HT2 by hand: 
 

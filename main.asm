@@ -14,23 +14,23 @@ TI8P EQU 4
 TI8XS EQU 5
 
 IF MODEL = TI82		
-include "_include/ti82.inc"
+include "include/ti82.inc"
 ENDIF
 
 IF MODEL = TI8P
-include "_include/ti82parcus.inc"
+include "include/ti82parcus.inc"
 ENDIF
 
 IF MODEL = TI83
-include "_include/ti83.inc"
+include "include/ti83.inc"
 ENDIF
 
 IF MODEL = TI8X
-include "_include/ti8xp.inc"
+include "include/ti8xp.inc"
 ENDIF
 
 IF MODEL = TI8XS
-include "_include/ti8xs.inc"
+include "include/ti8xs.inc"
 ENDIF
 
 	db "HT 2.24", 0
