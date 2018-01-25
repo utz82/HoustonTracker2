@@ -1,4 +1,104 @@
+;*******************************************************************************
+;MUSIC PLAYER
+;*******************************************************************************
 
+;setup function for rowPlay
+;*******************************************************************************
+
+rowPlay						;rowPlay subroutine
+	call waitForKeyRelease
+
+	ld a,(PlayerFlag)			;check if player is running
+	or a	
+	jp nz,_ignore				;and ignore rowPlay if that's the case	
+	
+	cpl					
+	ld (PlayerFlag),a			;set PlayerFlag to prevent double call
+	
+	;call waitForKeyRelease
+	
+	xor a
+	ld h,a
+	ld d,a
+	ld a,(OldCsrPos)
+	call findCurrLineNoSeq			;find current line in sequence
+	
+	ld de,3					;reading in backwards, therefore add 3 to offset
+	add hl,de
+	ex de,hl
+	
+
+	ld bc,fxptn00
+	
+	ld a,(CsrPos)
+	sub #50
+	cp #f
+	jr c,_skipadj	
+	sub 8
+_skipadj
+	add a,a
+	ld l,a
+	ld h,0
+	add hl,bc
+	ld b,h
+	ld c,l
+	
+	ld a,(de)
+	add a,a					;a*2
+	call calcPtnOffset+2
+	push hl					;fx - ;stack+0 = ch1, stack+2 = ch2, stack+4 = ch3, stack+6 = fx
+	
+	ld bc,ptn00
+	
+	ld a,(CsrPos)
+	sub #50
+	cp #f
+	jr c,_skipdiv
+	sub 8
+_skipdiv	
+	ld l,a
+	ld h,0
+	add hl,bc
+	ld b,h
+	ld c,l
+	
+	call calcPtnOffset
+	push hl					;ch3
+	
+	call calcPtnOffset
+	push hl					;ch2
+	
+	call calcPtnOffset
+	push hl					;ch1
+	
+	ld (oldSP),sp				
+	
+	ld hl,_next
+	ld (rowplaySwap),hl
+
+	xor a
+	out (kbd),a
+	
+	jp rdnotesRP				;call player
+_next	
+	pop hl					;clean stack and reset switch
+	pop hl
+	pop hl
+	pop hl
+	ld hl,rdnotes
+	ld (rowplaySwap),hl
+	xor a					;clear PlayerFlag
+	ld (PlayerFlag),a
+_ignore	
+	;jp waitForKeyRelease
+	ret
+
+
+;*******************************************************************************
+;main entry point for music player
+;*******************************************************************************
+
+mplay
 play
 	call waitForKeyRelease		;keyhandler is very fast, so make sure there are currently no keys pressed
 	
@@ -865,14 +965,16 @@ _ignore
 	
 	
 IF ((HIGH($))<(HIGH($+15)))
-.ERROR drumModeTable1 crosses page
+	org 256*(1+(HIGH($)))		;align to next page if necessary
+.WARNING drumModeTable1 crosses page
 ENDIF
 drumModeTable1
 	db #00, #27, #8f,     #1f, #2f, #79,    #89,     #88,     #90,   #91,   #a0,   #a1,  #b0,  #b1,  #a8,   #a9
 	;  nop  daa  add a,a  rra  cpl  ld c,a  add a,c  add a,b  sub b  sub c  and b  or b  or b  or c  xor b  xor c
 
 IF ((HIGH($))<(HIGH($+4)))
-.ERROR drumModeTable2 crosses page
+	org 256*(1+(HIGH($)))		;align to next page if necessary
+.WARNING drumModeTable2 crosses page
 ENDIF	
 drumModeTable2
 	db #03,    #0b,    #0c,   #0d,   #00
@@ -1190,5 +1292,4 @@ kickdr
 	db #20, #20, #20, #20, #20, #10, #10, #10, #10, #10, #10, #8, #8, #8, #8, #8, #8, #8
 	db #4, #4, #4, #4, #4, #4, #4, #4, #2, #2, #2, #2, #2, #2, #2, #2, #2, #0
 	
-musicData				;the music data
-	include "music.asm"
+
