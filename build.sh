@@ -7,8 +7,7 @@ if [ ! -e _bin/oysterpac/oysterpac ] ; then
   command -v git >/dev/null 2>&1 || \
     { echo >&2 "Need git to fetch oysterpac. Please install git, or obtain oysterpac manually and copy it to _bin/oysterpac"; \
     exit 1; }
-  [ ! -d _bin ] && mkdir -p _bin
-  cd _bin
+  mkdir -p _bin && cd _bin
   ping -c1 -q github.com >/dev/null 2>&1 || { echo >&2 "Cannot reach github.com. Aborting."; cd ..; exit 1; }
   git clone https://github.com/utz82/oysterpac.git || { echo >&2 "Failed to clone oysterpac repository. Aborting."; cd ..; exit 1; }
   cd oysterpac
@@ -16,7 +15,7 @@ if [ ! -e _bin/oysterpac/oysterpac ] ; then
   cd ../..
 fi
 
-[ ! -d _build ] && mkdir -p _build 
+mkdir -p _build 
 [ ! -e _build/oysterpac ] && cp _bin/oysterpac/oysterpac _build/oysterpac
 
 case $1 in
