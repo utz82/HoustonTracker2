@@ -652,11 +652,11 @@ xx \textless= 0x80 - set duty cycle and disable grind mode.
 
 xx \textgreater\space0x80 - set duty cycle to (xx*2)\&0xff and enable grind mode. \\
 \hline
-7xx & AUTO CHORD CH2 & Add a chord effect to channel 2.
+7xx & AUTO CHORD/ DRAWBAR CH2 & Add a chord or drawbar organ effect to channel 2.
 
 xx \textless\space0x80 - enable unsynced auto chord. The chord created varies depending on the note used, and is not necessarily harmonic.
 
-xx \textgreater= 0x80 - enable synced auto chord. This will produce an octave chord, depending to some extend on the current duty setting. A higher value for xx will generally produce stronger harmonics.
+xx \textgreater= 0x80 - enable synced auto chord (drawbar organ effect). This will produce an octave chord, depending to some extend on the current duty setting. A higher value for xx will generally produce stronger harmonics.
 
 700 switches off the effect.
 
