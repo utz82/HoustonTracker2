@@ -1,6 +1,49 @@
 ;************************************************************************************
 ;the key handler
 ;************************************************************************************
+	
+waitForKeyRelease			;wait for key release function.
+
+_rdkeys
+ 	in a,(kbd)
+ 	cpl			;4	;would be nice to skip these two lines
+ 	or a			;4	;but somehow that doesn't work
+	jr nz,_rdkeys
+	
+_wait
+	ld b,a
+	
+	ld a,(LastKey)			;reset ALPHA mode if last key pressed was not ALPHA
+	or a
+	jr nz,_resetLK
+	
+	xor a
+	ld (AlphaFlag),a
+	
+	ld de,#2888
+	call setXY
+	call clearPrintBuf		;clear print buffer
+	call printBuf			;remove Alpha mode marker from screen
+	;ld b,0				;unnecessary, printBuf returns with b=0 anyway
+	jr _waitlp
+	
+_resetLK
+	xor a				;clear LastKey flag
+	ld (LastKey),a	
+	
+_waitlp					;waiting for keypad bounce
+	ex (sp),hl
+	ex (sp),hl
+	ld a,(hl)
+;IF MODEL = TI83 || MODEL = TI8X || MODEL = TI8XS
+IF MODEL != TI82
+	ld a,(hl)
+ENDIF
+	djnz _waitlp
+	
+ 	ret			;5
+	
+;*******************************************************************************
 inputSlotNr
 	ld a,#ef
 	out (kbd),a
