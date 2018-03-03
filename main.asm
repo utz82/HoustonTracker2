@@ -1,5 +1,5 @@
 ;*******************************************************************************
-;HOUSTONTRACKER 2.25.00
+;HOUSTONTRACKER 2.30.00
 ;by utz * irrlichtproject.de/houston
 ;*******************************************************************************
 
@@ -13,7 +13,7 @@ TI8X EQU 3
 TI8P EQU 4
 TI8XS EQU 5
 
-IF MODEL = TI82		
+IF MODEL = TI82
 	include "include/ti82.inc"
 ENDIF
 
@@ -33,7 +33,7 @@ IF MODEL = TI8XS
 	include "include/ti8xs.inc"
 ENDIF
 
-	db "HT 2.25", 0				;in-shell title
+	db "HT 2.30", 0				;in-shell title
 
 ;*******************************************************************************
 ;scratch pad index and additional equates
@@ -47,10 +47,10 @@ ENDIF
 
 begin
 	include "init.asm"			;initialize stuff
-	
+
 	call waitForKeyRelease			;make sure no key is pressed before entering keyhandler
 
-	
+
 ;The main loop. Yes, it's very simple ;)
 ;However, there's some inception going on under the hood. Ok, so the main loop calls keyhand. Now, when
 ;keyhand detects a keypress indicating to start the player, then keyhand will call the player. The
@@ -59,9 +59,9 @@ begin
 ;that this "inception" is running in a stack-safe manner.
 ;There are however additional safeguards against stack corruption, see section "shutdown code".
 
-mainlp						
-	call keyhand				
-	
+mainlp
+	call keyhand
+
 	jp mainlp
 
 ;*******************************************************************************
@@ -69,7 +69,7 @@ mainlp
 ;*******************************************************************************
 
 	include "keyhand.asm"
-	
+
 ;*******************************************************************************
 ;shutdown code
 ;*******************************************************************************
@@ -81,7 +81,7 @@ exit						;exit HT2
 	ld (mute1),a
 	ld (mute2),a
 	ld (mute3),a
-	
+
 	ld a,lp_on				;switch link port lines high again
 	out (link),a
 
@@ -111,13 +111,13 @@ exitSP equ $+1					;reset stack
 ;*******************************************************************************
 
 	include "mem.asm"
-	
+
 ;*******************************************************************************
 ;various tables and includes
 ;*******************************************************************************
 
 	include "data.asm"
-	
+
 ;*******************************************************************************
 ;music driver
 ;*******************************************************************************
@@ -127,23 +127,23 @@ exitSP equ $+1					;reset stack
 ;*******************************************************************************
 ;work area
 ;*******************************************************************************
-	
-musicData				;initialize an empty song on first run		
+
+musicData				;initialize an empty song on first run
 
 speed
 	db #10				;speed
 usrDrum
 	dw #0				;usr drum pointer
-looprow		
+looprow
 	db 0				;loop point (row#)
 
 ptns					;the pattern matrix
-	ds 256*4,#ff			;1024+1 #ff bytes			
+	ds 256*4,#ff			;1024+1 #ff bytes
 	db #ff
-	
+
 ptn00					;the note patterns
 	ds 16*128			;128*16 #00 bytes
-	
+
 fxptn00					;the fx patterns
 	ds 32*64			;64*32 #00 bytes
 
@@ -161,7 +161,7 @@ savestateLUT				;32 byte save state lookup table
 
 savestates				;compressed savestates
 	include "teststate.asm"
-	
+
 firstend equ $				;debug symbol
 
 ;*******************************************************************************
