@@ -567,8 +567,9 @@ This will give you a waveform looking like this: \newline
 {\includegraphics[width=\textwidth]{drumwave}} \newline
 
 \begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
-{\textcolor{red}{\newline\Huge\danger}} & The last byte of the sample must be 0. \\
-\Huge{\textcolor{black}{\newline\PointingHand}} & You can even define a second drum sample, which you can then trigger in drum mode C1x/C3x. This sample also starts at FX pattern 0x20, but needs to be written backwards, so the second byte of the sample is on the last position (FX parameter of the last row) of FX pattern 0x1F, third byte is just before that (drum/FX command of the last row), and so forth. \\
+    {\textcolor{red}{\newline\Huge\danger}} & The last byte of the sample must be 0. \\
+    \Huge{\textcolor{black}{\newline\PointingHand}} & Need help with the PWM sample format? Use jefftheworld's \href{https://github.com/JeffAlyanak/pcm2pwm/}{pcm2pwm} utility to generate PWM data from PCM WAV samples. \\
+    \Huge{\textcolor{black}{\newline\PointingHand}} & You can even define a second drum sample, which you can then trigger in drum mode C1x/C3x. This sample also starts at FX pattern 0x20, but needs to be written backwards, so the second byte of the sample is on the last position (FX parameter of the last row) of FX pattern 0x1F, third byte is just before that (drum/FX command of the last row), and so forth. \\
 \end{tabularx} ~\\
 
 \newpage
