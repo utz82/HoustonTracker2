@@ -71,8 +71,8 @@ HT2 supports several models of the Z80-based line of TI calculators. It is mainl
 
 \section{Supported Calculator Models}
 \label{sec:supportedmodels}
-The following table gives an overview over which TI calculator models are supported by HoustonTracker 2. If your calculator isn't listed in the table, chances are HT2 doesn't support it. 
-\\ \\ 
+The following table gives an overview over which TI calculator models are supported by HoustonTracker 2. If your calculator isn't listed in the table, chances are HT2 doesn't support it.
+\\ \\
 \scalebox{0.8}{
 \begin{tabular}{l c c c c c}
   \textbf{model} & \textbf{ROM version} & \textbf{shell} & \textbf{HT2 build} & \textbf{status} \\
@@ -94,7 +94,7 @@ The following table gives an overview over which TI calculator models are suppor
   TI-89, 92, 92+, V200 & \textendash & \textendash & \textendash & \textcolor{red}{not supported} \\
 \end{tabular}
 }
-\\ \\ 
+\\ \\
 Models marked as "not supported" have differences in architecture that would require a major rewrite of HT2. There are no plans to support these models in the near future, especially not the 84+ Color models.
 
 
@@ -128,7 +128,7 @@ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \end{verbatim}
 }
 
@@ -149,7 +149,7 @@ All numbers in the HoustonTracker 2 user interface itself are hexadecimal, there
 
 \newpage
 \subparagraph{Terminology} ~\\
- 
+
 \begin{tabularx}{\textwidth}{r X}
 \textbf{bit} & This humble binary digit is at the core of HT2's inner workings. It can take a value of 0 (off) or 1 (on). \\
 \textbf{byte} & Not related to chewing by any means, the byte is an 8-bit number. It can take any value from 0x00 (decimal 0) to 0xFF (255). \\
@@ -195,10 +195,10 @@ All numbers in the HoustonTracker 2 user interface itself are hexadecimal, there
 
 \subparagraph{Software} ~\\
 In addition to the HT2 executable, you will also need to obtain:
-\\ 
+\\
 \begin{easylist}[itemize]
 & TI linking software for exchanging data between your PC and your calc (\href{http://lpg.ticalc.org/prj_tilp/}{TiLP} is strongly recommended, though it can be somewhat tricky to install. Check the \nameref{sec:troubleshoot} guide if you run into problems.)
-& a so-called "shell" for your calculator. The following table lists the recommended shells for each model. Other shells may work, but haven't been tested. 
+& a so-called "shell" for your calculator. The following table lists the recommended shells for each model. Other shells may work, but haven't been tested.
 \end{easylist} ~\\
 \begin{tabularx}{\textwidth}{l X}
 \textbf{model} & \textbf{shell} \\
@@ -346,7 +346,7 @@ The following section will explain how to get started with HoustonTracker 2 in 1
 \begin{longtable}{p{0.35\textwidth} p{0.6\textwidth} }
 \textbf{key} & \textbf{function} \\
 \hline
-%\rowfont\bfseries key & function & description \\ \hline 
+%\rowfont\bfseries key & function & description \\ \hline
 %\endhead
 
 \textbf{[ALPHA][ON]} & \textbf{QUIT} HT2. The current tune will be preserved in memory. You can only exit when music isn't playing. On TI83/8x Plus, exiting will take a few moments. \\
@@ -446,7 +446,7 @@ The AutoInc/RowPlay indicators tell you whether the auto-incrementing and RowPla
 
 Located to the right of the AutoInc/Rowplay indicators is the saveslot indicator. It will display the last used save slot once the load/save function has been used.
 
-Below the AutoInc/RowPlay indicators, there is the general purpose message area. Here, various important messages will be displayed, such as occuring errors, or requests for the user to confirm an action. Confirming is done with key \textbf{[.]}, cancelling is done with key \textbf{[0]}. 
+Below the AutoInc/RowPlay indicators, there is the general purpose message area. Here, various important messages will be displayed, such as occuring errors, or requests for the user to confirm an action. Confirming is done with key \textbf{[.]}, cancelling is done with key \textbf{[0]}.
 
 \paragraph{Global Variables}\label{sec:globalvars} The loop point defines what row in the sequence the player will loop back to after it has reached the end of the song. Pressing \textbf{[$\bm{x^2}$]} will set the loop point to the row currently highlighted by the cursor. To set it to another row, press \textbf{[ALPHA], [$\bm{x^2}$]}, then enter a 2-digit hex number.
 
@@ -522,7 +522,7 @@ To change the current octave, press \textbf{[GRAPH]}, then enter a number betwee
 
 Like with note patterns, fx patterns are organized in two columns à 8 steps. Each step consists of four hex digits. The \emph{first digit} sets the drum sound to be used on that step. A value of 0 means no drum. Refer to the \hyperref[sec:drums]{following section} to learn more about drums in HT2.
 
-The \emph{second digit} sets the effect command. A value of 0 means no effect. Finally, the \emph{last two digits} set the effect parameters. Refer to the \nameref{sec:fx} to learn all about effects. 
+The \emph{second digit} sets the effect command. A value of 0 means no effect. Finally, the \emph{last two digits} set the effect parameters. Refer to the \nameref{sec:fx} to learn all about effects.
 
 
 \subsubsection{Drums}
@@ -555,10 +555,10 @@ The user drum pointer can be set to any value between 0x0000 and 0xFFFF. However
 
 The data is in 1-bit PWM format, meaning each byte denotes a phase length. Think of it as the amount of time taken until the beeper output will toggle again. The values are inverse, ie. a lower value denotes a longer phase. Yes, it's a bit confusing... As an example, this is what drum sample 1 (the kick drum) looks like:
 \begin{verbatim}
-0x80, 0x80, 0x70, 0x70, 0x60, 0x60, 0x50, 0x50, 0x40, 0x40, 
-0x40, 0x30, 0x30, 0x30, 0x30, 0x20, 0x20, 0x20, 0x20, 0x20, 
-0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x8, 0x8, 0x8, 0x8, 0x8, 
-0x8, 0x8, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x2, 0x2, 
+0x80, 0x80, 0x70, 0x70, 0x60, 0x60, 0x50, 0x50, 0x40, 0x40,
+0x40, 0x30, 0x30, 0x30, 0x30, 0x20, 0x20, 0x20, 0x20, 0x20,
+0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x8, 0x8, 0x8, 0x8, 0x8,
+0x8, 0x8, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x4, 0x2, 0x2,
 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x0
 \end{verbatim}
 
@@ -845,7 +845,7 @@ where \emph{[model]} is one of ti82, ti83, or ti83p, and \emph{[build]} is the p
 Optionally, you can rebuild the note table before running the build script. In order to do so, run the tablegen.sh shell script. This will allow you to change HT2's base tuning.
 \fi
 
-\paragraph{Building by Hand} The following steps are required to build HT2 by hand: 
+\paragraph{Building by Hand} The following steps are required to build HT2 by hand:
 
 1. Assemble the sources with the following command:
 
@@ -1008,7 +1008,7 @@ Alternatively, you could use the official \href{https://education.ti.com/en/us/p
 \end{easylist}
 Try to send some program from your TI (in link mode), TILP should automatically ask you to save the file somewhere, which means linking finally works ;)
 
-Thanks to jankenpopp for coming up with the solution to this problem. 
+Thanks to jankenpopp for coming up with the solution to this problem.
 
 \section{TI-Connect won't let me transfer files to my TI82.}
 \paragraph{Are you using a SilverLink USB cable?} Sorry, that won't work with TI-Connect and TI82
@@ -1020,13 +1020,24 @@ Thanks to jankenpopp for coming up with the solution to this problem.
 & dump a TI82 backup file (.82b) from the emulator
 \end{easylist}
 
-You can now upload the .82b file you created to your real TI82, using TI-Connect. 
+You can now upload the .82b file you created to your real TI82, using TI-Connect.
 
 \section{I cleared the RAM on my TI-8x Plus, but there is still not enough space to install HT2.}
 Try deleting some of your APPS. While APPS themselves are stored in Flash memory, some information on them is stored in RAM, taking up space needed by HT2.
 
 \section{I tried everything, but it just won't work. Help!} Head over to the \href{http://randomflux.info/1bit}{1-bit Forum} and ask there. We're a friendly bunch.
 
+\section{The volume is very low when using headphones.}
+This is expected, and cannot be changed unfortunately. There are a number of options for dealing with this:
+
+\begin{easylist}[enumerate]
+  & Use active (ie. self-amplifying) headphones.
+  & Build yourself an Invert-A-Bit headphone amplifier. Gerber and Fritzing files are can be found in the docs directory of the HoustonTracker2 github repository. Thanks to \href{http://www.snorkeldata.com}{Salkinitzor} for the design.
+\end{easylist}
+
+\includegraphics[width=0.33\textwidth]{invertabit1}
+\includegraphics[width=0.33\textwidth]{invertabit2}
+\includegraphics[width=0.185\textwidth]{invertabit3}
 
 \end{appendices}
 \end{document}
