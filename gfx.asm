@@ -181,8 +181,7 @@ printFxScrNoInit			;init point when cycling through patterns
 	
 	call printFXP
 	
-	ld de,#268e
-	call setXY
+	setXYat #26, #8e
 	
 	call printFXP
 	

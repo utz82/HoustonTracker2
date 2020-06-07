@@ -597,8 +597,7 @@ kfleft
 	or a
 	jr z,_noalpha
 					;if Alpha is on, cycle through patterns
-	ld de,#2382			;TODO: optimize | set printing pos
-	call setXY
+	setXYat #23, #82		;TODO: optimize | set printing pos
 	
 	ld a,(CPtn)			;increment "current pattern" value
 	dec a
@@ -1141,8 +1140,7 @@ setUsrDrumHi
 	
 ; setUsrDrumLo					;TODO: dead code?
 ; 	ld hl,usrDrum
-; 	ld de,#2ba6
-; 	call setXY
+; 	setXYat #2b, a6
 ; 	jp kSetBFull
 
 kzoom
