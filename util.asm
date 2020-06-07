@@ -18,24 +18,20 @@ calcPtnOffset					;calculate offsets in note data
 confirmAction					;wait for confirmation/abortion of user action
 						;IN: nothing | OUT: carry reset if confirmed, else abort
 
-	ld de,#29b8				;print CONF message
-	call setXY
-	ld de,#0c00				;CO
-	call printDE
-	ld de,#2ab8
-	call setXY
-	ld de,#110f				;NF
-	call printDE
+	setXYat #29, #b8			;print CONF message
+	printTwoChars CHAR_C, CHAR_O		;CO
+	setXYat #2a, #b8
+	printTwoChars CHAR_N, CHAR_F		;NF
 
 _rdkeys
-	ld a,#ef				;read key 0
+	ld a,KBD_GROUP_ZERO			;read key 0
 	out (kbd),a
 	key_delay
 	in a,(kbd)
 	rra
 	jp nc,_cancel				;if pressed, cancel user action
 
-	ld a,#f7				;read key .
+	ld a,KBD_GROUP_DOT			;read key .
 	out (kbd),a
 	key_delay
 	in a,(kbd)
@@ -50,16 +46,13 @@ _confirm					;if user action confirmed, carry is already reset
 _exitc
 clrMsgArea					;clear message area
 	push af					;preserve flags
-	ld de,#29b2				;delete CONF message and rest of msg area
-	call setXY
+	setXYat #29, #b2			;delete CONF message and rest of msg area
 	call clearPrintBuf
 	call printBuf
 	call printBuf
-	ld de,#2ab8
-	call setXY
+	setXYat #2a, #b8
 	call printBuf
-	ld de,#2bb2
-	call setXY
+	setXYat #2b, #b2
 	call printBuf
 
 	pop af
@@ -194,7 +187,7 @@ _notfree
 	ret					;return with Z set if all values have been checked
 	
 
-findNextUnusedFX					;find the next free fx pattern
+findNextUnusedFX				;find the next free fx pattern
 						;IN: first # to check in A | OUT: next unused in A, Z if no unsed patterns found
 	ld hl,ptns
 	ld bc,256*4

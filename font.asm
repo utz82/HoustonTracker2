@@ -5,6 +5,34 @@
 ;omitting V, can use STOre instead of SAVe.
 ;M doesn't need shifting move to back
 
+CHAR_0		equ #00
+CHAR_1		equ #01
+CHAR_2		equ #02
+CHAR_3		equ #03
+CHAR_4		equ #04
+CHAR_5		equ #05
+CHAR_6		equ #06
+CHAR_7		equ #07
+CHAR_8		equ #08
+CHAR_9		equ #09
+CHAR_A		equ #0a
+CHAR_B		equ #0b
+CHAR_C		equ #0c
+CHAR_D		equ #0d
+CHAR_E		equ #0e
+CHAR_F		equ #0f
+CHAR_L		equ #10
+CHAR_N		equ #11
+CHAR_P		equ #12
+CHAR_O		equ CHAR_0
+CHAR_S		equ #13
+CHAR_T		equ #14
+CHAR_SHARP	equ #15
+CHAR_DASH	equ #16
+CHAR_G		equ #17
+CHAR_M		equ #18
+CHAR_STOP	equ #19
+CHAR_PLAY	equ #1a
 
 	db %01001010		;0
 	db %10101010
