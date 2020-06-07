@@ -550,7 +550,7 @@ printPlayModeIndicator
 	ld d,CHAR_STOP			; <STOP> ...
 	jr z,_playerStopped
 	
-	ld d,CHAR_P			;... or P
+	ld d,CHAR_PLAY			;... or <PLAY>
 	
 _playerStopped
 	
