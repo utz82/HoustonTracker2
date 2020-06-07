@@ -13,15 +13,14 @@ errorHand0				;clear StateSelect (when entering from LOAD/SAVE)
 
 errorHand				;error handler
 					;IN: A - error code
-	ld d,#0e
+	ld d,CHAR_E
 	ld e,a
 printMsg				;print a message to the message area
 					;IN: DE - message	
 	push de				
 					
 	ex af,af'			;';TODO: preserving A for what?
-	ld de,#29b2
-	call setXY
+	setXYat #29, #b2
 	ex af,af'
 	
 	pop de
@@ -31,35 +30,33 @@ printMsg				;print a message to the message area
 	
 ;*******************************************************************************
 printMute12					;print Mute state ch1/2
-	ld de,#2a88
-	call setXY
+	setXYat #2a, #88
 	
 	ld de,#0102
 	ld a,(MuteState)
 	rra
 	jr nc,_skip
-	ld d,#16
+	ld d,CHAR_DASH
 _skip
 	rra
 	jr nc,_skip2
-	ld e,#16
+	ld e,CHAR_DASH
 _skip2
 	jp printDE
 	
 
 printMute3D					;print Mute state ch3/4
-	ld de,#2b88
-	call setXY
+	setXYat #2b, #88
 	
 	ld de,#030D
 	ld a,(MuteState)
 	rla
 	jr nc,_skip
-	ld e,#16
+	ld e,CHAR_DASH
 _skip
 	rla
 	jr nc,_skip2
-	ld d,#16
+	ld d,CHAR_DASH
 _skip2
 	jp printDE
 
@@ -146,14 +143,10 @@ printFxScr				;print an FX pattern screen
 	call printSingleLN
 
 _header					;printing ptn#/curr. octave info
-	ld de,#2182
-	call setXY
+	setXYat #21, #82
+	printTwoChars CHAR_P, CHAR_T	;PT(N)
 	
-	ld de,#1214			;PT(N)
-	call printDE
-	
-	ld de,#2382
-	call setXY
+	setXYat #23, #82
 	
 	call getSeqOffset		;find pattern#
 	
@@ -165,8 +158,7 @@ printFxScrNoInit			;init point when cycling through patterns
 					
 	call printChars			;print ptn#
 	
-	ld de,#218e
-	call setXY
+	setXYat #21, #8e
 
 	ld a,(CPtn)
 	ld hl,fxptntab
@@ -178,13 +170,11 @@ printFxScrNoInit			;init point when cycling through patterns
 
 	call printFXP
 	
-	ld de,#258e
-	call setXY
+	setXYat #25, #8e
 	
 	call printFXP
 	
-	ld de,#228e
-	call setXY
+	setXYat #22, #8e
 	
 	pop hl
 	inc hl
@@ -238,17 +228,11 @@ printPtnScr				;print a pattern screen
 	call printSingleLN
 	
 _header					;printing ptn#/curr. octave info
-	ld de,#2182
-	call setXY
+	setXYat #21, #82
+	printTwoChars CHAR_P, CHAR_T	;PT(N)
+	printTwoChars CHAR_O, CHAR_C	;OC(T)
 	
-	ld de,#1214			;PT(N)
-	call printDE
-	
-	ld de,#000c			;OC(T)
-	call printDE
-	
-	ld de,#2382
-	call setXY
+	setXYat #23, #82
 	
 	call getSeqOffset
 	
@@ -264,9 +248,7 @@ printPtnScrNoInit			;init point when cycling through patterns
 	call printCharL
 
 printPtnScrBasic			;init point when not reprinting ptn nr, octave etc.
-	ld de,#218e
-	call setXY
-	
+	setXYat #21, #8e
 
 	call findCurrPtn
 	
@@ -274,22 +256,19 @@ printPtnScrBasic			;init point when not reprinting ptn nr, octave etc.
 
 	call printNoteNames
 	ex de,hl
-	ld de,#258e
-	call setXY
+	setXYat #25, #8e
 	
 	ex de,hl
 	call printNoteNames
 
-	ld de,#228e
-	call setXY
+	setXYat #22, #8e
 
 	pop de				;retrieve pattern pointer
 		
 	call printOctaves
 	
 	push de
-	ld de,#268e
-	call setXY
+	setXYat #26, #8e
 	
 	pop de
 	call printOctaves
@@ -315,7 +294,7 @@ _lp
 	push bc				;preserve counter
 	or a
 	jr nz,_skip2			;if note val = 0
-	ld a,#16			;print a dash
+	ld a,CHAR_DASH			;print a dash
 	jr _skip3
 _skip2
 	call divNoteVal			;octave val returned in B
@@ -344,7 +323,7 @@ _lp
 	push bc
 	or a
 	jr nz,_skip2			;if note val = 0
-	ld d,#16			;load dashes into DE
+	ld d,CHAR_DASH			;load dashes into DE
 	ld e,d
 	jr _skip3
 _skip2
@@ -373,17 +352,14 @@ _skip3
 
 
 printSingleLN				;print single digit line numbers
-
-	ld de,#208e
-	call setXY
+	setXYat #20, #8e
 
 	xor a				;starting with line 0
 	ld b,8
 	
 	call printSingleLP		;print the first column
 	
-	ld de,#248e
-	call setXY
+	setXYat #24, #8e
 	
 	ld a,8				;starting with 8, print 2nd column
 	ld b,a
@@ -417,8 +393,7 @@ printSeqScr				;print the sequence (main) screen
 
 printSeqScr0
 printLineNumbers			;print line numbers on main screen	
-	ld de,#2082
-	call setXY
+	setXYat #20, #82
 	
 	ld b,10				;10 lines to print	
 	ld a,(FirstLineMS)		;load first line number
@@ -433,8 +408,7 @@ _plnlp
 	djnz _plnlp
 	
 printPtnSequence
-	ld de,#2182			;ch1
-	call setXY
+	setXYat #21, #82		;ch1
 	
 	ld hl,ptns			;point HL to start of ptn sequence
 	ld a,(FirstLineMS)		;get first row to be printed
@@ -447,29 +421,24 @@ printPtnSequence
 	
 	ld c,10				;printing 10 rows for each column
 	call printSeqColR		;print upper nibbles
-	ld de,#2282
-	call setXY
+	setXYat #22, #82
 	call printSeqColL		;print lower nibbles
 	
-	ld de,#2382			;ch2
-	call setXY
+	setXYat #23, #82		;ch2
 
 	inc hl				;increment to point to next channel
 	push hl				;preserve seq. pointer (printSeqCol doesn't do this for speed reasons)
 	call printSeqCol
 	
-	ld de,#2482			;ch3
-	call setXY
+	setXYat #24, #82		;ch3
 	pop hl
 	
 	inc hl
 	call printSeqColR
-	ld de,#2582			;ch2
-	call setXY
+	setXYat #25, #82
 	call printSeqColL
 	
-	ld de,#2682			;fx-ch
-	call setXY
+	setXYat #26, #82		;fx-ch
 
 	inc hl
 	call printSeqCol
@@ -534,9 +503,9 @@ printCharR
 	call clearPrintBuf		;clear print buffer
 	ex af,af'			;retrieve byte to be printed
 	call hex2charU			;convert upper nibble
-	ld c,1				;init registers for setting up the print buffer (c=number of digits to print, b'=#83 signals shifted char)
+	ld c,1				;init registers for setting up the print buffer (c=number of digits to print, b'=shifted char offset)
 	exx
-	ld b,#8a
+	ld b,charNumTotal*5		;point to right-shifted start
 	call setupPB1char		;setup print buffer
 	jr printBuf			;and finally print what's in the buffer
 
@@ -575,15 +544,14 @@ printBuf
 	
 ;*******************************************************************************	
 printPlayModeIndicator
-	ld de,#2988
-	call setXY
+	setXYat #29, #88
 	
 	ld a,(PlayerFlag)
 	or a
-	ld d,#19			;"P"
+	ld d,CHAR_STOP			; <STOP> ...
 	jr z,_playerStopped
 	
-	ld d,#12
+	ld d,CHAR_PLAY			;... or <PLAY>
 	
 _playerStopped
 	
@@ -591,7 +559,7 @@ _playerStopped
 	or a
 	jr z,_noSynthMode
 	
-	ld e,#13
+	ld e,CHAR_S
 	jp printDE
 	
 _noSynthMode
@@ -602,11 +570,10 @@ _noSynthMode
 ;*******************************************************************************	
 printSaveSlotIndicator			;enter with A = slot number
 	ex af,af'
-	ld de,#2bac
-	call setXY
+	setXYat #2b, #ac
 	
 	ex af,af'
-	ld d,#13			;"S"
+	ld d,CHAR_S			;"S"
 	ld e,a
 	jp printDE
 	
@@ -633,9 +600,9 @@ setupPrintBuf				;set up print buffer with 5-byte bitmap (2 chars)
 	ld b,0
 	
 setupPB1char				;init point for printing 1 char
-					;char in A, B' = 0 (left) or #83 (right), C=1, print buffer must be cleared manually
+					;char in A, B' = 0 (left) or offset to right, C=1, print buffer must be cleared manually
 
-	ld d,1 + (HIGH(apd_buf))	;point to font bitmaps	
+	ld d,HIGH(FontLUT)		;point to font bitmaps
 _spblp
 	ld hl,ops			;print buffer resides in (ops)
 
@@ -660,7 +627,7 @@ _getbitslp				;get 5 byte-length bitmaps
 	
 	ld a,e				;otherwise, get second char
 	exx
-	ld b,#8a			;prep b with offset for shifted chars
+	ld b,charNumTotal*5		;prep b with offset for right-shifted chars
 	jr nz,_spblp			;JR NZ??? It's always NZ at this point.
 
 ;************************************************************************************

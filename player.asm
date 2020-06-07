@@ -1015,7 +1015,7 @@ ENDIF
 	ld a,#c9			;modify fxcont to contain a RET
 	ld (fxcont),a
 	
-	ld a,(de)			;read fx #
+	ld a,(de)				;read fx #
 	and #f				;mask out drum value
 	inc de				;inc fx pointer
 	call nz,fxextselect		;execute fx command

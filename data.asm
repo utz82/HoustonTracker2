@@ -28,24 +28,24 @@ htlogo					;the HT2 logo
 	
 varmsgs					;global var names (right side of screen)
 
-	db #10,#12			;LP
-	db #13,#12			;SP(D)
-	db #b,#13			;CS
-	db #b,#e			;CE
+	db CHAR_L,CHAR_P		;LP
+	db CHAR_S,CHAR_P		;SP(D)
+	db CHAR_B,CHAR_S		;BS
+	db CHAR_B,CHAR_E		;BE
 
 notenames
-	db #c,#16			;c
-	db #c,#15			;c#
-	db #d,#16			;d
-	db #d,#15			;d#
-	db #e,#16			;e
-	db #f,#16			;f
-	db #f,#15			;f#
-	db #17,#16			;g
-	db #17,#15			;g#
-	db #0a,#16			;a
-	db #0a,#15			;a#
-	db #0b,#16			;b
+	db CHAR_C,CHAR_DASH		;c
+	db CHAR_C,CHAR_SHARP		;c#
+	db CHAR_D,CHAR_DASH		;d
+	db CHAR_D,CHAR_SHARP		;d#
+	db CHAR_E,CHAR_DASH		;e
+	db CHAR_F,CHAR_DASH		;f
+	db CHAR_F,CHAR_SHARP		;f#
+	db CHAR_G,CHAR_DASH		;g
+	db CHAR_G,CHAR_SHARP		;g#
+	db CHAR_A,CHAR_DASH		;a
+	db CHAR_A,CHAR_SHARP		;a#
+	db CHAR_B,CHAR_DASH		;b
 	
 
 

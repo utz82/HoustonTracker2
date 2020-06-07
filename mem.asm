@@ -13,7 +13,7 @@ _skip
 ;************************************************************************************
 delSlot					;delete a save slot
 
-	ld de,#0d13			;print "DS" message
+	ld_de_TwoChars CHAR_D, CHAR_S	;print "DS" message
 	call printMsg	
 	call stateSelect
 	call confirmAction
@@ -122,7 +122,7 @@ _oldSP equ $+1				;restore stack pointer
 
 ;************************************************************************************
 zap					;delete song currently loaded in work area
-	ld hl,#10				;clear speed, usr drum, lp
+	ld hl,#10			;clear speed, usr drum, lp
 	ld (musicData),hl
 	ld l,0
 	ld (musicData+2),hl
@@ -501,8 +501,8 @@ load					;load a song from a backup savestate.
 	jp errorHand0
 	
 _ldstart
-; 	ld hl,ptns			;initialize sequence with #ff bytes			;this is all unnecessary since we zap before
-; 	ld de,ptns+1
+; 	ld hl,ptns			;initialize sequence with #ff bytes
+; 	ld de,ptns+1			;this is all unnecessary since we zap before
 ; 	ld bc,1025
 ; 	ld a,#ff
 ; 	ld (hl),a
