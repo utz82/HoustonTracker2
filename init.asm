@@ -248,7 +248,7 @@ unpackFont				;unpack the font
 	ld de,FontLUT			;unpacked font will be created in APD_BUF (TI82 at #8300)
 	push de				;preserve pointer to unpacked font
 	
-	ld b,#45			;unpacking 70 char bytes
+	ld b,cmprFontSize		;unpacking all the font bytes
 	or a				;clear carry
 	
 unpackFontLP
@@ -266,24 +266,22 @@ unpackFontLP
 	inc hl
 	djnz unpackFontLP
 		
-	dec de				;last unpacked byte is irrelevant and can be overwritten
+	dec de				;when uneven amount of chars, last unpacked byte is irrelevant and can be overwritten. TODO: Use IF/ENDIF
 	pop hl				;retrieve pointer to unpacked font
 	
-					;create shifted chars
+					;create right-shifted chars from unpacked font
 	
-	ld b,#76			;shifting #78 bytes (last 3 aren't needed) - TODO: need to exclude more chars from shifting so we don't cross page
-					;ATTN! temporary skip last 2 bytes
+	ld b,charNumShifted*5		;amount of chars to shift, use only the necessary ones
 	or a				;clear carry
-	;ld de,#81+256*((HIGH(apd_buf))+1)
 	
 shiftFontLP
-	inc de				;de already points to end of unshifted chars
 	ld a,(hl)			;load unshifted pixel row
 	rra				;shift right 4 pixels
 	rra
 	rra
 	rra
 	ld (de),a			;save unpacked byte
+	inc de
 	inc hl
 	djnz shiftFontLP
 

@@ -502,9 +502,9 @@ printCharR
 	call clearPrintBuf		;clear print buffer
 	ex af,af'			;retrieve byte to be printed
 	call hex2charU			;convert upper nibble
-	ld c,1				;init registers for setting up the print buffer (c=number of digits to print, b'=#83 signals shifted char)
+	ld c,1				;init registers for setting up the print buffer (c=number of digits to print, b'=shifted char offset)
 	exx
-	ld b,#8a
+	ld b,charNumTotal*5		;point to right-shifted start
 	call setupPB1char		;setup print buffer
 	jr printBuf			;and finally print what's in the buffer
 
@@ -599,7 +599,7 @@ setupPrintBuf				;set up print buffer with 5-byte bitmap (2 chars)
 	ld b,0
 	
 setupPB1char				;init point for printing 1 char
-					;char in A, B' = 0 (left) or #83 (right), C=1, print buffer must be cleared manually
+					;char in A, B' = 0 (left) or offset to right, C=1, print buffer must be cleared manually
 
 	ld d,HIGH(FontLUT)		;point to font bitmaps
 _spblp
@@ -626,7 +626,7 @@ _getbitslp				;get 5 byte-length bitmaps
 	
 	ld a,e				;otherwise, get second char
 	exx
-	ld b,#8a			;prep b with offset for shifted chars
+	ld b,charNumTotal*5		;prep b with offset for right-shifted chars
 	jr nz,_spblp			;JR NZ??? It's always NZ at this point.
 
 ;************************************************************************************
