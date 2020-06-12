@@ -32,7 +32,7 @@ CurVal		equ apd_buf+#12		;1	current cursor bitmap value (#0f, #f0, or #ff)
 
 MuteState	equ apd_buf+#13		;1	mute state of channels (bit 7 = drums, bit 6 = ch3, bit 1 = ch2, bit 0 = ch1)
 
-InputType	equ apd_buf+#14		;1	input type (0=regular, 1=single digit, 2=double digit, 4=word)
+InputType	equ apd_buf+#14		;1	input type (0=regular, 1=single digit, 2=double digit, 4=word, 6=low nibble)
 
 StateSelect	equ apd_buf+#15		;1	number of the currently selected save slot
 
@@ -50,7 +50,7 @@ SynthMode	equ apd_buf+#20		;1	Synth mode (0 = off, #ff = on).
 
 PrintBuf	equ ops			;6	print bitmap buffer
 
-;FontLUT	equ 256*((HIGH(apd_buf))+1)	;font LUT
+FontLUT		equ 256*((HIGH(apd_buf))+1)	;font LUT
 
 NoteTab		equ 256*((HIGH(apd_buf))+2)	;note LUT
 
@@ -69,3 +69,39 @@ ENDIF
 ptntab		equ 256*((HIGH(graph_mem))+2)	;pattern table
 
 fxptntab	equ text_mem2
+
+
+;************************************************************************************
+;HW Constants
+;************************************************************************************
+
+; Used by kbd port
+KBD_GROUP_DIRPAD	equ #fe
+KBD_GROUP_ENTER		equ #fd
+KBD_GROUP_MINUS		equ #fb
+KBD_GROUP_DOT		equ #f7
+KBD_GROUP_ZERO		equ #ef
+KBD_GROUP_ALPHA		equ #df
+KBD_GROUP_GRAPH		equ #bf
+
+;************************************************************************************
+;Macros
+;************************************************************************************
+
+
+; Set printing cursor at X, Y. DE is destroyed
+MACRO setXYat, X, Y
+	ld de,256*X+Y
+	call setXY
+ENDM
+
+; Prepares DE with a two-byte string. DE is destroyed
+MACRO ld_de_TwoChars, firstChar, secondChar
+	ld de,256*firstChar+secondChar
+ENDM
+
+; Print a two-byte string. DE is destroyed
+MACRO printTwoChars, firstChar, secondChar
+	ld_de_TwoChars firstChar, secondChar
+	call printDE
+ENDM

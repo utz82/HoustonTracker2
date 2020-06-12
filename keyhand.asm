@@ -20,8 +20,7 @@ _wait
 	xor a
 	ld (AlphaFlag),a
 	
-	ld de,#2888
-	call setXY
+	setXYat #28, #88
 	call clearPrintBuf		;clear print buffer
 	call printBuf			;remove Alpha mode marker from screen
 	;ld b,0				;unnecessary, printBuf returns with b=0 anyway
@@ -45,7 +44,7 @@ ENDIF
 	
 ;*******************************************************************************
 inputSlotNr
-	ld a,#ef
+	ld a,KBD_GROUP_ZERO
 	out (kbd),a
 	key_delay
 	in a,(kbd)
@@ -58,7 +57,7 @@ inputSlotNr
 	rra
 	jr nc,ik7
 
-	ld a,#f7
+	ld a,KBD_GROUP_DOT
 	out (kbd),a
 	key_delay
 	in a,(kbd)
@@ -68,7 +67,7 @@ inputSlotNr
 	rra
 	jr nc,ik5
 
-	ld a,#fb				;group (-)/3/6/9/)/G/VARS
+	ld a,KBD_GROUP_MINUS		;group (-)/3/6/9/)/G/VARS
 	out (kbd),a
 	key_delay
 	in a,(kbd)
@@ -105,15 +104,14 @@ ik7
 
 
 kSlotSelect				;print state selection, and update it
-	ld de,#2bb2
-	call setXY
+	setXYat #2b, #b2
 	
 	ld a,b
 	
 	ld (StateSelect),a		;store selected state
 	
 	jr reprint
-	;call printCharL			;reprint current 
+	;call printCharL		;reprint current
 	
 	;xor a
 	;ld (InputType),a		;reset input type
@@ -126,8 +124,7 @@ kSlotSelect				;print state selection, and update it
 
 inputSingle				;aka set current octave
 	
-	ld de,#2388
-	call setXY
+	setXYat #23, #88
 	
 	ld a,b
 	cp 7				;check if input digit is in range 0..6
@@ -206,8 +203,7 @@ wordSwitch equ $+1
 
 	call waitForKeyRelease
 	ld hl,usrDrum
-	ld de,#2ba6
-	call setXY
+	setXYat #2b, #a6
 	jp kSetBFull	
 	
 
@@ -445,15 +441,14 @@ reprintDash				;print dashes if new note byte = 0
 	call setPrintPos
 	push de
 	
-	ld de,#1616
-	call printDE
+	printTwoChars CHAR_DASH, CHAR_DASH
 	
 	pop de
 	inc d
 	call setXY
 	
 	call clearPrintBuf
-	ld a,#16
+	ld a,CHAR_DASH
 	call printCharLNC
 	
 	jr skipRP
@@ -602,8 +597,7 @@ kfleft
 	or a
 	jr z,_noalpha
 					;if Alpha is on, cycle through patterns
-	ld de,#2382			;TODO: optimize | set printing pos
-	call setXY
+	setXYat #23, #82		;TODO: optimize | set printing pos
 	
 	ld a,(CPtn)			;increment "current pattern" value
 	dec a
@@ -625,8 +619,7 @@ kfright
 	or a
 	jr z,_noalpha
 					;if Alpha is on, cycle through patterns
-	ld de,#2382			;TODO: optimize | set printing pos
-	call setXY
+	setXYat #23, #82		;TODO: optimize | set printing pos
 	
 	ld a,(CPtn)			;increment "current pattern" value
 	inc a
@@ -680,8 +673,7 @@ kpleft
 	or a
 	jr z,_noalpha
 					;if Alpha is on, cycle through patterns
-	ld de,#2382			;TODO: optimize | set printing pos
-	call setXY
+	setXYat #23, #82		;TODO: optimize | set printing pos
 	
 	ld a,(CPtn)			;increment "current pattern" value
 	dec a
@@ -704,8 +696,7 @@ kpright
 	or a
 	jr z,_noalpha
 					;if Alpha is on, cycle through patterns
-	ld de,#2382			;TODO: optimize | set printing pos
-	call setXY
+	setXYat #23, #82		;TODO: optimize | set printing pos
 	
 	ld a,(CPtn)			;increment "current pattern" value
 	inc a
@@ -875,7 +866,7 @@ kdirswitch equ $+1				;switch for changing the response to keypress according to
 ;************************************************************************************
 keyhand						;the main keyhandler
 
-	ld a,#fe				;group dirpad
+	ld a,KBD_GROUP_DIRPAD			;group dirpad
 	out (kbd),a
 IF MODEL != TI82
 	nop
@@ -887,7 +878,7 @@ ENDIF
 	cp e
 	jr nz,kdir
 
-	ld a,#fd				;group ENTER/+/-/*/div/CLEAR
+	ld a,KBD_GROUP_ENTER			;group ENTER/+/-/*/div/^/CLEAR
 	out (kbd),a
 	;nop
 	;nop
@@ -908,7 +899,7 @@ ENDIF
 	rra
 	jp nc,kclear				;CLEAR
 
-	ld a,#fb				;group (-)/3/6/9/)/G/VARS
+	ld a,KBD_GROUP_MINUS			;group (-)/3/6/9/)/G/VARS
 	out (kbd),a
 	;nop
 	;nop
@@ -929,7 +920,7 @@ ENDIF
 	rra
 	jp nc,kvars	
 	
-	ld a,#f7
+	ld a,KBD_GROUP_DOT			;group ./2/5/8/(/COS/PRGM/STAT
 	out (kbd),a
 	;nop
 	;nop
@@ -952,7 +943,7 @@ ENDIF
 	rra
 	jp nc,kstat
 	
-	ld a,#ef
+	ld a,KBD_GROUP_ZERO			;group 0/1/4/7/'/SIN/APPS/XTθn
 	out (kbd),a
 	;nop
 	;nop
@@ -975,7 +966,7 @@ ENDIF
 	rra
 	jp nc,kxto
 	
-	ld a,#df
+	ld a,KBD_GROUP_ALPHA			;group ALPHA/MATH/X-1/X2/LOG/LN/STO
 	out (kbd),a
 	;nop
 	;nop
@@ -996,7 +987,7 @@ ENDIF
 	rla
 	jr nc,ksto
 	
-	ld a,#bf
+	ld a,KBD_GROUP_GRAPH			;group GRAPH/TRACE/ZOOM/WINDOW/Y=/2nd/MODE/DEL
 	out (kbd),a
 	;nop
 	;nop
@@ -1031,8 +1022,7 @@ ENDIF
 
 ;************************************************************************************
 kalpha
-	ld de,#2888
-	call setXY
+	setXYat #28, #88
 
 	ld a,(AlphaFlag)	
 	xor #a0
@@ -1125,8 +1115,7 @@ kgraph						;set current Octave
 	ld a,1
 	ld (InputType),a
 	
-	ld de,#2388
-	call setXY
+	setXYat #23, #88
 	call clearPrintBuf
 	call printBuf
 	
@@ -1139,22 +1128,19 @@ ktrace
 	jr nz,setUsrDrumHi
 	
 	ld hl,speed
-	ld de,#2b94
-	call setXY
+	setXYat #2b, #94
 	jp kSetBFull
 
 setUsrDrumHi
 	ld hl,usrDrum+1
-	ld de,#2aa6
-	call setXY
+	setXYat #2a, #a6
 	ld a,4
 	jp kSetBFull+2
 	;jp kSetBFull
 	
 ; setUsrDrumLo					;TODO: dead code?
 ; 	ld hl,usrDrum
-; 	ld de,#2ba6
-; 	call setXY
+; 	setXYat #2b, a6
 ; 	jp kSetBFull
 
 kzoom
@@ -1174,7 +1160,7 @@ kwindow						;delete save slot / clear current tune
 	;jp nz,delSlot				;if Alpha mode is active, delete save slot
 						;else, clear current tune
 _zap	
-	ld de,#0c0a				;print "CA" message
+	ld_de_TwoChars CHAR_C, CHAR_A		;print "CA" message
 	call printMsg
 	call confirmAction
 	jp c,exitthis
@@ -1188,12 +1174,12 @@ kyeq						;load
 	ld a,(PlayerFlag)			;check if player is running - actually unnecessary, should be save to save while player is running
 	or a
 	ret nz					;if it is, ignore command
-	ld de,#100d				;LD message
+	ld_de_TwoChars CHAR_L, CHAR_D		;LD message
 	ld a,(AlphaFlag)
 	ld iyh,a
 	or a
 	jr z,_skip
-	ld de,#130a				;SA message
+	ld_de_TwoChars CHAR_S, CHAR_A		;SA message
 _skip	
 	call printMsg
 	call stateSelect
@@ -1234,8 +1220,7 @@ kmode						;switch AutoInc/RowPlay mode
 	or a
 	jr nz,_toggleRP
 	
-	ld de,#29ac
-	call setXY
+	setXYat #29, #ac
 	
 	ld a,(AutoInc)
 	xor 1
@@ -1243,15 +1228,14 @@ kmode						;switch AutoInc/RowPlay mode
 	
 	xor 1
 	ld e,a
-	ld d,#a
+	ld d,CHAR_A
 	
 	call printDE
 	
 	jp waitForKeyRelease
 
 _toggleRP
-	ld de,#2aac
-	call setXY
+	setXYat #2a, #ac
 	
 	ld a,(RowPlay)
 	cpl
@@ -1260,7 +1244,7 @@ _toggleRP
 	or a
 	jr z,_skipx
 	call clearPrintBuf
-	ld a,#12
+	ld a,CHAR_P
 	call printCharLNC	
 	jp waitForKeyRelease
 	

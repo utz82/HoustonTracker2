@@ -93,7 +93,7 @@ reinit
 generatePtnTabs					;generate pattern table and fx pattern table
 
 	ld (_restSP),sp				;save stack pointer
-	ld sp,0+(256*((HIGH(graph_mem))+3))
+	ld sp,256*((HIGH(ptntab))+1)
 	
 	ld de,#10
 	ld hl,ptn00+(#7f*#10)			;HL = address of pnt #7f
@@ -120,14 +120,14 @@ _restSP equ $+1
 ;************************************************************************************
 generateCounterLUT				;generate note counter value table
 
- 	ld hl,baseCounterLUT			;copy BaseCounterLUT to APD_BUF
- 	ld de,146+(256*((HIGH(apd_buf))+2))	;unpacked font will be created on 3rd page of APD_BUF
-						;length of LUT = 168 + 2 bytes (silence)
- 	ld bc,24
- 	ldir					;ok
+	ld hl,baseCounterLUT			;copy BaseCounterLUT to APD_BUF at [oct. 6]
+	ld de,NoteTab+(1+12*6)*2		;table will be created on 3rd page of APD_BUF. Each note counter is a word.
+						;length of LUT = silence (2 bytes) and then 7 octaves (168 bytes)
+	ld bc,2*12
+	ldir					;execute copy
 
-	ld hl,145+(256*((HIGH(apd_buf))+2))	;start reverse calculation of lower octaves at [oct. 6]-1, de already points to last byte of LUT
-	ld b,#48				;calculating 72 words
+	ld hl,NoteTab+(1+12*6)*2-1		;start reverse calculation of lower octaves at [oct. 6]-1, de already points to last byte of LUT
+	ld b,12*6				;calculating 6 octaves of notes
 	
 _lp
 	dec e					;decrement source pointer (it's initially 1 too high from previous ldir)
@@ -148,7 +148,7 @@ generateCsrLUT					;generate cursor position table
 						;LUT format: byte 1 = Horiz. + set bit 7 for #f0 cursor; byte 2 = vert.
 	ld c,10					;10 rows
 	ld a,#87				;first row vertical offset = #87
-	ld hl,1+(256*((HIGH(graph_mem))+1))	;start at 2nd page of graph_mem + 1
+	ld hl,CsrTab+1				;start at 2nd page of graph_mem + 1
 	
 _lpo						;generate vertical positions
 	ld b,8					;4*2 bytes per row
@@ -245,10 +245,10 @@ _lp
 ;************************************************************************************
 unpackFont				;unpack the font
 	ld hl,font
-	ld de,256*((HIGH(apd_buf))+1)	;unpacked font will be created in APD_BUF (TI82 at #8300)
+	ld de,FontLUT			;unpacked font will be created in APD_BUF (TI82 at #8300)
 	push de				;preserve pointer to unpacked font
 	
-	ld b,#45			;unpacking 70 char bytes
+	ld b,cmprFontSize		;unpacking all the font bytes
 	or a				;clear carry
 	
 unpackFontLP
@@ -266,24 +266,22 @@ unpackFontLP
 	inc hl
 	djnz unpackFontLP
 		
-	dec de				;last unpacked byte is irrelevant and can be overwritten
+	dec de				;when uneven amount of chars, last unpacked byte is irrelevant and can be overwritten. TODO: Use IF/ENDIF
 	pop hl				;retrieve pointer to unpacked font
 	
-					;create shifted chars
+					;create right-shifted chars from unpacked font
 	
-	ld b,#76			;shifting #78 bytes (last 3 aren't needed) - TODO: need to exclude more chars from shifting so we don't cross page
-					;ATTN! temporary skip last 2 bytes
+	ld b,charNumShifted*5		;amount of chars to shift, use only the necessary ones
 	or a				;clear carry
-	;ld de,#81+256*((HIGH(apd_buf))+1)
 	
 shiftFontLP
-	inc de				;de already points to end of unshifted chars
 	ld a,(hl)			;load unshifted pixel row
 	rra				;shift right 4 pixels
 	rra
 	rra
 	rra
-	ld (de),a
+	ld (de),a			;save unpacked byte
+	inc de
 	inc hl
 	djnz shiftFontLP
 
@@ -292,8 +290,7 @@ initSCR					;draw the basic screen layout
 	ld a,#f2			;modify setXY code to use longer wait lp
 	ld (setXYmod),a
 
-	ld de,#2080			;select column 0, row 0
-	call setXY			;set it
+	setXYat #20, #80		;select column 0, row 0
 	
 	ld a,7				;cursor direction right
 	out (lcd_crt),a
@@ -304,8 +301,7 @@ initSCR					;draw the basic screen layout
 	
 	call drawLoop			;draw a line on top of the screen
 	
-	ld de,#2981
-	call setXY
+	setXYat #29, #81
 	
 	ld a,5				;cursor direction down
 	out (lcd_crt),a
@@ -316,8 +312,7 @@ initSCR					;draw the basic screen layout
 	ld a,#ff
 	call drawLoop			;draw black block next to the logo
 	
-	ld de,#2881
-	call setXY
+	setXYat #28, #81
 	
 	ld b,c				;ld b,5
 	ld a,%00101111
@@ -328,15 +323,13 @@ _drawlp					;draw fancy block left of the black block
 	sra a
 	djnz _drawlp
 	
-	ld de,#2a81			;draw HT2 logo in the top right corner
-	call setXY
+	setXYat #2a, #81		;draw HT2 logo in the top right corner
 	
 	ld hl,htlogo
 	ld b,c				;ld b,5
 	call drawlp2
 	
-	ld de,#2b81
-	call setXY
+	setXYat #2b, #81
 	
 	ld b,c				;ld b,5
 	call drawlp2
@@ -347,8 +340,7 @@ _drawlp					;draw fancy block left of the black block
 
 printVarNames				;create global var names on the right side
 
-	ld de,#2aac			;reset RowPlay indicator
-	call setXY
+	setXYat #2a, #ac		;reset RowPlay indicator
 	call clearPrintBuf		;clear print buffer
 	call printBuf
 
@@ -374,14 +366,13 @@ _rdlp
 	inc hl
 	djnz _rdlp
 
-	ld a,#d				;print a "D" (as in usr Drum)
+	ld a,CHAR_D			;print a "D" (as in usr Drum)
 	call printCharL
 	
 	ld a,1
 	ld (AutoInc),a
 	
-	ld de,#0a00			;print AutoInc indicator
-	call printDE
+	printTwoChars CHAR_A, CHAR_0	;print AutoInc indicator
 	
 p123D					
 	ld a,#9f			;reset mute states
@@ -415,8 +406,7 @@ printVars				;print global var names
 	ld a,(usrDrum)			;print lo byte of usr drum pointer
 	call printChars
 	
-	ld de,#2aa6
-	call setXY
+	setXYat #2a, #a6
 	
 	ld a,(usrDrum+1)		;print hi byte of usr drum pointer
 	call printChars
