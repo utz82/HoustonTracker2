@@ -530,7 +530,7 @@ The \emph{second digit} sets the effect command. A value of 0 means no effect. F
 
 There are 15 different drums to chose from (0x1..0xF). Some of the drums use the TI-OS as sample data, so their sound may vary across different calculator models.
 
-Drums can be played in different modes, which affects the way they sound. Use command Cxx to change the drum mode, with xx = 0x00..0x4f. There are 80 different drum modes, though not all of them are particularly useful.
+Drums can be played in different modes, which affects the way they sound. Use command Dxx to change the drum mode, with xx = 0x00..0x4f. There are 80 different drum modes, though not all of them are particularly useful.
 
 Setting a non-zero value for the \emph{lower nibble} of the parameter causes the drum data to be manipulated in various ways. Refer to the appendix on \nameref{sec:synthtec} for details about this functionality.
 
@@ -539,11 +539,11 @@ The \emph{upper nibble} of the parameter defines the behaviour of the drum data 
 \begin{tabularx}{\textwidth}{p{0.1\textwidth} p{0.1\textwidth} X}
 \textbf{mode} & \textbf{cmd} & \textbf{effect} \\
 \hline
-0 & C00 & Increment pointer, ie. use the "standard" drum set. \\
-1 & C1x & Decrement pointer, ie. use the "alternative" drum set. Generally speaking, these drums are less useful than the standard set. Also, some drums will produce unpredictable results, namely drum 0, 1, C, and D. \\
-2 & C2x & Increment and loop pointer. Even less useful than mode 1, and suffers from the same problems. Also, this mode causes a slight global pitch shift. \\
-3 & C3x & Decrement and loop pointer. Like mode 2, with different sounds. \\
-4 & C4x & Don't move pointer. Instead of drums, in this mode triggering a drum will play a fixed, most likely out-of-tune frequency. This mode causes a slight global pitch shift. \\
+0 & D00 & Increment pointer, ie. use the "standard" drum set. \\
+1 & D1x & Decrement pointer, ie. use the "alternative" drum set. Generally speaking, these drums are less useful than the standard set. Also, some drums will produce unpredictable results, namely drum 0, 1, C, and D. \\
+2 & D2x & Increment and loop pointer. Even less useful than mode 1, and suffers from the same problems. Also, this mode causes a slight global pitch shift. \\
+3 & D3x & Decrement and loop pointer. Like mode 2, with different sounds. \\
+4 & D4x & Don't move pointer. Instead of drums, in this mode triggering a drum will play a fixed, most likely out-of-tune frequency. This mode causes a slight global pitch shift. \\
 \end{tabularx} ~\\
 
 Drum 0xE and 0xF are special cases.
@@ -553,7 +553,7 @@ The user drum pointer can be set to any value between 0x0000 and 0xFFFF. However
 
 0xE is the user defined sample. This feature is a bit quirky in use. In order to create a custom sample, go to FX pattern 0x20. Now, instead of entering the usual drum triggers, fx commands, and fx parameters, you enter your sample data. You can use more than one pattern, so after you've filled up FX pattern 0x20, go to 0x21.
 
-The data is in 1-bit PWM format, meaning each byte denotes a phase length. Think of it as the amount of time taken until the beeper output will toggle again. The values are inverse, ie. a lower value denotes a longer phase. Yes, it's a bit confusing... As an example, this is what drum sample 1 (the kick drum) looks like:
+The data is in 1-bit PWM format, where each byte corresponds to a division of a tick (a value of 5 means one tick divided by 5). Think of it as the amount of time taken until the beeper output will toggle again. The values are inverse, ie. a lower value denotes a longer phase.  As an example, this is what drum sample 1 (the kick drum) looks like:
 \begin{verbatim}
 0x80, 0x80, 0x70, 0x70, 0x60, 0x60, 0x50, 0x50, 0x40, 0x40,
 0x40, 0x30, 0x30, 0x30, 0x30, 0x20, 0x20, 0x20, 0x20, 0x20,
@@ -569,7 +569,7 @@ This will give you a waveform looking like this: \newline
 \begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
     {\textcolor{red}{\newline\Huge\danger}} & The last byte of the sample must be 0. \\
     \Huge{\textcolor{black}{\newline\PointingHand}} & Need help with the PWM sample format? Use jefftheworld's \href{https://github.com/JeffAlyanak/pcm2pwm/}{pcm2pwm} utility to generate PWM data from PCM WAV samples. \\
-    \Huge{\textcolor{black}{\newline\PointingHand}} & You can even define a second drum sample, which you can then trigger in drum mode C1x/C3x. This sample also starts at FX pattern 0x20, but needs to be written backwards, so the second byte of the sample is on the last position (FX parameter of the last row) of FX pattern 0x1F, third byte is just before that (drum/FX command of the last row), and so forth. \\
+    \Huge{\textcolor{black}{\newline\PointingHand}} & You can even define a second drum sample, which you can then trigger in drum mode D1x/D3x. This sample also starts at FX pattern 0x20, but needs to be written backwards, so the second byte of the sample is on the last position (FX parameter of the last row) of FX pattern 0x1F, third byte is just before that (drum/FX command of the last row), and so forth. \\
 \end{tabularx} ~\\
 
 \newpage
@@ -924,7 +924,7 @@ The threshold value determines the duty cycle ratio. When the threshold is 0x80,
 
 The 9xx effect (glitch channel 3) is achieved by constantly rotating the hi-byte of the base frequency value. Similarly, the A01 effect (noise/glitch channel 1) is achieved by rotating the hi-byte of the add counter. This may or may not generate enough pseudo-randomness to produce a noise-like effect, depending on the frequency base value.
 
-The D01 effect (duty cycle sweep) is achieved by incrementing the threshold value once every interlacing cycle. As it is an 8-bit value, it will wrap to 0 once it reaches 0xFF.
+The 58x effect (duty cycle sweep) is achieved by incrementing the threshold value once every interlacing cycle. As it is an 8-bit value, it will wrap to 0 once it reaches 0xFF.
 
 The pitch slides are achieved by adding a constant to the frequency base value once per interlacing cycle.
 
@@ -932,7 +932,7 @@ The pitch slides are achieved by adding a constant to the frequency base value o
 
 Drums 0x1, 0xC, and 0xD are hard-coded in RAM. The "user drum sample" (drum 0xE) is effectively a pointer to FX pattern 0x20. The "user drum pointer" (drum 0xF) is a simple user-definable pointer which can point to either RAM or ROM. All other drums point to ROM, which explains why they sound different depending on what calculator model is used.
 
-The "drum mode" effect (Cxx) will do two things. The upper nibble of the effect parameter determines the direction of the ROM/RAM pointer used to retrieve the counter values. If the upper nibble is 0, the pointer will move forward. If 1, it will move backward. If 2 or 3, only the lo-byte of the pointer will be in/decremented, which means the pointer stays on the same 256-byte memory page. If 4, the pointer will not be moved at all.
+The "drum mode" effect (Dxx) will do two things. The upper nibble of the effect parameter determines the direction of the ROM/RAM pointer used to retrieve the counter values. If the upper nibble is 0, the pointer will move forward. If 1, it will move backward. If 2 or 3, only the lo-byte of the pointer will be in/decremented, which means the pointer stays on the same 256-byte memory page. If 4, the pointer will not be moved at all.
 
 The lower nibble of the effect parameter will determine how the values are modified after they are read from memory. The manipulations are as follows: \newline
 
