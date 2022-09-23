@@ -3,7 +3,7 @@ By skate323k137 / AK-DJ
 
 In this folder you will find the Fritzing project files, and Gerber archive, for an updated version of the Invert-a-bit headphones amp for HoustonTracker2. Updates to the original design were to expand the board adding I/O jacks and power options.
 
-Updates were:
+Updates 2022 March:
 Added power switch ("Breadboard Compatible")
 Added 9V DC "Breadboard Compatible" Barrel connector, accepts a standard 9V center negative power supply, i.e. from most guitar pedals.
 Added solder terminals for optional 9V battery (DC Jack disconnects battery positive when inserted, so DC Jack power takes priority)
@@ -14,6 +14,15 @@ Original power terminals labelled TP1/TP2 can be used for a 2-wire voltmeter, wh
 
 If normal PCB Standoff feet are attached to the design there should be just enough room underneath for a 9V battery, but don't expect amazing life. Still, this design fits well within the width of a TI-83 so if you design an enclosoure it may serve well for some travel.
 
+Updates 2022 September:
+Rerouted traces
+Adjusted/increased trace sizes
+Fixed positioning of PCB Feet holes
+Fixed relevent silkscreens to be easier to read with headphones/power jacks installed.
+
+NOTE:
+
+The original design and gerbers from Snorkel can be found in the 'original' subdirectory with this document.
 The original note from Snorkel (who designed the real logic of this unit, and to whom I owe many thanks for his kindness) is below:
 
 --
