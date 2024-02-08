@@ -53,7 +53,7 @@ ops		equ	#8478		;66 bytes
 ;**********************************************************************************
 
 ;ramend					;24079 (documented, ti83+)
-mem_end		equ	#f900		;user memory end (excl. safety margin) In theory, up to ~FB00 would be possible
+mem_end		equ	#f800		;user memory end (excl. safety margin) In theory, up to ~FB00 would be possible
 
 ;**********************************************************************************
 ;rom_call macro
