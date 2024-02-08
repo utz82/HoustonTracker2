@@ -24,7 +24,7 @@
 \usepackage{marvosym}
 \newcommand*{\TakeFourierOrnament}[1]{{%
 \fontencoding{U}\fontfamily{futs}\selectfont\char#1}}
-\newcommand*{\danger}{\TakeFourierOrnament{66}}
+\newcommand*{\danger}{\TakeFourierOrnament{49}}
 
 
 \begin{document}
@@ -87,7 +87,7 @@ The following table gives an overview over which TI calculator models are suppor
   TI-82 Stats, Stats.fr	& all & Ion & ht2.83p & \textcolor{green}{supported} \\
   TI-82 Plus & all & DoorsCS & ht2(s).8xp & \textcolor{green}{supported} \\
   TI-83 (all versions) & all & Ion & ht2.83p & \textcolor{green}{supported} \\
-  TI-83 Plus (all versions) & all & DoorsCS & ht2(s).8xp & \textcolor{green}{supported} \\
+  TI-83 Plus (all versions) & \textgreater = 1.16 & DoorsCS & ht2(s).8xp & \textcolor{green}{supported} \\
   TI-84 Plus/Plus SE & all & DoorsCS & ht2(s).8xp & \textcolor{green}{supported} \\
   TI-84 Plus CSE/CE & \textendash & \textendash & \textendash & \textcolor{red}{not supported} \\
   TI-85, 86 & \textendash & \textendash & \textendash & \textcolor{red}{not supported} \\
@@ -163,21 +163,6 @@ All numbers in the HoustonTracker 2 user interface itself are hexadecimal, there
 \textbf{song sequence} & A matrix containing the order of patterns. Think of it as a storyboard, or the song's masterplan. \\
 \textbf{word} & A 16-bit value. Equivalent to two bytes, or four hexadecimal digits. \\
 \end{tabularx}
-
-% \begin{xtabular}{r p{0.8\textwidth}}
-% \textbf{bit} & This humble binary digit is at the core of HT2's inner workings. It can take a value of 0 (off) or 1 (on). \\
-% \textbf{byte} & Not related to chewing by any means, the byte is an 8-bit number. It can take any value from 0x00 (decimal 0) to 0xFF (255). \\
-% \textbf{duty cycle} & The relative amount of time each of the two half-periods of a square wave will consume. \\
-% \textbf{hi-byte} & The left two hexadecimal digits, aka most significant byte of a word. \\
-% \textbf{lo-byte} & The right two hexadecimal digits, aka least significant byte of a word. \\
-% \textbf{nibble} & A single hexadecimal digit. It consists of 4 bits, and can therefore take a value from 0x0 to 0xF (15). \\
-% \textbf{pattern} & A list of events that makes up a part of a tune. These can be notes, drum triggers, or effect commands. All patterns in HT2 are 16 steps long. \\
-% \textbf{pitch} &The (perceived) frequency of a tone. \\
-% \textbf{shell} &A program that facilitates the execution of machine language programs on your TI calculator, among other things. You'll need to install one in order to run HT2. \\
-% \textbf{song sequence} & A matrix containing the order of patterns. Think of it as a storyboard, or the song's masterplan. \\
-% \textbf{word} & A 16-bit value. Equivalent to two bytes, or four hexadecimal digits. \\
-% \end{xtabular}
-
 
 \chapter{Setup}
 \section{Requirements}
@@ -265,7 +250,8 @@ The following instructions assume that you have TiLP installed on your computer.
 \end{easylist} ~\\
 
 \begin{tabularx}{\textwidth}{m{0.075\textwidth} X}
-\textcolor{black}{\newline\Huge\PointingHand} & If you don't have enough free memory because you have a large number of archived apps, you can install ht2s.8xp instead. \\
+  \textcolor{black}{\newline\Huge\PointingHand} & If your TI83 Plus runs an OS older than 1.16, you must upgrade first. \\
+  \textcolor{black}{\newline\Huge\PointingHand} & If you don't have enough free memory because you have a large number of archived apps, you can install ht2s.8xp instead. \\
 \Huge\textcolor{black}{\newline\PointingHand} & For faster access, you can use TiLP in GUI-less mode. To do so, open a command prompt (cmd.exe on Win or any shell on *nix), and enter the following command: \newline
 
 \verb+tilp [calc-model] [cable-model] [filename]+ \newline
